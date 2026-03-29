@@ -21,11 +21,15 @@ Optional advanced helper:
 
 ## How To Use The Kit
 
-1. Copy the starter files from [`templates/agent-onboarding/`](/mnt/c/users/vatsa/agentinteractioncontrol/templates/agent-onboarding) into the app repo.
+1. Run `aic init [project-root]` in the app repo to scaffold `aic.project.json` and the recommended onboarding files.
 2. Keep `AGENTS.md` as the source of truth and keep the other wrappers short.
-3. Add or update `aic.project.json` for the app.
-4. Instrument critical flows with explicit `agent*` metadata.
+3. Instrument critical flows with explicit `agent*` metadata.
+4. Run `aic doctor [project-root]` to audit readiness before generating artifacts.
 5. Run `aic scan`, `aic generate project`, `aic inspect report.json`, and `aic validate ...` as part of review.
+
+Manual fallback:
+
+- Copy the starter files from [`templates/agent-onboarding/`](/mnt/c/users/vatsa/agentinteractioncontrol/templates/agent-onboarding) if you are not using the CLI scaffold path.
 
 ## What Agents Should Be Told
 
@@ -39,8 +43,9 @@ Optional advanced helper:
 
 ## Optional Validation
 
-`aic generate project <config-file> --out-dir <dir>` now records an `agent_onboarding` section in `report.json`.
+`aic doctor [project-root]` is the primary readiness audit, and `aic generate project <config-file> --out-dir <dir>` still records an `agent_onboarding` section in `report.json`.
 
 - Missing recommended files are warnings only.
 - Template-managed files can be marked stale if their embedded template version falls behind.
 - Hand-written files without a template marker still count as present.
+- `aic doctor` returns non-zero only for blocking errors such as missing/invalid config, unreadable project roots, unsupported frameworks, or invalid generated manifests.

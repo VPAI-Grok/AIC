@@ -12,7 +12,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - offline bootstrap from saved captures with reviewed outputs
 - reference consumer proof showing external resolution by contract instead of selector-first fallbacks
 - explicit `@aic/*/client` entrypoints for Next/RSC-aware consumption of React-facing packages
-- coding-agent onboarding templates and report warnings for app repos adopting AIC
+- coding-agent onboarding templates plus `aic init` and `aic doctor` for app repos adopting AIC
 
 ## Not Guaranteed Yet
 
@@ -91,7 +91,9 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 
 - The canonical coding-agent instructions for this repo live in [AGENTS.md](/mnt/c/users/vatsa/agentinteractioncontrol/AGENTS.md).
 - Tool-specific wrappers live in [CLAUDE.md](/mnt/c/users/vatsa/agentinteractioncontrol/CLAUDE.md), [GEMINI.md](/mnt/c/users/vatsa/agentinteractioncontrol/GEMINI.md), [.github/copilot-instructions.md](/mnt/c/users/vatsa/agentinteractioncontrol/.github/copilot-instructions.md), and [.cursor/rules/aic.mdc](/mnt/c/users/vatsa/agentinteractioncontrol/.cursor/rules/aic.mdc).
-- Copy-ready starter files for app teams live under [templates/agent-onboarding](/mnt/c/users/vatsa/agentinteractioncontrol/templates/agent-onboarding).
+- Run `aic init [project-root]` to scaffold `aic.project.json` plus the recommended onboarding files into an app repo.
+- Run `aic doctor [project-root]` to audit config presence, onboarding files, scan coverage, diagnostics, and generated-manifest validity without mutating source files.
+- Copy-ready starter files still live under [templates/agent-onboarding](/mnt/c/users/vatsa/agentinteractioncontrol/templates/agent-onboarding) for manual or external-tool use.
 - `aic generate project ... --out-dir ...` now records optional onboarding warnings in `report.json` when the recommended repo-level agent files are missing or stale.
 
 ## Key Idea
@@ -114,7 +116,9 @@ See [examples/bootstrap-openai/README.md](/mnt/c/Users/vatsa/agentinteractioncon
 
 ## Automation Flow
 
+- Run `aic init [project-root]` to scaffold onboarding files and a starter `aic.project.json`.
 - Annotate controls with explicit `agent*` props.
+- Run `aic doctor [project-root]` before artifact generation to surface missing config, onboarding drift, empty workflows/policies, extraction diagnostics, and invalid generated manifests.
 - Run `aic scan <path>` to see extracted matches, deterministic source inventory entries, and diagnostics.
 - Run `aic generate project <config-file> [--out-dir <dir>]` to emit discovery, UI, action, permissions, workflow, and `operate.txt` artifacts together. When `--out-dir` is used, the CLI also writes a review `report.json` with extracted matches, source inventory, and diagnostics.
 - Run `aic diff <discovery|ui|permissions|workflows|actions> <before> <after>` for stable summary output.

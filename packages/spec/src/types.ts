@@ -446,6 +446,80 @@ export interface AICAgentOnboardingReport {
   warnings: AICAgentOnboardingWarning[];
 }
 
+export interface AICInitFileResult {
+  action: "create" | "overwrite" | "skip";
+  kind: "canonical" | "copilot_instructions" | "cursor_rule" | "project_config" | "wrapper";
+  path: string;
+  status: "created" | "overwritten" | "planned" | "skipped";
+  template_version?: string;
+}
+
+export interface AICInitSummary {
+  created: number;
+  overwritten: number;
+  planned: number;
+  skipped: number;
+  total: number;
+}
+
+export interface AICInitResult {
+  app_name: string;
+  artifact_type: "aic_init_result";
+  config_file: string;
+  dry_run: boolean;
+  files: AICInitFileResult[];
+  framework: "nextjs" | "react" | "vite";
+  next_steps: string[];
+  project_root: string;
+  summary: AICInitSummary;
+}
+
+export interface AICDoctorFinding {
+  code:
+    | "extraction_diagnostics_present"
+    | "invalid_generated_manifest"
+    | "invalid_project_config"
+    | "missing_agent_onboarding_file"
+    | "missing_project_config"
+    | "no_aic_annotations_found"
+    | "no_permission_policies_configured"
+    | "no_workflows_configured"
+    | "stale_agent_onboarding_file"
+    | "unreadable_project_root"
+    | "unsupported_framework";
+  file?: string;
+  fix_hint?: string;
+  manifest_kind?: AICManifestKind;
+  message: string;
+  related_count?: number;
+  severity: "warning" | "error";
+}
+
+export interface AICDoctorScanSummary {
+  diagnostics: number;
+  files_scanned: number;
+  matches: number;
+  source_inventory: number;
+}
+
+export interface AICDoctorSummary {
+  errors: number;
+  findings: number;
+  warnings: number;
+}
+
+export interface AICDoctorReport {
+  artifact_type: "aic_doctor_report";
+  config_file?: string;
+  detected_framework?: "nextjs" | "react" | "vite";
+  findings: AICDoctorFinding[];
+  framework?: "nextjs" | "react" | "vite";
+  onboarding: AICAgentOnboardingReport;
+  project_root: string;
+  scan: AICDoctorScanSummary;
+  summary: AICDoctorSummary;
+}
+
 export interface AICAuthoringProjectReport {
   agent_onboarding?: AICAgentOnboardingReport;
   diagnostics: AICAuthoringReportDiagnostic[];

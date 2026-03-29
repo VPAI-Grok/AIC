@@ -310,6 +310,182 @@ test("CLI project report and inspect summarize recommended onboarding files", as
   assert.match(inspectResult.stdout, /Agent onboarding: 5\/5 recommended present/);
 });
 
+test("CLI init scaffolds onboarding files and config with dry-run, write, skip, and force modes", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  await writeJsonFile(`${tempDir}/package.json`, {
+    dependencies: {
+      react: "^19.0.0",
+      vite: "^6.4.1"
+    },
+    name: "fresh-vite-app"
+  });
+
+  const dryRunResult = await runCli(["init", tempDir, "--dry-run"]);
+  assert.equal(dryRunResult.code, 0);
+
+  const dryRunPayload = JSON.parse(dryRunResult.stdout);
+  assert.equal(dryRunPayload.artifact_type, "aic_init_result");
+  assert.equal(dryRunPayload.framework, "vite");
+  assert.equal(dryRunPayload.app_name, "fresh-vite-app");
+  assert.equal(dryRunPayload.summary.planned, 7);
+  assert.ok(dryRunPayload.files.every((file) => file.status === "planned"));
+
+  const writeResult = await runCli(["init", tempDir]);
+  assert.equal(writeResult.code, 0);
+
+  const writePayload = JSON.parse(writeResult.stdout);
+  assert.equal(writePayload.summary.created, 7);
+  assert.equal(writePayload.summary.skipped, 0);
+
+  const config = await readJsonFile(`${tempDir}/aic.project.json`);
+  assert.equal(config.appName, "fresh-vite-app");
+  assert.equal(config.framework, "vite");
+  assert.equal(config.hmr, true);
+  assert.equal(config.viewId, "vite.root");
+  assert.equal(config.viewUrl, "http://localhost:5173");
+
+  const skipResult = await runCli(["init", tempDir]);
+  assert.equal(skipResult.code, 0);
+  assert.equal(JSON.parse(skipResult.stdout).summary.skipped, 7);
+
+  const forceResult = await runCli(["init", tempDir, "--force"]);
+  assert.equal(forceResult.code, 0);
+  const forcePayload = JSON.parse(forceResult.stdout);
+  assert.equal(forcePayload.summary.overwritten, 7);
+
+  const initResultFile = `${tempDir}/init-result.json`;
+  await writeJsonFile(initResultFile, forcePayload);
+
+  const inspectResult = await runCli(["inspect", initResultFile]);
+  assert.equal(inspectResult.code, 0);
+  assert.match(inspectResult.stdout, /AIC init result/);
+  assert.match(inspectResult.stdout, /Framework: vite/);
+  assert.match(inspectResult.stdout, /Overwritten: 7/);
+});
+
+test("CLI doctor reports missing config, warning-only repos, and inspect summaries", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  await writeJsonFile(`${tempDir}/package.json`, {
+    dependencies: {
+      next: "^15.0.0",
+      react: "^19.0.0"
+    },
+    name: "doctor-next-app"
+  });
+
+  const missingConfigResult = await runCli(["doctor", tempDir]);
+  assert.equal(missingConfigResult.code, 1);
+  const missingConfigPayload = JSON.parse(missingConfigResult.stdout);
+  assert.equal(missingConfigPayload.artifact_type, "aic_doctor_report");
+  assert.equal(missingConfigPayload.detected_framework, "nextjs");
+  assert.ok(
+    missingConfigPayload.findings.some((finding) => finding.code === "missing_project_config")
+  );
+
+  await runCli(["init", tempDir]);
+
+  const reportFile = `${tempDir}/doctor-report.json`;
+  const doctorResult = await runCli(["doctor", tempDir, "--report-file", reportFile]);
+  assert.equal(doctorResult.code, 0);
+
+  const doctorPayload = JSON.parse(doctorResult.stdout);
+  assert.equal(doctorPayload.summary.errors, 0);
+  assert.ok(
+    doctorPayload.findings.some((finding) => finding.code === "no_aic_annotations_found")
+  );
+  assert.ok(
+    doctorPayload.findings.some((finding) => finding.code === "no_workflows_configured")
+  );
+  assert.ok(
+    doctorPayload.findings.some((finding) => finding.code === "no_permission_policies_configured")
+  );
+
+  const writtenReport = await readJsonFile(reportFile);
+  assert.equal(writtenReport.artifact_type, "aic_doctor_report");
+
+  const inspectResult = await runCli(["inspect", reportFile]);
+  assert.equal(inspectResult.code, 0);
+  assert.match(inspectResult.stdout, /AIC doctor report/);
+  assert.match(inspectResult.stdout, /Framework: nextjs/);
+  assert.match(inspectResult.stdout, /Errors: 0/);
+});
+
+test("CLI doctor fails for invalid config JSON and invalid generated manifest output", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  await writeJsonFile(`${tempDir}/package.json`, {
+    dependencies: {
+      react: "^19.0.0",
+      vite: "^6.4.1"
+    },
+    name: "broken-app"
+  });
+
+  await writeTextFile(`${tempDir}/aic.project.json`, "{\n");
+  const invalidJsonResult = await runCli(["doctor", tempDir]);
+  assert.equal(invalidJsonResult.code, 1);
+  assert.ok(
+    JSON.parse(invalidJsonResult.stdout).findings.some(
+      (finding) => finding.code === "invalid_project_config"
+    )
+  );
+
+  await writeJsonFile(`${tempDir}/aic.project.json`, {
+    appName: "Broken App",
+    framework: "vite",
+    permissions: {},
+    projectRoot: ".",
+    workflows: []
+  });
+  await writeTextFile(
+    `${tempDir}/src/App.tsx`,
+    `export function App() {
+  return (
+    <main>
+      <button
+        agentId="duplicate.action"
+        agentDescription="Duplicate action one"
+        agentAction="click"
+        agentRisk="medium"
+      >
+        First duplicate
+      </button>
+      <button
+        agentId="duplicate.action"
+        agentDescription="Duplicate action two"
+        agentAction="click"
+        agentRisk="medium"
+      >
+        Second duplicate
+      </button>
+    </main>
+  );
+}
+`
+  );
+
+  const invalidManifestResult = await runCli(["doctor", tempDir]);
+  assert.equal(invalidManifestResult.code, 1);
+  const invalidManifestPayload = JSON.parse(invalidManifestResult.stdout);
+  assert.ok(
+    invalidManifestPayload.findings.some(
+      (finding) =>
+        finding.code === "invalid_generated_manifest" && finding.manifest_kind === "ui"
+    )
+  );
+});
+
 test("CLI bootstrap writes prompt, draft, review, and report artifacts from offline fixtures", async (t) => {
   const tempDir = await createTempDir();
   t.after(async () => {

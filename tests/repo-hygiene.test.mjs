@@ -3,7 +3,7 @@ import test from "node:test";
 import { access, readFile } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
 
-import { resolveFromRepo } from "./helpers.mjs";
+import { importWorkspaceModule, resolveFromRepo } from "./helpers.mjs";
 
 const requiredFiles = [
   "LICENSE",
@@ -58,4 +58,21 @@ test("agent onboarding wrappers point back to the canonical AGENTS file", async 
   assert.match(copilot, /AGENTS\.md/);
   assert.match(cursorRule, /AGENTS\.md/);
   assert.match(skill, /AGENTS\.md/);
+});
+
+test("automation-core onboarding templates stay in sync with checked-in template files", async () => {
+  const automationCore = await importWorkspaceModule(
+    "packages/automation-core/dist/automation-core/src/index.js"
+  );
+
+  await Promise.all(
+    automationCore.AIC_AGENT_ONBOARDING_TEMPLATE_FILES.map(async (templateFile) => {
+      const checkedInContents = await readFile(
+        resolveFromRepo("templates/agent-onboarding", templateFile.path),
+        "utf8"
+      );
+
+      assert.equal(templateFile.contents, checkedInContents);
+    })
+  );
 });

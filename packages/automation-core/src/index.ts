@@ -1,12 +1,14 @@
 import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
-import { dirname, extname, relative, resolve } from "node:path";
+import { basename, dirname, extname, relative, resolve } from "node:path";
 import ts from "typescript";
 import { AICRegistry } from "@aic/runtime";
 import {
   type AICAgentOnboardingFileStatus,
   type AICAgentOnboardingReport,
   type AICAgentOnboardingWarning,
+  type AICDoctorFinding,
+  type AICDoctorReport,
   type AICAuthoringApplyResult,
   type AICAuthoringPatchPlan,
   type AICAuthoringProjectReport,
@@ -20,13 +22,20 @@ import {
   AICDiscoveryManifest,
   AICElementManifest,
   type AICFieldDiffEntry,
+  type AICInitFileResult,
+  type AICInitResult,
   type AICManifestDiff,
   type AICManifestKind,
   AICPermissionsManifest,
   type AICRole,
   AICRuntimeUiManifest,
   AICSemanticActionsManifest,
-  AICWorkflowManifest
+  AICWorkflowManifest,
+  validateDiscoveryManifest,
+  validatePermissionsManifest,
+  validateRuntimeUiManifest,
+  validateSemanticActionsManifest,
+  validateWorkflowManifest
 } from "@aic/spec";
 
 export type AICAutomationSeverity = "warning" | "error";
@@ -119,24 +128,135 @@ export type AICProjectArtifactReport = AICAuthoringProjectReport;
 
 export const AIC_AGENT_ONBOARDING_TEMPLATE_VERSION = "1";
 
-const aicAgentOnboardingFiles: Array<{
+export type AICSupportedInitFramework = "nextjs" | "react" | "vite";
+
+export interface AICAgentOnboardingTemplateFile {
+  contents: string;
   kind: AICAgentOnboardingFileStatus["kind"];
   path: string;
   recommended: boolean;
-}> = [
-  { kind: "canonical", path: "AGENTS.md", recommended: true },
-  { kind: "wrapper", path: "CLAUDE.md", recommended: true },
-  { kind: "wrapper", path: "GEMINI.md", recommended: true },
+  template_version: string;
+}
+
+export interface AICInitializeProjectOptions {
+  appName?: string;
+  dryRun?: boolean;
+  force?: boolean;
+  framework?: AICSupportedInitFramework;
+  now?: string;
+  projectRoot?: string;
+  viewId?: string;
+  viewUrl?: string;
+}
+
+export interface AICDoctorOptions {
+  configFile?: string;
+  projectRoot?: string;
+}
+
+export const AIC_AGENT_ONBOARDING_TEMPLATE_FILES: AICAgentOnboardingTemplateFile[] = [
   {
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+# AIC Agent Onboarding
+
+Use AIC when this repo needs to expose reliable interaction semantics for AI agents.
+
+## Implementation Order
+
+1. Identify the important flows, risky actions, and entity-scoped actions.
+2. Add explicit \`agent*\` metadata to important controls.
+3. Add or update \`aic.project.json\`.
+4. Generate and inspect AIC artifacts.
+5. Fix review findings before treating the app as agent-ready.
+
+## Rules
+
+- stable IDs first
+- explicit metadata over inference
+- confirmation on critical actions
+- entity metadata on record-scoped actions
+- workflow, validation, execution, and recovery metadata where the app supports them
+- generated JSON stays generated
+
+## Verification
+
+- \`aic scan <path>\`
+- \`aic generate project <config-file> --out-dir <dir>\`
+- \`aic inspect <dir>/report.json\`
+- \`aic validate <kind> <file>\`
+`,
+    kind: "canonical",
+    path: "AGENTS.md",
+    recommended: true,
+    template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
+  },
+  {
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+# Claude Code Wrapper
+
+Read \`AGENTS.md\` first and treat it as the canonical AIC policy for this repo.
+`,
+    kind: "wrapper",
+    path: "CLAUDE.md",
+    recommended: true,
+    template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
+  },
+  {
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+# Gemini Wrapper
+
+Read \`AGENTS.md\` first and follow it as the canonical AIC policy for this repo.
+`,
+    kind: "wrapper",
+    path: "GEMINI.md",
+    recommended: true,
+    template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
+  },
+  {
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+# GitHub Copilot AIC Instructions
+
+Use \`AGENTS.md\` as the canonical AIC instruction file for this repo.
+`,
     kind: "copilot_instructions",
     path: ".github/copilot-instructions.md",
-    recommended: true
+    recommended: true,
+    template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   },
-  { kind: "cursor_rule", path: ".cursor/rules/aic.mdc", recommended: true },
   {
+    contents: `---
+description: AIC implementation guidance for app code
+globs:
+  - "app/**"
+  - "src/**"
+  - "components/**"
+  - "pages/**"
+  - "lib/**"
+alwaysApply: false
+---
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+
+# AIC Cursor Rule
+
+Follow \`AGENTS.md\` as the canonical AIC policy.
+`,
+    kind: "cursor_rule",
+    path: ".cursor/rules/aic.mdc",
+    recommended: true,
+    template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
+  },
+  {
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+# AIC Onboarding
+
+Use this skill when asked to make a React, Next.js, or Vite app AIC-ready.
+
+Read \`AGENTS.md\`, add explicit metadata first, update \`aic.project.json\`, then generate and inspect AIC artifacts.
+`,
     kind: "wrapper",
     path: ".github/skills/aic-onboarding/SKILL.md",
-    recommended: false
+    recommended: false,
+    template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   }
 ];
 
@@ -145,7 +265,7 @@ function getAICAgentOnboardingReport(projectRoot: string): AICAgentOnboardingRep
   const warnings: AICAgentOnboardingWarning[] = [];
   const versionPattern = /AIC_AGENT_ONBOARDING_TEMPLATE_VERSION:\s*([^\s>]+)/;
 
-  for (const expectedFile of aicAgentOnboardingFiles) {
+  for (const expectedFile of AIC_AGENT_ONBOARDING_TEMPLATE_FILES) {
     const resolvedPath = resolve(projectRoot, expectedFile.path);
     let status: AICAgentOnboardingFileStatus["status"] = "missing";
     let templateVersion: string | undefined;
@@ -211,6 +331,523 @@ function getAICAgentOnboardingReport(projectRoot: string): AICAgentOnboardingRep
     },
     template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION,
     warnings
+  };
+}
+
+interface AICProjectConfigInput {
+  appName?: string;
+  appVersion?: string;
+  framework?: string;
+  generatedAt?: string;
+  hmr?: boolean;
+  notes?: string[];
+  permissions?: Partial<AICPermissionsManifest>;
+  projectRoot?: string;
+  updatedAt?: string;
+  viewId?: string;
+  viewUrl?: string;
+  workflows?: AICWorkflowManifest["workflows"];
+}
+
+type AICValidatedProjectConfig = AICProjectConfigInput & {
+  appName: string;
+};
+
+function isSupportedInitFramework(value: string | undefined): value is AICSupportedInitFramework {
+  return value === "nextjs" || value === "react" || value === "vite";
+}
+
+async function readPackageJson(projectRoot: string): Promise<Record<string, unknown> | undefined> {
+  const filePath = resolve(projectRoot, "package.json");
+
+  try {
+    const value = JSON.parse(await readFile(filePath, "utf8")) as unknown;
+    return value && typeof value === "object" ? (value as Record<string, unknown>) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function readPackageDependencyNames(packageJson: Record<string, unknown> | undefined): Set<string> {
+  const names = new Set<string>();
+
+  for (const key of ["dependencies", "devDependencies", "peerDependencies"]) {
+    const bucket = packageJson?.[key];
+
+    if (!bucket || typeof bucket !== "object") {
+      continue;
+    }
+
+    for (const name of Object.keys(bucket as Record<string, unknown>)) {
+      names.add(name);
+    }
+  }
+
+  return names;
+}
+
+export async function detectAICProjectFramework(
+  projectRoot: string
+): Promise<AICSupportedInitFramework | undefined> {
+  const packageJson = await readPackageJson(projectRoot);
+  const dependencyNames = readPackageDependencyNames(packageJson);
+
+  if (dependencyNames.has("next")) {
+    return "nextjs";
+  }
+
+  if (dependencyNames.has("vite")) {
+    return "vite";
+  }
+
+  if (dependencyNames.has("react")) {
+    return "react";
+  }
+
+  return undefined;
+}
+
+function inferAICAppName(
+  packageJson: Record<string, unknown> | undefined,
+  projectRoot: string
+): string {
+  const packageName = packageJson?.name;
+
+  if (typeof packageName === "string" && packageName.trim().length > 0) {
+    return packageName.trim();
+  }
+
+  return basename(projectRoot);
+}
+
+function defaultViewUrlForFramework(framework: AICSupportedInitFramework): string {
+  return framework === "vite" ? "http://localhost:5173" : "http://localhost:3000";
+}
+
+function createInitProjectConfig(
+  options: Required<Pick<AICInitializeProjectOptions, "appName" | "viewId" | "viewUrl">> & {
+    framework: AICSupportedInitFramework;
+    now: string;
+  }
+): AICProjectConfigInput {
+  return {
+    appName: options.appName,
+    framework: options.framework,
+    generatedAt: options.now,
+    ...(options.framework === "vite" ? { hmr: true } : {}),
+    notes: ["initialized by aic init"],
+    permissions: {},
+    projectRoot: ".",
+    updatedAt: options.now,
+    viewId: options.viewId,
+    viewUrl: options.viewUrl,
+    workflows: []
+  };
+}
+
+function summarizeInitFiles(files: AICInitFileResult[]): AICInitResult["summary"] {
+  return {
+    created: files.filter((file) => file.status === "created").length,
+    overwritten: files.filter((file) => file.status === "overwritten").length,
+    planned: files.filter((file) => file.status === "planned").length,
+    skipped: files.filter((file) => file.status === "skipped").length,
+    total: files.length
+  };
+}
+
+export async function initializeAICProject(
+  options: AICInitializeProjectOptions = {}
+): Promise<AICInitResult> {
+  const projectRoot = resolve(options.projectRoot ?? process.cwd());
+  const packageJson = await readPackageJson(projectRoot);
+  const detectedFramework = await detectAICProjectFramework(projectRoot);
+  const framework = options.framework ?? detectedFramework;
+
+  if (!framework) {
+    throw new Error(
+      "Unable to detect a supported framework for this repo. Pass --framework <nextjs|vite|react>."
+    );
+  }
+
+  const appName = options.appName ?? inferAICAppName(packageJson, projectRoot);
+  const now = options.now ?? new Date().toISOString();
+  const viewId = options.viewId ?? `${framework}.root`;
+  const viewUrl = options.viewUrl ?? defaultViewUrlForFramework(framework);
+  const configContents = `${JSON.stringify(
+    createInitProjectConfig({
+      appName,
+      framework,
+      now,
+      viewId,
+      viewUrl
+    }),
+    null,
+    2
+  )}\n`;
+  const fileDefinitions: Array<{
+    contents: string;
+    kind: AICInitFileResult["kind"];
+    path: string;
+    template_version?: string;
+  }> = [
+    {
+      contents: configContents,
+      kind: "project_config",
+      path: "aic.project.json"
+    },
+    ...AIC_AGENT_ONBOARDING_TEMPLATE_FILES.map((file) => ({
+      contents: file.contents,
+      kind: file.kind,
+      path: file.path,
+      template_version: file.template_version
+    }))
+  ];
+
+  const files: AICInitFileResult[] = [];
+
+  for (const file of fileDefinitions) {
+    const resolvedPath = resolve(projectRoot, file.path);
+    const exists = existsSync(resolvedPath);
+    const action: AICInitFileResult["action"] = exists
+      ? options.force
+        ? "overwrite"
+        : "skip"
+      : "create";
+
+    let status: AICInitFileResult["status"];
+
+    if (action === "skip") {
+      status = "skipped";
+    } else if (options.dryRun) {
+      status = "planned";
+    } else {
+      await mkdir(dirname(resolvedPath), { recursive: true });
+      await writeFile(resolvedPath, file.contents, "utf8");
+      status = action === "create" ? "created" : "overwritten";
+    }
+
+    files.push({
+      action,
+      kind: file.kind,
+      path: file.path,
+      status,
+      template_version: file.template_version
+    });
+  }
+
+  return {
+    app_name: appName,
+    artifact_type: "aic_init_result",
+    config_file: "aic.project.json",
+    dry_run: options.dryRun ?? false,
+    files,
+    framework,
+    next_steps: [
+      "Add explicit agent* metadata to critical flows.",
+      "Run `aic doctor` to audit onboarding, config, and manifest readiness.",
+      "Run `aic generate project aic.project.json --out-dir .aic` once source metadata is in place."
+    ],
+    project_root: projectRoot,
+    summary: summarizeInitFiles(files)
+  };
+}
+
+function createDoctorFinding(
+  finding: AICDoctorFinding
+): AICDoctorFinding {
+  return finding;
+}
+
+function summarizeDoctorFindings(findings: AICDoctorFinding[]): AICDoctorReport["summary"] {
+  return {
+    errors: findings.filter((finding) => finding.severity === "error").length,
+    findings: findings.length,
+    warnings: findings.filter((finding) => finding.severity === "warning").length
+  };
+}
+
+function createEmptyDoctorScanSummary(): AICDoctorReport["scan"] {
+  return {
+    diagnostics: 0,
+    files_scanned: 0,
+    matches: 0,
+    source_inventory: 0
+  };
+}
+
+function isProjectConfigInput(value: unknown): value is AICValidatedProjectConfig {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  return typeof record.appName === "string" && record.appName.trim().length > 0;
+}
+
+export async function createAICDoctorReport(
+  options: AICDoctorOptions = {}
+): Promise<AICDoctorReport> {
+  const projectRoot = resolve(options.projectRoot ?? process.cwd());
+  const onboarding = getAICAgentOnboardingReport(projectRoot);
+  const findings: AICDoctorFinding[] = onboarding.warnings.map((warning) =>
+    createDoctorFinding({
+      code: warning.code,
+      file: warning.file,
+      fix_hint: `Run \`aic init ${projectRoot}\` or copy the matching onboarding template into place.`,
+      message: warning.message,
+      severity: warning.severity
+    })
+  );
+  const configFilePath = options.configFile
+    ? resolve(process.cwd(), options.configFile)
+    : resolve(projectRoot, "aic.project.json");
+  const packageDetectedFramework = await detectAICProjectFramework(projectRoot);
+  const scan = createEmptyDoctorScanSummary();
+
+  if (!existsSync(configFilePath)) {
+    findings.unshift(
+      createDoctorFinding({
+        code: "missing_project_config",
+        file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+        fix_hint: "Run `aic init` to scaffold aic.project.json, then update the app-specific fields.",
+        message: "AIC project config is missing.",
+        severity: "error"
+      })
+    );
+
+    return {
+      artifact_type: "aic_doctor_report",
+      config_file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+      detected_framework: packageDetectedFramework,
+      findings,
+      framework: packageDetectedFramework,
+      onboarding,
+      project_root: projectRoot,
+      scan,
+      summary: summarizeDoctorFindings(findings)
+    };
+  }
+
+  let configValue: unknown;
+
+  try {
+    configValue = JSON.parse(await readFile(configFilePath, "utf8"));
+  } catch (error) {
+    findings.unshift(
+      createDoctorFinding({
+        code: "invalid_project_config",
+        file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+        fix_hint: "Fix the JSON syntax in aic.project.json.",
+        message: error instanceof Error ? error.message : "Unable to read AIC project config JSON.",
+        severity: "error"
+      })
+    );
+
+    return {
+      artifact_type: "aic_doctor_report",
+      config_file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+      detected_framework: packageDetectedFramework,
+      findings,
+      framework: packageDetectedFramework,
+      onboarding,
+      project_root: projectRoot,
+      scan,
+      summary: summarizeDoctorFindings(findings)
+    };
+  }
+
+  if (!isProjectConfigInput(configValue)) {
+    findings.unshift(
+      createDoctorFinding({
+        code: "invalid_project_config",
+        file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+        fix_hint: "Ensure aic.project.json contains at least a non-empty appName string.",
+        message: "AIC project config must be an object with a non-empty appName.",
+        severity: "error"
+      })
+    );
+
+    return {
+      artifact_type: "aic_doctor_report",
+      config_file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+      detected_framework: packageDetectedFramework,
+      findings,
+      framework: packageDetectedFramework,
+      onboarding,
+      project_root: projectRoot,
+      scan,
+      summary: summarizeDoctorFindings(findings)
+    };
+  }
+
+  const config = configValue;
+  const framework = config.framework ?? packageDetectedFramework;
+
+  if (!isSupportedInitFramework(framework)) {
+    findings.unshift(
+      createDoctorFinding({
+        code: "unsupported_framework",
+        file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+        fix_hint: "Set framework to nextjs, vite, or react, or run `aic init --framework <value>`.",
+        message: "AIC adoption automation currently supports nextjs, vite, and react repos only.",
+        severity: "error"
+      })
+    );
+
+    return {
+      artifact_type: "aic_doctor_report",
+      config_file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+      detected_framework: packageDetectedFramework,
+      findings,
+      onboarding,
+      project_root: projectRoot,
+      scan,
+      summary: summarizeDoctorFindings(findings)
+    };
+  }
+
+  const configProjectRoot = resolve(dirname(configFilePath), config.projectRoot ?? ".");
+
+  try {
+    const projectRootStats = await stat(configProjectRoot);
+
+    if (!projectRootStats.isDirectory()) {
+      throw new Error("Configured projectRoot is not a directory.");
+    }
+  } catch (error) {
+    findings.unshift(
+      createDoctorFinding({
+        code: "unreadable_project_root",
+        file: toPortablePath(relative(projectRoot, configProjectRoot) || "."),
+        fix_hint: "Update projectRoot in aic.project.json to point at a readable source directory.",
+        message:
+          error instanceof Error ? error.message : "Configured projectRoot is not readable.",
+        severity: "error"
+      })
+    );
+
+    return {
+      artifact_type: "aic_doctor_report",
+      config_file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+      detected_framework: packageDetectedFramework,
+      findings,
+      framework,
+      onboarding,
+      project_root: projectRoot,
+      scan,
+      summary: summarizeDoctorFindings(findings)
+    };
+  }
+
+  const artifacts = await generateProjectArtifacts({
+    appName: config.appName,
+    appVersion: config.appVersion,
+    framework,
+    generatedAt: config.generatedAt,
+    notes: config.notes,
+    operateNotes:
+      framework === "vite"
+        ? [
+            ...(config.notes ?? []),
+            config.hmr === false ? "HMR metadata refresh disabled." : "HMR metadata refresh enabled."
+          ]
+        : config.notes,
+    permissions: config.permissions,
+    projectRoot: configProjectRoot,
+    updatedAt: config.updatedAt,
+    viewId: config.viewId,
+    viewUrl: config.viewUrl,
+    workflows: config.workflows
+  });
+
+  scan.diagnostics = artifacts.diagnostics.length;
+  scan.files_scanned = artifacts.scan.filesScanned;
+  scan.matches = artifacts.matches.length;
+  scan.source_inventory = artifacts.source_inventory.length;
+
+  if (artifacts.matches.length === 0) {
+    findings.push(
+      createDoctorFinding({
+        code: "no_aic_annotations_found",
+        file: toPortablePath(relative(projectRoot, configProjectRoot) || "."),
+        fix_hint: "Add explicit agent* props to critical controls before generating production artifacts.",
+        message: "No explicit AIC annotations were found in the configured project root.",
+        severity: "warning"
+      })
+    );
+  }
+
+  if (artifacts.diagnostics.length > 0) {
+    findings.push(
+      createDoctorFinding({
+        code: "extraction_diagnostics_present",
+        file: toPortablePath(relative(projectRoot, configProjectRoot) || "."),
+        fix_hint: "Review `aic scan` output and replace unsupported dynamic patterns with deterministic metadata where practical.",
+        message: "Build-time extraction produced diagnostics that should be reviewed.",
+        related_count: artifacts.diagnostics.length,
+        severity: "warning"
+      })
+    );
+  }
+
+  if ((config.workflows?.length ?? 0) === 0) {
+    findings.push(
+      createDoctorFinding({
+        code: "no_workflows_configured",
+        file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+        fix_hint: "Add at least one workflow definition for meaningful multi-step flows.",
+        message: "No workflows are configured in aic.project.json.",
+        severity: "warning"
+      })
+    );
+  }
+
+  if (Object.keys(config.permissions?.actionPolicies ?? {}).length === 0) {
+    findings.push(
+      createDoctorFinding({
+        code: "no_permission_policies_configured",
+        file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+        fix_hint: "Add actionPolicies for risky or role-restricted actions.",
+        message: "No explicit permission policies are configured in aic.project.json.",
+        severity: "warning"
+      })
+    );
+  }
+
+  const manifestValidationResults = [
+    ["discovery", validateDiscoveryManifest(artifacts.discovery)],
+    ["ui", validateRuntimeUiManifest(artifacts.ui)],
+    ["actions", validateSemanticActionsManifest(artifacts.actions)],
+    ["permissions", validatePermissionsManifest(artifacts.permissions)],
+    ["workflows", validateWorkflowManifest(artifacts.workflows)]
+  ] as const;
+
+  for (const [kind, result] of manifestValidationResults) {
+    if (!result.ok) {
+      findings.push(
+        createDoctorFinding({
+          code: "invalid_generated_manifest",
+          file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+          fix_hint: `Run \`aic generate project ${toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json")} --out-dir .aic\` and inspect the ${kind} manifest issues.`,
+          manifest_kind: kind,
+          message: `${kind} manifest validation failed for generated artifacts.`,
+          related_count: result.issues.length,
+          severity: "error"
+        })
+      );
+    }
+  }
+
+  return {
+    artifact_type: "aic_doctor_report",
+    config_file: toPortablePath(relative(projectRoot, configFilePath) || "aic.project.json"),
+    detected_framework: packageDetectedFramework,
+    findings,
+    framework,
+    onboarding,
+    project_root: projectRoot,
+    scan,
+    summary: summarizeDoctorFindings(findings)
   };
 }
 

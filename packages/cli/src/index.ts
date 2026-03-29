@@ -7,10 +7,12 @@ import { format } from "node:util";
 import {
   analyzeProjectForAICAnnotations,
   applyAuthoringPatchPlan,
+  createAICDoctorReport,
   createProjectArtifactReport,
   diffManifestValues,
   diffManifestValuesDetailed,
   generateProjectArtifacts,
+  initializeAICProject,
   scanSourceForAICAnnotations,
   writeArtifactFiles,
   type AICAutomationManifestKind
@@ -43,8 +45,10 @@ import {
   validateWorkflowManifest,
   type AICAuthoringInputs,
   type AICAuthoringPatchPlan,
+  type AICDoctorReport,
   type AICDiscoveryManifest,
   type AICElementManifest,
+  type AICInitResult,
   type AICPermissionsManifest,
   type AICRuntimeUiManifest,
   type AICSemanticActionsManifest,
@@ -116,6 +120,8 @@ function printUsage(): void {
 
 Usage:
   aic scan <file-or-directory>
+  aic init [project-root] [--framework <nextjs|vite|react>] [--app-name <name>] [--view-id <id>] [--view-url <url>] [--dry-run] [--force]
+  aic doctor [project-root] [--config <file>] [--report-file <file>]
   aic validate <discovery|ui|permissions|workflows|actions> <file>
   aic bootstrap <url> [routes-csv] [--app-name <name>] [--captures-file <file>] [--suggestions-file <file>] [--provider-kind <http|openai>] [--provider-endpoint <url>] [--provider-model <name>] [--provider-header <k=v>] [--provider-selector <path>] [--provider-bearer-env <env>] [--provider-timeout-ms <ms>] [--provider-retries <n>] [--openai-api-key-env <env>] [--openai-base-url <url>] [--draft-file <file>] [--review-file <file>] [--report-file <file>] [--prompt-file <file>] [--min-confidence <0-1>] [--max-suggestions <n>] [--print-prompt]
   aic generate discovery <config-file>
@@ -375,6 +381,58 @@ function parseHeaderEntries(values: string[]): Record<string, string> {
 
     return headers;
   }, {});
+}
+
+async function initProject(args: string[]): Promise<number> {
+  const positional = readPositionalArgs(args);
+  const projectRoot = positional[0];
+  const framework = readOptionValue(args, "--framework");
+  const appName = readOptionValue(args, "--app-name");
+  const viewId = readOptionValue(args, "--view-id");
+  const viewUrl = readOptionValue(args, "--view-url");
+  const dryRun = hasFlag(args, "--dry-run");
+  const force = hasFlag(args, "--force");
+
+  if (framework && !["nextjs", "react", "vite"].includes(framework)) {
+    console.error('--framework must be one of "nextjs", "vite", or "react".');
+    return 1;
+  }
+
+  try {
+    const result = await initializeAICProject({
+      appName,
+      dryRun,
+      force,
+      framework: framework as "nextjs" | "react" | "vite" | undefined,
+      projectRoot,
+      viewId,
+      viewUrl
+    });
+    printJson(result);
+    return 0;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to initialize AIC project.";
+    console.error(message);
+    return 1;
+  }
+}
+
+async function doctorProject(args: string[]): Promise<number> {
+  const positional = readPositionalArgs(args);
+  const projectRoot = positional[0];
+  const configFile = readOptionValue(args, "--config");
+  const reportFile = readOptionValue(args, "--report-file");
+  const result = await createAICDoctorReport({
+    configFile,
+    projectRoot
+  });
+
+  if (reportFile) {
+    await writeTextFile(reportFile, `${JSON.stringify(result, null, 2)}\n`);
+  }
+
+  printJson(result);
+  return result.summary.errors > 0 ? 1 : 0;
 }
 
 async function generateProject(filePath: string, args: string[]): Promise<number> {
@@ -802,8 +860,66 @@ function isProjectArtifactReport(value: unknown): value is AICAuthoringInputs["p
   );
 }
 
+function isInitResult(value: unknown): value is AICInitResult {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  return (
+    record.artifact_type === "aic_init_result" &&
+    Array.isArray(record.files) &&
+    typeof record.project_root === "string" &&
+    typeof record.summary === "object" &&
+    record.summary !== null
+  );
+}
+
+function isDoctorReport(value: unknown): value is AICDoctorReport {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  return (
+    record.artifact_type === "aic_doctor_report" &&
+    Array.isArray(record.findings) &&
+    typeof record.project_root === "string" &&
+    typeof record.summary === "object" &&
+    record.summary !== null
+  );
+}
+
 async function inspect(filePath: string): Promise<number> {
   const value = await readJson<unknown>(filePath);
+  if (isInitResult(value)) {
+    console.log("AIC init result");
+    console.log(`Project root: ${value.project_root}`);
+    console.log(`Framework: ${value.framework}`);
+    console.log(`App: ${value.app_name}`);
+    console.log(`Planned: ${value.summary.planned}`);
+    console.log(`Created: ${value.summary.created}`);
+    console.log(`Overwritten: ${value.summary.overwritten}`);
+    console.log(`Skipped: ${value.summary.skipped}`);
+    return 0;
+  }
+
+  if (isDoctorReport(value)) {
+    console.log("AIC doctor report");
+    console.log(`Project root: ${value.project_root}`);
+    console.log(`Framework: ${value.framework ?? value.detected_framework ?? "unknown"}`);
+    console.log(`Findings: ${value.summary.findings}`);
+    console.log(`Errors: ${value.summary.errors}`);
+    console.log(`Warnings: ${value.summary.warnings}`);
+    console.log(`Files scanned: ${value.scan.files_scanned}`);
+    console.log(`Matches: ${value.scan.matches}`);
+    console.log(`Diagnostics: ${value.scan.diagnostics}`);
+    console.log(
+      `Agent onboarding: ${value.onboarding.summary.present}/${value.onboarding.summary.recommended} recommended present`
+    );
+    return 0;
+  }
+
   if (isAuthoringPatchPlan(value)) {
     console.log("AIC authoring patch plan");
     console.log(`Proposals: ${value.summary.total_proposals}`);
@@ -927,6 +1043,16 @@ async function main(): Promise<void> {
 
   if (command === "scan" && kind) {
     process.exitCode = await scanPath(kind);
+    return;
+  }
+
+  if (command === "init") {
+    process.exitCode = await initProject([kind, ...args].filter((value): value is string => Boolean(value)));
+    return;
+  }
+
+  if (command === "doctor") {
+    process.exitCode = await doctorProject([kind, ...args].filter((value): value is string => Boolean(value)));
     return;
   }
 
