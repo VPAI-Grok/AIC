@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../../",
+    "paths": {
+      "@aic/spec": ["packages/spec/src/index.ts"],
+      "@aic/runtime": ["packages/runtime/src/index.ts"],
+      "@aic/sdk-react": ["packages/sdk-react/src/index.tsx"],
+      "@aic/devtools": ["packages/devtools/src/index.tsx"]
+    }
+  }
+}

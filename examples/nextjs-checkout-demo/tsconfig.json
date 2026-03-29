@@ -2,7 +2,22 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "allowJs": true,
+    "baseUrl": ".",
     "incremental": true,
+    "paths": {
+      "@aic/spec": [
+        "../../packages/spec/dist/index.js"
+      ],
+      "@aic/runtime": [
+        "../../packages/runtime/dist/runtime/src/index.js"
+      ],
+      "@aic/sdk-react": [
+        "../../packages/sdk-react/dist/sdk-react/src/index.js"
+      ],
+      "@aic/devtools": [
+        "../../packages/devtools/dist/devtools/src/index.js"
+      ]
+    },
     "plugins": [
       {
         "name": "next"
