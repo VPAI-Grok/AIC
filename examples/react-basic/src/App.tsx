@@ -3,10 +3,15 @@ import { AICDevtoolsBridge, AICDevtoolsOverlay } from "@aic/devtools";
 import {
   ShadcnAICButton,
   ShadcnAICCheckbox,
+  ShadcnAICDialogClose,
   ShadcnAICDialogContent,
   ShadcnAICDialogTrigger,
+  ShadcnAICDropdownMenuContent,
+  ShadcnAICDropdownMenuItem,
+  ShadcnAICDropdownMenuTrigger,
   ShadcnAICInput,
   ShadcnAICSelectContent,
+  ShadcnAICSelectItem,
   ShadcnAICSelectTrigger,
   ShadcnAICTabsContent,
   ShadcnAICTabsTrigger
@@ -15,11 +20,17 @@ import { AIC, AICProvider, useAICRegistry } from "@aic/sdk-react";
 import type { AICRuntimeUiManifest } from "@aic/spec";
 import {
   ACCOUNT_STATUS_OPTIONS_PROPS,
+  ACCOUNT_STATUS_ACTIVE_PROPS,
+  ACCOUNT_STATUS_AT_RISK_PROPS,
   ACCOUNT_STATUS_TRIGGER_PROPS,
+  ACCOUNT_STATUS_TRIAL_PROPS,
   ARCHIVE_CUSTOMER_PROPS,
+  ARCHIVE_DIALOG_CLOSE_PROPS,
   ARCHIVE_DIALOG_PROPS,
   BILLING_TAB_PROPS,
   CRM_VIEW,
+  CUSTOMER_ACTIONS_MENU_PROPS,
+  CUSTOMER_ACTIONS_TRIGGER_PROPS,
   OVERVIEW_PANEL_PROPS,
   OVERVIEW_TAB_PROPS,
   RENEWAL_NOTE_INPUT_PROPS,
@@ -120,28 +131,32 @@ export function App() {
           >
             <div style={{ display: "grid", gap: 16 }}>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                <ShadcnAICDropdownMenuTrigger {...CUSTOMER_ACTIONS_TRIGGER_PROPS}>
+                  Customer actions
+                </ShadcnAICDropdownMenuTrigger>
+              </div>
+
+              <ShadcnAICDropdownMenuContent {...CUSTOMER_ACTIONS_MENU_PROPS}>
+                <ShadcnAICDropdownMenuItem {...SEND_RENEWAL_REMINDER_PROPS} type="button">
+                  Send renewal reminder
+                </ShadcnAICDropdownMenuItem>
                 <ShadcnAICDialogTrigger {...ARCHIVE_CUSTOMER_PROPS}>
                   Archive customer
                 </ShadcnAICDialogTrigger>
-
-                <ShadcnAICButton
-                  {...SEND_RENEWAL_REMINDER_PROPS}
-                  style={{
-                    background: "#d7eefc",
-                    border: 0,
-                    color: "#103149",
-                    cursor: "pointer",
-                    fontSize: 15
-                  }}
-                  type="button"
-                >
-                  Send renewal reminder
-                </ShadcnAICButton>
-              </div>
+              </ShadcnAICDropdownMenuContent>
 
               <ShadcnAICDialogContent {...ARCHIVE_DIALOG_PROPS}>
-                Archiving Northwind Traders removes the record from the active customer list and
-                pauses reminder workflows until it is restored.
+                <div style={{ display: "grid", gap: 14 }}>
+                  <div>
+                    Archiving Northwind Traders removes the record from the active customer list
+                    and pauses reminder workflows until it is restored.
+                  </div>
+                  <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+                    <ShadcnAICDialogClose {...ARCHIVE_DIALOG_CLOSE_PROPS} type="button">
+                      Cancel archive
+                    </ShadcnAICDialogClose>
+                  </div>
+                </div>
               </ShadcnAICDialogContent>
 
               <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
@@ -149,7 +164,15 @@ export function App() {
                   Account status
                 </ShadcnAICSelectTrigger>
                 <ShadcnAICSelectContent {...ACCOUNT_STATUS_OPTIONS_PROPS}>
-                  Active, Trial, At-risk
+                  <ShadcnAICSelectItem {...ACCOUNT_STATUS_ACTIVE_PROPS} type="button">
+                    Active
+                  </ShadcnAICSelectItem>
+                  <ShadcnAICSelectItem {...ACCOUNT_STATUS_TRIAL_PROPS} type="button">
+                    Trial
+                  </ShadcnAICSelectItem>
+                  <ShadcnAICSelectItem {...ACCOUNT_STATUS_AT_RISK_PROPS} type="button">
+                    At-risk
+                  </ShadcnAICSelectItem>
                 </ShadcnAICSelectContent>
                 <label
                   style={{

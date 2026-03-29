@@ -394,6 +394,7 @@ async function generateProject(filePath: string, args: string[]): Promise<number
   }>(filePath);
   const outDir = readOptionValue(args, "--out-dir");
   const framework = config.framework ?? "vite";
+  const projectRoot = resolveConfigRelativePath(filePath, config.projectRoot) ?? process.cwd();
   const artifacts = await generateProjectArtifacts({
     appName: config.appName,
     appVersion: config.appVersion,
@@ -408,15 +409,17 @@ async function generateProject(filePath: string, args: string[]): Promise<number
           ]
         : config.notes,
     permissions: config.permissions,
-    projectRoot: resolveConfigRelativePath(filePath, config.projectRoot) ?? process.cwd(),
+    projectRoot,
     updatedAt: config.updatedAt,
     viewId: config.viewId,
     viewUrl: config.viewUrl,
     workflows: config.workflows
   });
+  const frameworkReport = createProjectArtifactReport(framework, artifacts, {
+    projectRoot
+  });
 
   if (outDir) {
-    const frameworkReport = createProjectArtifactReport(framework, artifacts);
     await writeArtifactFiles(resolve(process.cwd(), outDir), {
       ...artifacts.files,
       "/report.json": `${JSON.stringify(sortObject(frameworkReport), null, 2)}\n`
@@ -425,6 +428,7 @@ async function generateProject(filePath: string, args: string[]): Promise<number
 
   printJson({
     actions: artifacts.actions,
+    agent_onboarding: frameworkReport.agent_onboarding,
     diagnostics: artifacts.diagnostics,
     discovery: artifacts.discovery,
     files: Object.keys(artifacts.files),
@@ -784,6 +788,20 @@ function isBootstrapDraft(value: unknown): value is {
   return Array.isArray(record.ui) && Array.isArray(record.suggestions) && typeof record.discovery === "object";
 }
 
+function isProjectArtifactReport(value: unknown): value is AICAuthoringInputs["project_report"] {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.framework === "string" &&
+    typeof record.filesScanned === "number" &&
+    Array.isArray(record.matches) &&
+    Array.isArray(record.diagnostics)
+  );
+}
+
 async function inspect(filePath: string): Promise<number> {
   const value = await readJson<unknown>(filePath);
   if (isAuthoringPatchPlan(value)) {
@@ -811,6 +829,23 @@ async function inspect(filePath: string): Promise<number> {
     console.log(`Skipped: ${value.summary.skipped}`);
     console.log(`Failed: ${value.summary.failed}`);
     console.log(`Changed files: ${value.summary.changed_files}`);
+    return 0;
+  }
+
+  if (isProjectArtifactReport(value)) {
+    const report = value as NonNullable<AICAuthoringInputs["project_report"]>;
+    console.log(`AIC project report for ${report.framework}`);
+    console.log(`Files scanned: ${report.filesScanned}`);
+    console.log(`Matches: ${report.matches.length}`);
+    console.log(`Diagnostics: ${report.diagnostics.length}`);
+
+    if (report.agent_onboarding) {
+      console.log(
+        `Agent onboarding: ${report.agent_onboarding.summary.present}/${report.agent_onboarding.summary.recommended} recommended present`
+      );
+      console.log(`Onboarding warnings: ${report.agent_onboarding.summary.warnings}`);
+    }
+
     return 0;
   }
 

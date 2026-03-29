@@ -10,6 +10,11 @@
       "types": "./dist/devtools/src/index.d.ts",
       "import": "./dist/devtools/src/index.js",
       "default": "./dist/devtools/src/index.js"
+    },
+    "./client": {
+      "types": "./dist/devtools/src/client.d.ts",
+      "import": "./dist/devtools/src/client.js",
+      "default": "./dist/devtools/src/client.js"
     }
   },
   "scripts": {

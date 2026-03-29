@@ -1,12 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 
 import * as React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 
-import { importWorkspaceModule } from "./helpers.mjs";
+import { importWorkspaceModule, resolveFromRepo } from "./helpers.mjs";
 
 const sdkReact = await importWorkspaceModule("packages/sdk-react/dist/sdk-react/src/index.js");
+const sdkReactClient = await importWorkspaceModule("packages/sdk-react/dist/sdk-react/src/client.js");
 const runtime = await importWorkspaceModule("packages/runtime/dist/runtime/src/index.js");
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -29,6 +31,22 @@ async function withReactTestRendererWarningsSuppressed(callback) {
     console.error = originalError;
   }
 }
+
+test("sdk-react root entry is directive-free and client entry preserves the client boundary", async () => {
+  const rootFile = await readFile(
+    resolveFromRepo("packages/sdk-react/dist/sdk-react/src/index.js"),
+    "utf8"
+  );
+  const clientFile = await readFile(
+    resolveFromRepo("packages/sdk-react/dist/sdk-react/src/client.js"),
+    "utf8"
+  );
+
+  assert.equal(rootFile.startsWith("\"use client\";"), false);
+  assert.equal(clientFile.startsWith("\"use client\";"), true);
+  assert.equal(typeof sdkReactClient.AICProvider, "function");
+  assert.equal(sdkReactClient.AICProvider, sdkReact.AICProvider);
+});
 
 test("AIC components register with the runtime registry and unregister on unmount", async () => {
   const registry = new runtime.AICRegistry();

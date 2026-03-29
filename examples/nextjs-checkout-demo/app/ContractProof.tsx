@@ -1,4 +1,4 @@
-import { AICButton, AICInput } from "@aic/sdk-react";
+import { AICButton, AICInput } from "@aic/sdk-react/client";
 
 export function ContractProof() {
   return (

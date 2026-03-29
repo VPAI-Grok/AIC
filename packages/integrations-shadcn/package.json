@@ -10,6 +10,11 @@
       "types": "./dist/integrations-shadcn/src/index.d.ts",
       "import": "./dist/integrations-shadcn/src/index.js",
       "default": "./dist/integrations-shadcn/src/index.js"
+    },
+    "./client": {
+      "types": "./dist/integrations-shadcn/src/client.d.ts",
+      "import": "./dist/integrations-shadcn/src/client.js",
+      "default": "./dist/integrations-shadcn/src/client.js"
     }
   },
   "scripts": {

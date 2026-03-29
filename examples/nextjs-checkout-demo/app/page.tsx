@@ -1,7 +1,7 @@
 "use client";
 
-import { AICDevtoolsBridge } from "@aic/devtools";
-import { AICProvider } from "@aic/sdk-react";
+import { AICDevtoolsBridge } from "@aic/devtools/client";
+import { AICProvider } from "@aic/sdk-react/client";
 import { CheckoutDemoContent } from "./CheckoutDemoContent";
 import { CHECKOUT_VIEW } from "./checkout-contract.mjs";
 

@@ -10,10 +10,50 @@
   },
   "elements": [
     {
+      "id": "customer.actions",
+      "label": "Open customer actions",
+      "description": "Open customer actions",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.actions",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from src/App.tsx:41"
+      ]
+    },
+    {
+      "id": "customer.actions.menu",
+      "label": "Read customer actions menu",
+      "description": "Read customer actions menu",
+      "role": "menu",
+      "actions": [
+        {
+          "name": "read",
+          "target": "customer.actions.menu",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from src/App.tsx:49"
+      ]
+    },
+    {
       "id": "customer.archive",
       "label": "Archive customer",
       "description": "Archive customer",
-      "role": "dialog_trigger",
+      "role": "menuitem",
       "actions": [
         {
           "name": "click",
@@ -26,7 +66,7 @@
         "visible": true
       },
       "notes": [
-        "Extracted from src/App.tsx:39"
+        "Extracted from src/App.tsx:58"
       ]
     },
     {
@@ -46,14 +86,14 @@
         "visible": true
       },
       "notes": [
-        "Extracted from src/App.tsx:48"
+        "Extracted from src/App.tsx:67"
       ]
     },
     {
       "id": "customer.view",
       "label": "View customer",
       "description": "View customer",
-      "role": "tab",
+      "role": "option",
       "actions": [
         {
           "name": "select",
@@ -66,7 +106,7 @@
         "visible": true
       },
       "notes": [
-        "Extracted from src/App.tsx:57"
+        "Extracted from src/App.tsx:76"
       ]
     }
   ]

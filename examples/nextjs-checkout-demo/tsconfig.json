@@ -14,8 +14,14 @@
       "@aic/sdk-react": [
         "../../packages/sdk-react/dist/sdk-react/src/index.js"
       ],
+      "@aic/sdk-react/client": [
+        "../../packages/sdk-react/dist/sdk-react/src/client.js"
+      ],
       "@aic/devtools": [
         "../../packages/devtools/dist/devtools/src/index.js"
+      ],
+      "@aic/devtools/client": [
+        "../../packages/devtools/dist/devtools/src/client.js"
       ]
     },
     "plugins": [

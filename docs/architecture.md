@@ -140,7 +140,7 @@ Repo mutation stays outside the extension. The write path now lives in the CLI:
 The current codebase now covers the master-spec core platform plus read-only devtools authoring plus a first guarded CLI apply path. The next substantial layers are:
 
 - richer model-provider integrations on top of the current bootstrap prompt/provider pipeline
-- fuller Radix and shadcn coverage beyond the current adapter helpers
+- broader table/card/list semantics and deeper design-system adoption beyond the current control-layer Radix/shadcn coverage
 - potentially broader static extraction only if it remains deterministic and reviewable
 - deeper write-back support beyond in-place JSX prop edits, including broader source inventories and more complex component patterns
 

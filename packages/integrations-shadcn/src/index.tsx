@@ -1,5 +1,3 @@
-"use client";
-
 import { AICButton, AICInput, type AICComponentProps } from "@aic/sdk-react";
 
 export function ShadcnAICButton(props: AICComponentProps<"button">) {
@@ -88,6 +86,26 @@ export function ShadcnAICDialogContent(props: AICComponentProps<"section">) {
   );
 }
 
+export function ShadcnAICDialogClose(props: AICComponentProps<"button">) {
+  return (
+    <AICButton
+      {...props}
+      agentAction={props.agentAction ?? "click"}
+      agentRole={props.agentRole ?? "button"}
+      style={{
+        background: "#e2e8f0",
+        border: 0,
+        borderRadius: 999,
+        color: "#0f172a",
+        cursor: "pointer",
+        fontWeight: 600,
+        padding: "10px 16px",
+        ...(props.style ?? {})
+      }}
+    />
+  );
+}
+
 export function ShadcnAICSelectTrigger(props: AICComponentProps<"button">) {
   return (
     <AICButton
@@ -123,6 +141,93 @@ export function ShadcnAICSelectContent(props: AICComponentProps<"section">) {
         border: "1px solid rgba(15, 23, 42, 0.1)",
         borderRadius: 16,
         padding: "10px 12px",
+        ...(props.style ?? {})
+      }}
+    />
+  );
+}
+
+export function ShadcnAICSelectItem(props: AICComponentProps<"button">) {
+  return (
+    <AICButton
+      {...props}
+      agentAction={props.agentAction ?? "select"}
+      agentRole={props.agentRole ?? "option"}
+      style={{
+        background: "transparent",
+        border: 0,
+        borderRadius: 10,
+        color: "#0f172a",
+        cursor: "pointer",
+        justifyContent: "flex-start",
+        padding: "8px 10px",
+        textAlign: "left",
+        width: "100%",
+        ...(props.style ?? {})
+      }}
+    />
+  );
+}
+
+export function ShadcnAICDropdownMenuTrigger(props: AICComponentProps<"button">) {
+  return (
+    <AICButton
+      {...props}
+      agentAction={props.agentAction ?? "click"}
+      agentRole={props.agentRole ?? "button"}
+      style={{
+        background: "#0f172a",
+        border: 0,
+        borderRadius: 999,
+        color: "#f8fafc",
+        cursor: "pointer",
+        fontWeight: 700,
+        padding: "10px 16px",
+        ...(props.style ?? {})
+      }}
+    />
+  );
+}
+
+export function ShadcnAICDropdownMenuContent(props: AICComponentProps<"section">) {
+  return (
+    <AICButton
+      {...props}
+      agentAction={props.agentAction ?? "read"}
+      agentRole={props.agentRole ?? "menu"}
+      as="section"
+      style={{
+        background: "#ffffff",
+        border: "1px solid rgba(15, 23, 42, 0.1)",
+        borderRadius: 16,
+        boxShadow: "0 16px 36px rgba(15, 23, 42, 0.12)",
+        display: "grid",
+        gap: 8,
+        minWidth: 240,
+        padding: "10px 12px",
+        ...(props.style ?? {})
+      }}
+    />
+  );
+}
+
+export function ShadcnAICDropdownMenuItem(props: AICComponentProps<"button">) {
+  return (
+    <AICButton
+      {...props}
+      agentAction={props.agentAction ?? "click"}
+      agentRole={props.agentRole ?? "menuitem"}
+      style={{
+        background: "transparent",
+        border: 0,
+        borderRadius: 12,
+        color: "#0f172a",
+        cursor: "pointer",
+        fontWeight: 600,
+        justifyContent: "flex-start",
+        padding: "10px 12px",
+        textAlign: "left",
+        width: "100%",
         ...(props.style ?? {})
       }}
     />

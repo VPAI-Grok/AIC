@@ -25,6 +25,7 @@ const spec = await importWorkspaceModule("packages/spec/dist/index.js");
 const fixtureRoot = resolveFromRepo("tests/fixtures/plugin-app");
 const capturesFile = resolveFromRepo("tests/fixtures/bootstrap/captures.json");
 const diffFixtureRoot = resolveFromRepo("tests/fixtures/diffs");
+const exampleViteConfig = resolveFromRepo("examples/react-basic/aic.project.json");
 const projectNextConfig = resolveFromRepo("tests/fixtures/plugin-app/project.next.json");
 const projectViteConfig = resolveFromRepo("tests/fixtures/plugin-app/project.vite.json");
 const projectReportFixture = await readJsonFile(
@@ -83,14 +84,20 @@ test("CLI scan reports annotated elements from source files", async () => {
   assert.equal(result.code, 0);
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.summary.filesScanned, 1);
-  assert.equal(payload.summary.extractedElements, 3);
-  assert.equal(payload.summary.sourceInventoryEntries, 8);
+  assert.equal(payload.summary.extractedElements, 5);
+  assert.equal(payload.summary.sourceInventoryEntries, 10);
   assert.equal(payload.summary.warnings, 4);
   assert.deepEqual(
     payload.matches.map((match) => match.agentId),
-    ["customer.archive", "customer.archive.dialog", "customer.view"]
+    [
+      "customer.actions",
+      "customer.actions.menu",
+      "customer.archive",
+      "customer.archive.dialog",
+      "customer.view"
+    ]
   );
-  assert.equal(payload.source_inventory.length, 8);
+  assert.equal(payload.source_inventory.length, 10);
   assert.deepEqual(
     payload.diagnostics.map((diagnostic) => diagnostic.code),
     [
@@ -262,11 +269,45 @@ test("CLI generate project emits the full artifact set and writes generated file
 
   assert.equal(nextPayload.framework, "nextjs");
   assert.equal(nextPayload.diagnostics.length, 4);
-  assert.equal(vitePayload.source_inventory.length, 8);
+  assert.equal(vitePayload.source_inventory.length, 10);
+  assert.equal(vitePayload.agent_onboarding.summary.recommended, 5);
+  assert.equal(vitePayload.agent_onboarding.summary.missing, 5);
+  assert.equal(vitePayload.agent_onboarding.summary.warnings, 5);
   assert.ok(vitePayload.outDir.endsWith(viteOutDir));
   assert.ok(nextPayload.outDir.endsWith(nextOutDir));
   assert.deepEqual(viteFiles, expectedVite.files);
   assert.deepEqual(nextFiles, expectedNext.files);
+});
+
+test("CLI project report and inspect summarize recommended onboarding files", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const outDir = `${tempDir}/example-vite`;
+  const result = await runCli([
+    "generate",
+    "project",
+    exampleViteConfig,
+    "--out-dir",
+    outDir
+  ]);
+
+  assert.equal(result.code, 0);
+
+  const payload = JSON.parse(result.stdout);
+  const report = await readJsonFile(`${outDir}/report.json`);
+  const inspectResult = await runCli(["inspect", `${outDir}/report.json`]);
+
+  assert.equal(payload.agent_onboarding.summary.recommended, 5);
+  assert.equal(payload.agent_onboarding.summary.present, 5);
+  assert.equal(payload.agent_onboarding.summary.missing, 0);
+  assert.equal(report.agent_onboarding.summary.warnings, 0);
+  assert.equal(report.agent_onboarding.files[0].path, "AGENTS.md");
+  assert.equal(inspectResult.code, 0);
+  assert.match(inspectResult.stdout, /AIC project report for vite/);
+  assert.match(inspectResult.stdout, /Agent onboarding: 5\/5 recommended present/);
 });
 
 test("CLI bootstrap writes prompt, draft, review, and report artifacts from offline fixtures", async (t) => {
@@ -576,7 +617,9 @@ test("CLI apply authoring-plan supports dry-run and write modes with guarded exa
     viewId: "customers.list",
     viewUrl: "https://demo.example/customers"
   });
-  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const report = automationCore.createProjectArtifactReport("vite", artifacts, {
+    projectRoot: tempDir
+  });
   const plan = spec.buildAICAuthoringPatchPlan({
     bootstrap_review: {
       artifact_type: "aic_bootstrap_review",
@@ -745,7 +788,9 @@ test("CLI apply authoring-plan recovers drifted line numbers by opening tag sign
     viewId: "customers.list",
     viewUrl: "https://demo.example/customers"
   });
-  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const report = automationCore.createProjectArtifactReport("vite", artifacts, {
+    projectRoot: tempDir
+  });
   const plan = spec.buildAICAuthoringPatchPlan({
     bootstrap_review: {
       artifact_type: "aic_bootstrap_review",
@@ -847,7 +892,9 @@ test("CLI apply authoring-plan blocks spread-attribute targets", async (t) => {
     viewId: "customers.list",
     viewUrl: "https://demo.example/customers"
   });
-  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const report = automationCore.createProjectArtifactReport("vite", artifacts, {
+    projectRoot: tempDir
+  });
   const plan = spec.buildAICAuthoringPatchPlan({
     bootstrap_review: {
       artifact_type: "aic_bootstrap_review",
@@ -950,7 +997,9 @@ test("CLI apply authoring-plan blocks duplicate AIC props on exact matches", asy
     viewId: "customers.list",
     viewUrl: "https://demo.example/customers"
   });
-  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const report = automationCore.createProjectArtifactReport("vite", artifacts, {
+    projectRoot: tempDir
+  });
   const plan = spec.buildAICAuthoringPatchPlan({
     project_report: report,
     snapshot: {
@@ -1037,7 +1086,9 @@ test("CLI apply authoring-plan blocks dynamic existing AIC props on exact matche
     viewId: "customers.list",
     viewUrl: "https://demo.example/customers"
   });
-  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const report = automationCore.createProjectArtifactReport("vite", artifacts, {
+    projectRoot: tempDir
+  });
   const plan = spec.buildAICAuthoringPatchPlan({
     project_report: report,
     snapshot: {
@@ -1115,7 +1166,9 @@ test("CLI apply authoring-plan skips proposals whose recorded source target drif
     viewId: "customers.list",
     viewUrl: "https://demo.example/customers"
   });
-  const report = automationCore.createProjectArtifactReport("vite", artifacts);
+  const report = automationCore.createProjectArtifactReport("vite", artifacts, {
+    projectRoot: tempDir
+  });
   const plan = spec.buildAICAuthoringPatchPlan({
     bootstrap_review: {
       artifact_type: "aic_bootstrap_review",

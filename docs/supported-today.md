@@ -9,6 +9,7 @@ This project currently targets **owned React/Next/Vite apps** where the team can
 - generated discovery, action, permissions, and workflow manifests from project configs
 - CLI-only repo mutation through guarded authoring-plan apply
 - offline bootstrap from saved captures with human-reviewed outputs
+- coding-agent onboarding through `AGENTS.md`-style templates and advisory report warnings
 
 ## Not Guaranteed Yet
 

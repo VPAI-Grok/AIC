@@ -1,8 +1,12 @@
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { dirname, extname, relative, resolve } from "node:path";
 import ts from "typescript";
 import { AICRegistry } from "@aic/runtime";
 import {
+  type AICAgentOnboardingFileStatus,
+  type AICAgentOnboardingReport,
+  type AICAgentOnboardingWarning,
   type AICAuthoringApplyResult,
   type AICAuthoringPatchPlan,
   type AICAuthoringProjectReport,
@@ -112,6 +116,103 @@ export type {
 };
 
 export type AICProjectArtifactReport = AICAuthoringProjectReport;
+
+export const AIC_AGENT_ONBOARDING_TEMPLATE_VERSION = "1";
+
+const aicAgentOnboardingFiles: Array<{
+  kind: AICAgentOnboardingFileStatus["kind"];
+  path: string;
+  recommended: boolean;
+}> = [
+  { kind: "canonical", path: "AGENTS.md", recommended: true },
+  { kind: "wrapper", path: "CLAUDE.md", recommended: true },
+  { kind: "wrapper", path: "GEMINI.md", recommended: true },
+  {
+    kind: "copilot_instructions",
+    path: ".github/copilot-instructions.md",
+    recommended: true
+  },
+  { kind: "cursor_rule", path: ".cursor/rules/aic.mdc", recommended: true },
+  {
+    kind: "wrapper",
+    path: ".github/skills/aic-onboarding/SKILL.md",
+    recommended: false
+  }
+];
+
+function getAICAgentOnboardingReport(projectRoot: string): AICAgentOnboardingReport {
+  const files: AICAgentOnboardingFileStatus[] = [];
+  const warnings: AICAgentOnboardingWarning[] = [];
+  const versionPattern = /AIC_AGENT_ONBOARDING_TEMPLATE_VERSION:\s*([^\s>]+)/;
+
+  for (const expectedFile of aicAgentOnboardingFiles) {
+    const resolvedPath = resolve(projectRoot, expectedFile.path);
+    let status: AICAgentOnboardingFileStatus["status"] = "missing";
+    let templateVersion: string | undefined;
+
+    if (existsSync(resolvedPath)) {
+      status = "present";
+
+      try {
+        const contents = readFileSync(resolvedPath, "utf8");
+        const versionMatch = contents.match(versionPattern);
+
+        if (versionMatch) {
+          templateVersion = versionMatch[1];
+
+          if (templateVersion !== AIC_AGENT_ONBOARDING_TEMPLATE_VERSION) {
+            status = "stale";
+          }
+        }
+      } catch {
+        status = "stale";
+      }
+    }
+
+    files.push({
+      kind: expectedFile.kind,
+      path: expectedFile.path,
+      recommended: expectedFile.recommended,
+      status,
+      template_version: templateVersion
+    });
+
+    if (!expectedFile.recommended) {
+      continue;
+    }
+
+    if (status === "missing") {
+      warnings.push({
+        code: "missing_agent_onboarding_file",
+        file: expectedFile.path,
+        message: `Recommended AIC agent onboarding file is missing: ${expectedFile.path}`,
+        severity: "warning"
+      });
+    }
+
+    if (status === "stale") {
+      warnings.push({
+        code: "stale_agent_onboarding_file",
+        file: expectedFile.path,
+        message: `AIC onboarding template marker in ${expectedFile.path} is stale. Expected version ${AIC_AGENT_ONBOARDING_TEMPLATE_VERSION}.`,
+        severity: "warning"
+      });
+    }
+  }
+
+  return {
+    files,
+    summary: {
+      missing: files.filter((file) => file.recommended && file.status === "missing").length,
+      present: files.filter((file) => file.recommended && file.status === "present").length,
+      recommended: files.filter((file) => file.recommended).length,
+      stale: files.filter((file) => file.recommended && file.status === "stale").length,
+      warnings: warnings.length
+    },
+    template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION,
+    warnings
+  };
+}
 
 interface ParsedJsxElementRecord {
   action?: string;
@@ -1518,9 +1619,13 @@ export async function writeArtifactFiles(
 
 export function createProjectArtifactReport(
   framework: string,
-  artifacts: Pick<AICProjectArtifacts, "diagnostics" | "matches" | "scan" | "source_inventory">
+  artifacts: Pick<AICProjectArtifacts, "diagnostics" | "matches" | "scan" | "source_inventory">,
+  options: {
+    projectRoot?: string;
+  } = {}
 ): AICProjectArtifactReport {
   return {
+    agent_onboarding: getAICAgentOnboardingReport(options.projectRoot ?? process.cwd()),
     diagnostics: artifacts.diagnostics,
     filesScanned: artifacts.scan.filesScanned,
     framework,

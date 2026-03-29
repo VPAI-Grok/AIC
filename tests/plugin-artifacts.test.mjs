@@ -19,15 +19,21 @@ test("Vite scan ignores build output directories and extracts explicit AIC annot
 
   assert.deepEqual(
     matches.map((match) => match.agentId),
-    ["customer.archive", "customer.archive.dialog", "customer.view"]
+    [
+      "customer.actions",
+      "customer.actions.menu",
+      "customer.archive",
+      "customer.archive.dialog",
+      "customer.view"
+    ]
   );
   assert.deepEqual(
     matches.map((match) => match.file),
-    ["src/App.tsx", "src/App.tsx", "src/App.tsx"]
+    ["src/App.tsx", "src/App.tsx", "src/App.tsx", "src/App.tsx", "src/App.tsx"]
   );
   assert.ok(matches.every((match) => !match.file.includes("dist")));
   assert.equal(analyzed.diagnostics.length, 4);
-  assert.equal(analyzed.source_inventory.length, 8);
+  assert.equal(analyzed.source_inventory.length, 10);
   assert.deepEqual(
     analyzed.diagnostics.map((diagnostic) => diagnostic.code),
     [
@@ -45,12 +51,18 @@ test("Vite artifact generation produces valid manifests from scan results", asyn
   const { artifacts, files } = await generateGoldenProjectFixture("vite");
 
   assert.equal(artifacts.discovery.framework, "vite");
-  assert.equal(artifacts.matches.length, 3);
+  assert.equal(artifacts.matches.length, 5);
   assert.equal(artifacts.diagnostics.length, 4);
-  assert.equal(artifacts.source_inventory.length, 8);
+  assert.equal(artifacts.source_inventory.length, 10);
   assert.deepEqual(
     artifacts.ui.elements.map((element) => element.id),
-    ["customer.archive", "customer.archive.dialog", "customer.view"]
+    [
+      "customer.actions",
+      "customer.actions.menu",
+      "customer.archive",
+      "customer.archive.dialog",
+      "customer.view"
+    ]
   );
   assert.equal(spec.validateRuntimeUiManifest(artifacts.ui).ok, true);
   assert.equal(spec.validateSemanticActionsManifest(artifacts.actions).ok, true);
@@ -63,15 +75,21 @@ test("Next scan ignores framework output directories and extracts explicit AIC a
 
   assert.deepEqual(
     matches.map((match) => match.agentId),
-    ["customer.archive", "customer.archive.dialog", "customer.view"]
+    [
+      "customer.actions",
+      "customer.actions.menu",
+      "customer.archive",
+      "customer.archive.dialog",
+      "customer.view"
+    ]
   );
   assert.deepEqual(
     matches.map((match) => match.file),
-    ["src/App.tsx", "src/App.tsx", "src/App.tsx"]
+    ["src/App.tsx", "src/App.tsx", "src/App.tsx", "src/App.tsx", "src/App.tsx"]
   );
   assert.ok(matches.every((match) => !match.file.includes(".next")));
   assert.equal(analyzed.diagnostics.length, 4);
-  assert.equal(analyzed.source_inventory.length, 8);
+  assert.equal(analyzed.source_inventory.length, 10);
   assert.deepEqual(
     analyzed.diagnostics.map((diagnostic) => diagnostic.code),
     [
@@ -89,12 +107,18 @@ test("Next artifact generation produces valid manifests from scan results", asyn
   const { artifacts, files } = await generateGoldenProjectFixture("next");
 
   assert.equal(artifacts.discovery.framework, "nextjs");
-  assert.equal(artifacts.matches.length, 3);
+  assert.equal(artifacts.matches.length, 5);
   assert.equal(artifacts.diagnostics.length, 4);
-  assert.equal(artifacts.source_inventory.length, 8);
+  assert.equal(artifacts.source_inventory.length, 10);
   assert.deepEqual(
     artifacts.actions.actions.map((action) => action.target),
-    ["customer.archive", "customer.archive.dialog", "customer.view"]
+    [
+      "customer.actions",
+      "customer.actions.menu",
+      "customer.archive",
+      "customer.archive.dialog",
+      "customer.view"
+    ]
   );
   assert.equal(spec.validateRuntimeUiManifest(artifacts.ui).ok, true);
   assert.equal(spec.validateSemanticActionsManifest(artifacts.actions).ok, true);

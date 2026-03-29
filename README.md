@@ -11,6 +11,8 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - guarded CLI apply for exact-match source edits
 - offline bootstrap from saved captures with reviewed outputs
 - reference consumer proof showing external resolution by contract instead of selector-first fallbacks
+- explicit `@aic/*/client` entrypoints for Next/RSC-aware consumption of React-facing packages
+- coding-agent onboarding templates and report warnings for app repos adopting AIC
 
 ## Not Guaranteed Yet
 
@@ -25,6 +27,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - [Next checkout example](/mnt/c/users/vatsa/agentinteractioncontrol/examples/nextjs-checkout-demo)
 - [Vite CRM example](/mnt/c/users/vatsa/agentinteractioncontrol/examples/react-basic)
 - [Bootstrap example](/mnt/c/users/vatsa/agentinteractioncontrol/examples/bootstrap-openai)
+- [Coding Agent Onboarding](/mnt/c/users/vatsa/agentinteractioncontrol/docs/coding-agents.md)
 - [Supported Today](/mnt/c/users/vatsa/agentinteractioncontrol/docs/supported-today.md)
 - [Reference consumer proof](/mnt/c/users/vatsa/agentinteractioncontrol/tests/reference-consumer.test.mjs)
 
@@ -59,7 +62,7 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - `@aic/ai-bootstrap-openai`
   OpenAI Responses/Structured Outputs adapter for bootstrap suggestion generation.
 - `@aic/integrations-radix` and `@aic/integrations-shadcn`
-  Lightweight adapter helpers for common component-library usage.
+  Practical adapter coverage for common dialog, dropdown/menu, select, checkbox, switch, and tabs usage.
 - examples
   A Vite CRM demo, a Next checkout demo proving serious-workflow metadata, and an OpenAI bootstrap example from saved captures.
 
@@ -77,11 +80,19 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - Checked-in v1 JSON Schemas now live under [`schemas/`](/mnt/c/users/vatsa/agentinteractioncontrol/schemas).
 - Contract and usage docs live in:
   [manifest-spec.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/manifest-spec.md),
+  [coding-agents.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/coding-agents.md),
   [sdk-api.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/sdk-api.md),
   [threat-model.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/threat-model.md),
   [release-checklist.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/release-checklist.md),
   [supported-today.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/supported-today.md),
   and [implementation-phases.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/implementation-phases.md).
+
+## Coding Agent Onboarding
+
+- The canonical coding-agent instructions for this repo live in [AGENTS.md](/mnt/c/users/vatsa/agentinteractioncontrol/AGENTS.md).
+- Tool-specific wrappers live in [CLAUDE.md](/mnt/c/users/vatsa/agentinteractioncontrol/CLAUDE.md), [GEMINI.md](/mnt/c/users/vatsa/agentinteractioncontrol/GEMINI.md), [.github/copilot-instructions.md](/mnt/c/users/vatsa/agentinteractioncontrol/.github/copilot-instructions.md), and [.cursor/rules/aic.mdc](/mnt/c/users/vatsa/agentinteractioncontrol/.cursor/rules/aic.mdc).
+- Copy-ready starter files for app teams live under [templates/agent-onboarding](/mnt/c/users/vatsa/agentinteractioncontrol/templates/agent-onboarding).
+- `aic generate project ... --out-dir ...` now records optional onboarding warnings in `report.json` when the recommended repo-level agent files are missing or stale.
 
 ## Key Idea
 
@@ -157,4 +168,4 @@ See [examples/bootstrap-openai/README.md](/mnt/c/Users/vatsa/agentinteractioncon
 - Extraction diagnostics are review signals, not CI blockers by default. The repo treats warning drift as important by asserting expected diagnostics in fixtures and goldens.
 - Devtools remains read-only: live inspection, filtering, diffing, DOM discovery, and authoring patch-plan export are implemented in the extension, but repo mutation only happens through the CLI apply flow.
 - The first write-back phase is intentionally narrow: `aic apply authoring-plan` only mutates proposals with one exact source match and only edits JSX opening-tag AIC props in place.
-- Radix and shadcn packages remain reference-grade adapter surfaces rather than full production integrations.
+- Radix and shadcn coverage now handles common control-layer adoption paths, but it is still not a full design-system mirror or a guarantee for every custom component pattern.

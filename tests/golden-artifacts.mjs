@@ -132,7 +132,9 @@ export async function generateGoldenProjectFixture(name) {
     name === "vite"
       ? await pluginVite.generateViteArtifacts(config)
       : await pluginNext.generateNextArtifacts(config);
-  const report = automationCore.createProjectArtifactReport(fixture.framework, artifacts);
+  const report = automationCore.createProjectArtifactReport(fixture.framework, artifacts, {
+    projectRoot: config.projectRoot
+  });
   const files = Object.fromEntries(
     Object.entries({
       ...artifacts.files,

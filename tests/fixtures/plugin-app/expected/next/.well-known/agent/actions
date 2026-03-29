@@ -4,6 +4,42 @@
   "generated_at": "2026-03-28T00:00:00.000Z",
   "actions": [
     {
+      "name": "customer.actions",
+      "title": "Open customer actions",
+      "target": "customer.actions",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "customer.actions.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "customer.actions.menu",
+      "title": "Read customer actions menu",
+      "target": "customer.actions.menu",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "customer.actions.menu.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
       "name": "customer.archive",
       "title": "Archive customer",
       "target": "customer.archive",

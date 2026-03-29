@@ -6,7 +6,9 @@
       "@aic/spec": ["packages/spec/src/index.ts"],
       "@aic/runtime": ["packages/runtime/src/index.ts"],
       "@aic/sdk-react": ["packages/sdk-react/src/index.tsx"],
-      "@aic/devtools": ["packages/devtools/src/index.tsx"]
+      "@aic/sdk-react/client": ["packages/sdk-react/src/client.ts"],
+      "@aic/devtools": ["packages/devtools/src/index.tsx"],
+      "@aic/devtools/client": ["packages/devtools/src/client.ts"]
     }
   }
 }

@@ -14,6 +14,11 @@ This document describes the current React-first surface that is stable enough fo
 
 `AICProvider` supplies an `AICRegistry` instance to the tree. If no registry is passed, the provider creates one.
 
+For framework-aware client boundaries:
+
+- use `@aic/sdk-react/client` in Next.js or other React Server Components-aware apps
+- use `@aic/sdk-react` in plain client-only React/Vite apps
+
 ## Element Annotation Props
 
 The wrapped components and `useAICElement` hook currently revolve around explicit annotation props:
@@ -75,6 +80,15 @@ Compatibility aliases remain available for the earlier naming scheme:
 
 The bridge emits live registry snapshots to the extension or overlay. Repo mutation remains outside the extension and goes through the CLI apply flow.
 
+For Next.js or other RSC-aware apps, import bridge/overlay usage from `@aic/devtools/client`.
+
+`@aic/integrations-shadcn/client` is also available for explicit client-boundary imports when needed, while plain client-only apps can keep using `@aic/integrations-shadcn`.
+
+The current integration layer is practical rather than exhaustive:
+
+- `@aic/integrations-radix` covers common dialog, dropdown/menu, select, checkbox, switch, and tabs control semantics through prop factories
+- `@aic/integrations-shadcn` mirrors the same control families through thin wrapped components
+
 ## Extraction Boundaries
 
 The current build-time extraction path is intentionally deterministic:
@@ -94,4 +108,4 @@ Use explicit `agent*` props on critical paths and high-risk actions. Let the run
 The example apps show the intended depth for v1-owned React apps:
 
 - the Next checkout example covers critical confirmation, async execution plus recovery, validation-bearing inputs, and entity-bound actions
-- the Vite CRM example covers confirmation, entity identity, workflow references, and validation-bearing operational inputs via the shadcn wrappers
+- the Vite CRM example covers confirmation, entity identity, workflow references, validation-bearing operational inputs, and dropdown/select/dialog control semantics via the shadcn wrappers

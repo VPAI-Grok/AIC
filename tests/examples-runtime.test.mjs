@@ -162,22 +162,47 @@ test("crm example emits confirmation, validation, execution, recovery, entity, a
             React.Fragment,
             null,
             React.createElement(
-              shadcn.ShadcnAICDialogTrigger,
-              crmContract.ARCHIVE_CUSTOMER_PROPS,
-              "Archive customer"
+              shadcn.ShadcnAICDropdownMenuTrigger,
+              crmContract.CUSTOMER_ACTIONS_TRIGGER_PROPS,
+              "Customer actions"
+            ),
+            React.createElement(
+              shadcn.ShadcnAICDropdownMenuContent,
+              crmContract.CUSTOMER_ACTIONS_MENU_PROPS,
+              React.createElement(
+                React.Fragment,
+                null,
+                React.createElement(
+                  shadcn.ShadcnAICDropdownMenuItem,
+                  {
+                    ...crmContract.SEND_RENEWAL_REMINDER_PROPS,
+                    type: "button"
+                  },
+                  "Send renewal reminder"
+                ),
+                React.createElement(
+                  shadcn.ShadcnAICDialogTrigger,
+                  crmContract.ARCHIVE_CUSTOMER_PROPS,
+                  "Archive customer"
+                )
+              )
             ),
             React.createElement(
               shadcn.ShadcnAICDialogContent,
               crmContract.ARCHIVE_DIALOG_PROPS,
-              "Archiving Northwind Traders pauses reminder workflows."
-            ),
-            React.createElement(
-              shadcn.ShadcnAICButton,
-              {
-                ...crmContract.SEND_RENEWAL_REMINDER_PROPS,
-                type: "button"
-              },
-              "Send renewal reminder"
+              React.createElement(
+                React.Fragment,
+                null,
+                "Archiving Northwind Traders pauses reminder workflows.",
+                React.createElement(
+                  shadcn.ShadcnAICDialogClose,
+                  {
+                    ...crmContract.ARCHIVE_DIALOG_CLOSE_PROPS,
+                    type: "button"
+                  },
+                  "Cancel archive"
+                )
+              )
             ),
             React.createElement(shadcn.ShadcnAICInput, crmContract.RENEWAL_NOTE_INPUT_PROPS),
             React.createElement(
@@ -187,6 +212,43 @@ test("crm example emits confirmation, validation, execution, recovery, entity, a
                 type: "button"
               },
               "Save renewal note"
+            ),
+            React.createElement(
+              shadcn.ShadcnAICSelectTrigger,
+              crmContract.ACCOUNT_STATUS_TRIGGER_PROPS,
+              "Account status"
+            ),
+            React.createElement(
+              shadcn.ShadcnAICSelectContent,
+              crmContract.ACCOUNT_STATUS_OPTIONS_PROPS,
+              React.createElement(
+                React.Fragment,
+                null,
+                React.createElement(
+                  shadcn.ShadcnAICSelectItem,
+                  {
+                    ...crmContract.ACCOUNT_STATUS_ACTIVE_PROPS,
+                    type: "button"
+                  },
+                  "Active"
+                ),
+                React.createElement(
+                  shadcn.ShadcnAICSelectItem,
+                  {
+                    ...crmContract.ACCOUNT_STATUS_TRIAL_PROPS,
+                    type: "button"
+                  },
+                  "Trial"
+                ),
+                React.createElement(
+                  shadcn.ShadcnAICSelectItem,
+                  {
+                    ...crmContract.ACCOUNT_STATUS_AT_RISK_PROPS,
+                    type: "button"
+                  },
+                  "At-risk"
+                )
+              )
             ),
             React.createElement(
               shadcn.ShadcnAICTabsTrigger,
@@ -213,15 +275,30 @@ test("crm example emits confirmation, validation, execution, recovery, entity, a
   assert.equal(archive.entity_ref?.entity_id, "cus_2048");
   assert.equal(archive.workflow_ref, "customer.archive.review");
 
+  const actionsMenu = getElement(manifest, "customer.actions_menu");
+  assert.equal(actionsMenu.role, "button");
+  assert.equal(actionsMenu.entity_ref?.entity_type, "customer");
+
+  const actionsContent = getElement(manifest, "customer.actions_menu.content");
+  assert.equal(actionsContent.role, "menu");
+
   const sendReminder = getElement(manifest, "customer.send_renewal_email");
   assert.equal(sendReminder.execution?.estimated_latency_ms, 2500);
   assert.equal(sendReminder.recovery?.recovery, "retry_email_send");
   assert.equal(sendReminder.workflow_ref, "customer.renewal.outreach.send");
 
+  const closeArchive = getElement(manifest, "customer.archive.dialog.close");
+  assert.equal(closeArchive.role, "button");
+  assert.equal(closeArchive.workflow_ref, "customer.archive.review");
+
   const renewalNote = getElement(manifest, "customer.renewal_note");
   assert.equal(renewalNote.validation?.required, true);
   assert.equal(renewalNote.validation?.max_length, 240);
   assert.equal(renewalNote.workflow_ref, "customer.renewal.note.capture");
+
+  const statusOption = getElement(manifest, "customer.filter.account_status.at_risk");
+  assert.equal(statusOption.role, "option");
+  assert.equal(statusOption.risk, "medium");
 
   const saveNote = getElement(manifest, "customer.renewal_note.save");
   assert.equal(saveNote.entity_ref?.entity_type, "customer");

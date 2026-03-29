@@ -10,6 +10,11 @@
       "types": "./dist/sdk-react/src/index.d.ts",
       "import": "./dist/sdk-react/src/index.js",
       "default": "./dist/sdk-react/src/index.js"
+    },
+    "./client": {
+      "types": "./dist/sdk-react/src/client.d.ts",
+      "import": "./dist/sdk-react/src/client.js",
+      "default": "./dist/sdk-react/src/client.js"
     }
   },
   "scripts": {

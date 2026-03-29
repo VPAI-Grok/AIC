@@ -29,6 +29,27 @@ export const ARCHIVE_CUSTOMER_PROPS = /** @type {AICMetadataProps} */ ({
   agentWorkflowStep: "customer.archive.review"
 });
 
+export const CUSTOMER_ACTIONS_TRIGGER_PROPS = /** @type {AICMetadataProps} */ ({
+  agentDescription: "Opens the customer actions menu",
+  agentEntityId: "cus_2048",
+  agentEntityLabel: "Northwind Traders",
+  agentEntityType: "customer",
+  agentId: "customer.actions_menu",
+  agentLabel: "Customer actions",
+  agentRisk: "low"
+});
+
+export const CUSTOMER_ACTIONS_MENU_PROPS = /** @type {AICMetadataProps} */ ({
+  agentDescription: "Lists the actions available for the selected customer",
+  agentEntityId: "cus_2048",
+  agentEntityLabel: "Northwind Traders",
+  agentEntityType: "customer",
+  agentId: "customer.actions_menu.content",
+  agentLabel: "Customer actions menu",
+  agentRisk: "low",
+  agentRole: "menu"
+});
+
 export const SEND_RENEWAL_REMINDER_PROPS = /** @type {AICMetadataProps} */ ({
   agentAction: "click",
   agentDescription: "Sends a renewal reminder email to the current customer",
@@ -61,6 +82,18 @@ export const ARCHIVE_DIALOG_PROPS = /** @type {AICMetadataProps} */ ({
   agentRisk: "medium"
 });
 
+export const ARCHIVE_DIALOG_CLOSE_PROPS = /** @type {AICMetadataProps} */ ({
+  agentAction: "click",
+  agentDescription: "Dismisses the archive customer dialog without making changes",
+  agentEntityId: "cus_2048",
+  agentEntityLabel: "Northwind Traders",
+  agentEntityType: "customer",
+  agentId: "customer.archive.dialog.close",
+  agentLabel: "Cancel archive",
+  agentRisk: "low",
+  agentWorkflowStep: "customer.archive.review"
+});
+
 export const ACCOUNT_STATUS_TRIGGER_PROPS = /** @type {AICMetadataProps} */ ({
   agentDescription: "Opens the account status filter",
   agentId: "customer.filter.account_status"
@@ -70,6 +103,33 @@ export const ACCOUNT_STATUS_OPTIONS_PROPS = /** @type {AICMetadataProps} */ ({
   agentDescription: "Shows the available account status filter options",
   agentId: "customer.filter.account_status.options",
   agentRole: "listbox"
+});
+
+export const ACCOUNT_STATUS_ACTIVE_PROPS = /** @type {AICMetadataProps} */ ({
+  agentAction: "select",
+  agentDescription: "Filters customers with active status",
+  agentId: "customer.filter.account_status.active",
+  agentLabel: "Active",
+  agentRisk: "low",
+  agentRole: "option"
+});
+
+export const ACCOUNT_STATUS_TRIAL_PROPS = /** @type {AICMetadataProps} */ ({
+  agentAction: "select",
+  agentDescription: "Filters customers with trial status",
+  agentId: "customer.filter.account_status.trial",
+  agentLabel: "Trial",
+  agentRisk: "low",
+  agentRole: "option"
+});
+
+export const ACCOUNT_STATUS_AT_RISK_PROPS = /** @type {AICMetadataProps} */ ({
+  agentAction: "select",
+  agentDescription: "Filters customers with at-risk status",
+  agentId: "customer.filter.account_status.at_risk",
+  agentLabel: "At-risk",
+  agentRisk: "medium",
+  agentRole: "option"
 });
 
 export const SHOW_ARCHIVED_PROPS = /** @type {AICMetadataProps} */ ({

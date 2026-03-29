@@ -28,6 +28,16 @@ export function createRadixDialogContentAICProps(options: RadixAICOptions): AICM
   };
 }
 
+export function createRadixDialogCloseAICProps(options: RadixAICOptions): AICMetadataProps {
+  return {
+    agentAction: "click",
+    agentDescription: options.description ?? "Closes a dialog",
+    agentId: options.id,
+    agentRisk: options.risk ?? "low",
+    agentRole: "button"
+  };
+}
+
 export function createRadixSelectAICProps(options: RadixAICOptions): AICMetadataProps {
   return {
     ...createRadixSelectTriggerAICProps(options),
@@ -59,6 +69,40 @@ export function createRadixSelectItemAICProps(options: RadixAICOptions): AICMeta
   };
 }
 
+export function createRadixSelectContentAICProps(options: RadixAICOptions): AICMetadataProps {
+  return {
+    agentAction: "read",
+    agentDescription: options.description ?? "Reads the available options",
+    agentId: options.id,
+    agentRisk: options.risk ?? "low",
+    agentRole: "listbox"
+  };
+}
+
+export function createRadixDropdownMenuTriggerAICProps(options: RadixAICOptions): AICMetadataProps {
+  return {
+    agentAction: "click",
+    agentDescription: options.description ?? "Opens an action menu",
+    agentEntityId: options.entityId,
+    agentEntityType: options.entityType,
+    agentId: options.id,
+    agentRisk: options.risk ?? "low",
+    agentRole: "button"
+  };
+}
+
+export function createRadixDropdownMenuContentAICProps(options: RadixAICOptions): AICMetadataProps {
+  return {
+    agentAction: "read",
+    agentDescription: options.description ?? "Reads the available menu actions",
+    agentEntityId: options.entityId,
+    agentEntityType: options.entityType,
+    agentId: options.id,
+    agentRisk: options.risk ?? "low",
+    agentRole: "menu"
+  };
+}
+
 export function createRadixMenuItemAICProps(options: RadixAICOptions): AICMetadataProps {
   return {
     agentAction: "click",
@@ -69,6 +113,10 @@ export function createRadixMenuItemAICProps(options: RadixAICOptions): AICMetada
     agentRisk: options.risk ?? "medium",
     agentRole: "menuitem"
   };
+}
+
+export function createRadixDropdownMenuItemAICProps(options: RadixAICOptions): AICMetadataProps {
+  return createRadixMenuItemAICProps(options);
 }
 
 export function createRadixCheckboxAICProps(options: RadixAICOptions): AICMetadataProps {
@@ -102,6 +150,16 @@ export function createRadixTabsTriggerAICProps(options: RadixAICOptions): AICMet
     agentId: options.id,
     agentRisk: options.risk ?? "low",
     agentRole: "tab"
+  };
+}
+
+export function createRadixTabsListAICProps(options: RadixAICOptions): AICMetadataProps {
+  return {
+    agentAction: "read",
+    agentDescription: options.description ?? "Reads the available tabs",
+    agentId: options.id,
+    agentRisk: options.risk ?? "low",
+    agentRole: "tablist"
   };
 }
 

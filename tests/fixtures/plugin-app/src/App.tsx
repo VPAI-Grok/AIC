@@ -1,7 +1,9 @@
 import {
   ShadcnAICDialogContent,
-  ShadcnAICDialogTrigger,
-  ShadcnAICTabsTrigger
+  ShadcnAICDropdownMenuContent,
+  ShadcnAICDropdownMenuItem,
+  ShadcnAICDropdownMenuTrigger,
+  ShadcnAICSelectItem
 } from "@aic/integrations-shadcn";
 import { importedAgentId } from "./external";
 
@@ -36,15 +38,32 @@ const getViewNavigationAction = () => `navigate`;
 export function App() {
   return (
     <main>
-      <ShadcnAICDialogTrigger
+      <ShadcnAICDropdownMenuTrigger
+        agentId="customer.actions"
+        agentDescription="Open customer actions"
+        agentAction="click"
+        agentRisk="low"
+      >
+        Customer actions
+      </ShadcnAICDropdownMenuTrigger>
+      <ShadcnAICDropdownMenuContent
+        agentId="customer.actions.menu"
+        agentDescription="Read customer actions menu"
+        agentAction="read"
+        agentRisk="low"
+        agentRole="menu"
+      >
+        Menu content
+      </ShadcnAICDropdownMenuContent>
+      <ShadcnAICDropdownMenuItem
         agentId={archiveId}
         agentDescription="Archive customer"
         agentAction={agentTokens.archive.action}
         agentRisk={archiveRisk}
-        agentRole="dialog_trigger"
+        agentRole="menuitem"
       >
         Archive customer
-      </ShadcnAICDialogTrigger>
+      </ShadcnAICDropdownMenuItem>
       <ShadcnAICDialogContent
         agentId="customer.archive.dialog"
         agentDescription="Archive customer dialog"
@@ -54,15 +73,15 @@ export function App() {
       >
         Review archive impact
       </ShadcnAICDialogContent>
-      <ShadcnAICTabsTrigger
+      <ShadcnAICSelectItem
         agentId={getViewId()}
         agentDescription={getViewDescription()}
         agentAction="select"
         agentRisk="low"
-        agentRole="tab"
+        agentRole="option"
       >
         View customer
-      </ShadcnAICTabsTrigger>
+      </ShadcnAICSelectItem>
       <button data-testid="send-renewal">Send renewal email</button>
       <button agentId={importedAgentId} agentDescription="Imported unsupported control">
         Skip imported

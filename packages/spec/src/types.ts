@@ -36,6 +36,7 @@ export const AIC_ROLES = [
   "radio",
   "switch",
   "tab",
+  "tablist",
   "tabpanel",
   "menu",
   "menuitem",
@@ -415,7 +416,38 @@ export interface AICAuthoringReportMatch {
   tagName: string;
 }
 
+export interface AICAgentOnboardingFileStatus {
+  kind: "canonical" | "copilot_instructions" | "cursor_rule" | "wrapper";
+  path: string;
+  recommended: boolean;
+  status: "missing" | "present" | "stale";
+  template_version?: string;
+}
+
+export interface AICAgentOnboardingWarning {
+  code: "missing_agent_onboarding_file" | "stale_agent_onboarding_file";
+  file: string;
+  message: string;
+  severity: "warning";
+}
+
+export interface AICAgentOnboardingSummary {
+  missing: number;
+  present: number;
+  recommended: number;
+  stale: number;
+  warnings: number;
+}
+
+export interface AICAgentOnboardingReport {
+  files: AICAgentOnboardingFileStatus[];
+  summary: AICAgentOnboardingSummary;
+  template_version: string;
+  warnings: AICAgentOnboardingWarning[];
+}
+
 export interface AICAuthoringProjectReport {
+  agent_onboarding?: AICAgentOnboardingReport;
   diagnostics: AICAuthoringReportDiagnostic[];
   filesScanned: number;
   framework: string;

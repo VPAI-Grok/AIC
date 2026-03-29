@@ -1,0 +1,17 @@
+---
+description: AIC implementation guidance for app code
+globs:
+  - "app/**"
+  - "src/**"
+  - "components/**"
+  - "pages/**"
+  - "lib/**"
+alwaysApply: false
+---
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+
+# AIC Cursor Rule
+
+For AIC work, follow [AGENTS.md](/mnt/c/users/vatsa/agentinteractioncontrol/AGENTS.md) as the canonical policy.
+
+Prefer explicit `agent*` annotations, stable IDs, and reviewed artifact generation over heuristics.

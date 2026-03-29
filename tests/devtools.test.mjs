@@ -8,6 +8,7 @@ import TestRenderer, { act } from "react-test-renderer";
 import { importWorkspaceModule, resolveFromRepo } from "./helpers.mjs";
 
 const devtools = await importWorkspaceModule("packages/devtools/dist/devtools/src/index.js");
+const devtoolsClient = await importWorkspaceModule("packages/devtools/dist/devtools/src/client.js");
 const runtime = await importWorkspaceModule("packages/runtime/dist/runtime/src/index.js");
 const sdkReact = await importWorkspaceModule("packages/sdk-react/dist/sdk-react/src/index.js");
 
@@ -31,6 +32,22 @@ async function withReactWarningsSuppressed(callback) {
     console.error = originalError;
   }
 }
+
+test("devtools root entry is directive-free and client entry preserves the bridge boundary", async () => {
+  const rootFile = await readFile(
+    resolveFromRepo("packages/devtools/dist/devtools/src/index.js"),
+    "utf8"
+  );
+  const clientFile = await readFile(
+    resolveFromRepo("packages/devtools/dist/devtools/src/client.js"),
+    "utf8"
+  );
+
+  assert.equal(rootFile.startsWith("\"use client\";"), false);
+  assert.equal(clientFile.startsWith("\"use client\";"), true);
+  assert.equal(typeof devtoolsClient.AICDevtoolsBridge, "function");
+  assert.equal(devtoolsClient.AICDevtoolsBridge, devtools.AICDevtoolsBridge);
+});
 
 function createWindowStub() {
   const eventTarget = new EventTarget();

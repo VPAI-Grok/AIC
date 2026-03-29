@@ -12,6 +12,9 @@ const radix = await importWorkspaceModule(
 const shadcn = await importWorkspaceModule(
   "packages/integrations-shadcn/dist/integrations-shadcn/src/index.js"
 );
+const shadcnClient = await importWorkspaceModule(
+  "packages/integrations-shadcn/dist/integrations-shadcn/src/client.js"
+);
 const sdkReact = await importWorkspaceModule("packages/sdk-react/dist/sdk-react/src/index.js");
 const runtime = await importWorkspaceModule("packages/runtime/dist/runtime/src/index.js");
 
@@ -36,6 +39,24 @@ async function withWarningsSuppressed(callback) {
   }
 }
 
+test("shadcn root entry is directive-free and client entry preserves the wrapper boundary", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const { resolveFromRepo } = await import("./helpers.mjs");
+  const rootFile = await readFile(
+    resolveFromRepo("packages/integrations-shadcn/dist/integrations-shadcn/src/index.js"),
+    "utf8"
+  );
+  const clientFile = await readFile(
+    resolveFromRepo("packages/integrations-shadcn/dist/integrations-shadcn/src/client.js"),
+    "utf8"
+  );
+
+  assert.equal(rootFile.startsWith("\"use client\";"), false);
+  assert.equal(clientFile.startsWith("\"use client\";"), true);
+  assert.equal(typeof shadcnClient.ShadcnAICButton, "function");
+  assert.equal(shadcnClient.ShadcnAICButton, shadcn.ShadcnAICButton);
+});
+
 test("Radix helper factories expose stable AIC props for common controls", () => {
   assert.deepEqual(radix.createRadixDialogTriggerAICProps({ id: "dialog.open" }), {
     agentAction: "click",
@@ -52,6 +73,7 @@ test("Radix helper factories expose stable AIC props for common controls", () =>
     agentRisk: "low",
     agentRole: "dialog"
   });
+  assert.equal(radix.createRadixDialogCloseAICProps({ id: "dialog.close" }).agentAction, "click");
 
   assert.deepEqual(
     radix.createRadixSelectTriggerAICProps({
@@ -69,9 +91,14 @@ test("Radix helper factories expose stable AIC props for common controls", () =>
     }
   );
 
+  assert.equal(radix.createRadixSelectContentAICProps({ id: "filter.status.options" }).agentRole, "listbox");
   assert.equal(radix.createRadixSelectItemAICProps({ id: "filter.status.active" }).agentRole, "option");
+  assert.equal(radix.createRadixDropdownMenuTriggerAICProps({ id: "menu.actions" }).agentRole, "button");
+  assert.equal(radix.createRadixDropdownMenuContentAICProps({ id: "menu.actions.content" }).agentRole, "menu");
+  assert.equal(radix.createRadixDropdownMenuItemAICProps({ id: "menu.actions.archive" }).agentRole, "menuitem");
   assert.equal(radix.createRadixCheckboxAICProps({ id: "toggle.archived" }).agentAction, "toggle");
   assert.equal(radix.createRadixSwitchAICProps({ id: "toggle.sync" }).agentRole, "switch");
+  assert.equal(radix.createRadixTabsListAICProps({ id: "tabs.customer" }).agentRole, "tablist");
   assert.equal(radix.createRadixTabsTriggerAICProps({ id: "tab.overview" }).agentRole, "tab");
   assert.equal(radix.createRadixTabsContentAICProps({ id: "panel.overview" }).agentRole, "tabpanel");
 });
@@ -93,7 +120,30 @@ test("Shadcn wrappers register expected runtime roles and actions", async () => 
             React.createElement(
               shadcn.ShadcnAICDialogContent,
               { agentId: "dialog.content" },
-              "Dialog body"
+              React.createElement(
+                React.Fragment,
+                null,
+                "Dialog body",
+                React.createElement(
+                  shadcn.ShadcnAICDialogClose,
+                  { agentId: "dialog.close", type: "button" },
+                  "Close dialog"
+                )
+              )
+            ),
+            React.createElement(
+              shadcn.ShadcnAICDropdownMenuTrigger,
+              { agentId: "menu.actions" },
+              "Actions"
+            ),
+            React.createElement(
+              shadcn.ShadcnAICDropdownMenuContent,
+              { agentId: "menu.actions.content" },
+              React.createElement(
+                shadcn.ShadcnAICDropdownMenuItem,
+                { agentId: "menu.actions.archive", type: "button" },
+                "Archive"
+              )
             ),
             React.createElement(
               shadcn.ShadcnAICSelectTrigger,
@@ -103,7 +153,11 @@ test("Shadcn wrappers register expected runtime roles and actions", async () => 
             React.createElement(
               shadcn.ShadcnAICSelectContent,
               { agentId: "filter.status.options" },
-              "Active, Trial, At-risk"
+              React.createElement(
+                shadcn.ShadcnAICSelectItem,
+                { agentId: "filter.status.active", type: "button" },
+                "Active"
+              )
             ),
             React.createElement(shadcn.ShadcnAICCheckbox, {
               agentId: "filter.show_archived",
@@ -122,11 +176,16 @@ test("Shadcn wrappers register expected runtime roles and actions", async () => 
   });
 
   const snapshot = registry.snapshot();
-  assert.equal(snapshot.length, 7);
+  assert.equal(snapshot.length, 12);
   assert.equal(registry.get("dialog.open")?.role, "dialog_trigger");
   assert.equal(registry.get("dialog.content")?.actions[0]?.name, "read");
+  assert.equal(registry.get("dialog.close")?.actions[0]?.name, "click");
+  assert.equal(registry.get("menu.actions")?.role, "button");
+  assert.equal(registry.get("menu.actions.content")?.role, "menu");
+  assert.equal(registry.get("menu.actions.archive")?.role, "menuitem");
   assert.equal(registry.get("filter.status")?.role, "combobox");
   assert.equal(registry.get("filter.status.options")?.role, "listbox");
+  assert.equal(registry.get("filter.status.active")?.role, "option");
   assert.equal(registry.get("filter.show_archived")?.actions[0]?.name, "toggle");
   assert.equal(registry.get("tab.overview")?.role, "tab");
   assert.equal(registry.get("panel.overview")?.role, "tabpanel");
