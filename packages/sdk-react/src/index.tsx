@@ -9,7 +9,7 @@ import {
   type PropsWithChildren,
   type ReactNode
 } from "react";
-import { AICRegistry, createAICDataAttributes } from "@aic/runtime";
+import { AICRegistry, createAICDataAttributes } from "@aicorg/runtime";
 import type {
   AICActionName,
   AICConfirmationProtocol,
@@ -19,7 +19,7 @@ import type {
   AICRisk,
   AICRole,
   AICValidationMetadata
-} from "@aic/spec";
+} from "@aicorg/spec";
 
 const defaultRegistry = new AICRegistry();
 const AICRegistryContext = createContext<AICRegistry>(defaultRegistry);

@@ -346,20 +346,20 @@ Build the project as a TypeScript monorepo.
 
 ### 8.1 Required packages
 
-- `@aic/spec`
-- `@aic/runtime`
-- `@aic/sdk-react`
-- `@aic/plugin-next`
-- `@aic/plugin-vite`
-- `@aic/cli`
-- `@aic/devtools`
-- `@aic/ai-bootstrap`
-- `@aic/integrations-radix`
-- `@aic/integrations-shadcn`
+- `@aicorg/spec`
+- `@aicorg/runtime`
+- `@aicorg/sdk-react`
+- `@aicorg/plugin-next`
+- `@aicorg/plugin-vite`
+- `@aicorg/cli`
+- `@aicorg/devtools`
+- `@aicorg/ai-bootstrap`
+- `@aicorg/integrations-radix`
+- `@aicorg/integrations-shadcn`
 
 ### 8.2 Package responsibilities
 
-#### `@aic/spec`
+#### `@aicorg/spec`
 Contains:
 
 - JSON schemas
@@ -368,7 +368,7 @@ Contains:
 - versioning rules
 - manifest shape definitions
 
-#### `@aic/runtime`
+#### `@aicorg/runtime`
 Contains:
 
 - in-browser registry
@@ -378,7 +378,7 @@ Contains:
 - serializer
 - runtime contract serving helpers
 
-#### `@aic/sdk-react`
+#### `@aicorg/sdk-react`
 Contains:
 
 - provider
@@ -389,7 +389,7 @@ Contains:
 - runtime registration
 - dev warnings
 
-#### `@aic/plugin-next`
+#### `@aicorg/plugin-next`
 Contains:
 
 - Next.js integration
@@ -399,7 +399,7 @@ Contains:
 - optional data-attribute injection
 - route-aware outputs
 
-#### `@aic/plugin-vite`
+#### `@aicorg/plugin-vite`
 Contains:
 
 - Vite integration
@@ -408,7 +408,7 @@ Contains:
 - manifest generation
 - debug helpers
 
-#### `@aic/cli`
+#### `@aicorg/cli`
 Contains:
 
 - scan
@@ -419,7 +419,7 @@ Contains:
 - inspect
 - export helpers
 
-#### `@aic/devtools`
+#### `@aicorg/devtools`
 Contains:
 
 - browser extension
@@ -428,7 +428,7 @@ Contains:
 - export panel
 - runtime visualizer
 
-#### `@aic/ai-bootstrap`
+#### `@aicorg/ai-bootstrap`
 Contains:
 
 - Playwright crawler
@@ -437,14 +437,14 @@ Contains:
 - draft manifest generation
 - patch suggestion generation
 
-#### `@aic/integrations-radix`
+#### `@aicorg/integrations-radix`
 Contains:
 
 - adapters/wrappers for Radix primitives
 - role/state/action inference
 - trigger-content relationship mapping
 
-#### `@aic/integrations-shadcn`
+#### `@aicorg/integrations-shadcn`
 Contains:
 
 - shadcn-friendly wrappers
@@ -1942,7 +1942,7 @@ Build:
 
 Deliverables:
 
-- `@aic/spec`
+- `@aicorg/spec`
 - schemas for:
   - discovery
   - runtime UI
@@ -1966,7 +1966,7 @@ Build:
 
 Deliverables:
 
-- `@aic/runtime`
+- `@aicorg/runtime`
 
 ### Phase 3 — React SDK
 
@@ -1982,7 +1982,7 @@ Build:
 
 Deliverables:
 
-- `@aic/sdk-react`
+- `@aicorg/sdk-react`
 
 ### Phase 4 — Build plugins
 
@@ -1997,8 +1997,8 @@ Build:
 
 Deliverables:
 
-- `@aic/plugin-next`
-- `@aic/plugin-vite`
+- `@aicorg/plugin-next`
+- `@aicorg/plugin-vite`
 
 ### Phase 5 — CLI
 
@@ -2008,7 +2008,7 @@ Build:
 
 Deliverables:
 
-- `@aic/cli`
+- `@aicorg/cli`
 
 ### Phase 6 — Devtools
 
@@ -2021,7 +2021,7 @@ Build:
 
 Deliverables:
 
-- `@aic/devtools`
+- `@aicorg/devtools`
 
 ### Phase 7 — AI bootstrap
 
@@ -2035,7 +2035,7 @@ Build:
 
 Deliverables:
 
-- `@aic/ai-bootstrap`
+- `@aicorg/ai-bootstrap`
 
 ### Phase 8 — Integrations and demos
 
@@ -2047,8 +2047,8 @@ Build:
 
 Deliverables:
 
-- `@aic/integrations-radix`
-- `@aic/integrations-shadcn`
+- `@aicorg/integrations-radix`
+- `@aicorg/integrations-shadcn`
 - examples/
 
 ---
@@ -2217,9 +2217,9 @@ Measure:
 Codex should start with these concrete implementation tasks:
 
 1. initialize monorepo with `pnpm` + `turborepo`
-2. create `@aic/spec` with versioned JSON schemas
-3. create `@aic/runtime` with registry and event model
-4. create `@aic/sdk-react` with provider + button/input/select wrappers
+2. create `@aicorg/spec` with versioned JSON schemas
+3. create `@aicorg/runtime` with registry and event model
+4. create `@aicorg/sdk-react` with provider + button/input/select wrappers
 5. create sample `/.well-known/agent.json` generator
 6. create `agent-permissions.json` + `operate.txt` generation
 7. create validator rules for:

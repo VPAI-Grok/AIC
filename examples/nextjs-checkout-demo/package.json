@@ -1,5 +1,5 @@
 {
-  "name": "@aic/example-nextjs-checkout-demo",
+  "name": "@aicorg/example-nextjs-checkout-demo",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,8 +8,8 @@
     "check": "tsc -p tsconfig.check.json --noEmit"
   },
   "dependencies": {
-    "@aic/devtools": "workspace:*",
-    "@aic/sdk-react": "workspace:*",
+    "@aicorg/devtools": "workspace:*",
+    "@aicorg/sdk-react": "workspace:*",
     "next": "^15.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

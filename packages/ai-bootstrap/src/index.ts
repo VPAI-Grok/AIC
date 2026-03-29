@@ -12,7 +12,7 @@ import {
   type JsonObject,
   validateDiscoveryManifest,
   validateRuntimeUiManifest
-} from "@aic/spec";
+} from "@aicorg/spec";
 
 export interface AICBootstrapPageCapture {
   accessibility?: JsonObject;

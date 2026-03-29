@@ -1,4 +1,4 @@
-import type { AICMetadataProps } from "@aic/sdk-react";
+import type { AICMetadataProps } from "@aicorg/sdk-react";
 
 export interface RadixAICOptions {
   description?: string;

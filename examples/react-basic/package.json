@@ -1,5 +1,5 @@
 {
-  "name": "@aic/example-vite-crm-demo",
+  "name": "@aicorg/example-vite-crm-demo",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,9 +9,9 @@
     "check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@aic/devtools": "workspace:*",
-    "@aic/integrations-shadcn": "workspace:*",
-    "@aic/sdk-react": "workspace:*",
+    "@aicorg/devtools": "workspace:*",
+    "@aicorg/integrations-shadcn": "workspace:*",
+    "@aicorg/sdk-react": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

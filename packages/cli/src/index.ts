@@ -16,7 +16,7 @@ import {
   scanSourceForAICAnnotations,
   writeArtifactFiles,
   type AICAutomationManifestKind
-} from "@aic/automation-core";
+} from "@aicorg/automation-core";
 import {
   isAICBootstrapProviderError,
   createBootstrapSuggestionPrompt,
@@ -28,10 +28,10 @@ import {
   renderBootstrapReport,
   renderBootstrapReviewReport,
   type AICBootstrapPageCapture
-} from "@aic/ai-bootstrap";
-import { createHttpBootstrapSuggestionProvider } from "@aic/ai-bootstrap-http";
-import { createOpenAIBootstrapSuggestionProvider } from "@aic/ai-bootstrap-openai";
-import { AICRegistry } from "@aic/runtime";
+} from "@aicorg/ai-bootstrap";
+import { createHttpBootstrapSuggestionProvider } from "@aicorg/ai-bootstrap-http";
+import { createOpenAIBootstrapSuggestionProvider } from "@aicorg/ai-bootstrap-openai";
+import { AICRegistry } from "@aicorg/runtime";
 import {
   type AICAuthoringApplyResult,
   buildAICAuthoringPatchPlan,
@@ -54,7 +54,7 @@ import {
   type AICSemanticActionsManifest,
   type AICValidationIssue,
   type AICWorkflowManifest
-} from "@aic/spec";
+} from "@aicorg/spec";
 
 console.log = (...args: unknown[]) => {
   writeSync(process.stdout.fd, `${format(...args)}\n`);

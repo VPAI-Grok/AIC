@@ -1,5 +1,5 @@
 {
-  "name": "@aic/ai-bootstrap",
+  "name": "@aicorg/ai-bootstrap",
   "version": "0.1.0-alpha.0",
   "type": "module",
   "description": "Bootstrap prompt and review tooling for generating AIC drafts from captured pages.",
@@ -31,7 +31,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@aic/spec": "workspace:*",
+    "@aicorg/spec": "workspace:*",
     "playwright": "^1.52.0"
   }
 }

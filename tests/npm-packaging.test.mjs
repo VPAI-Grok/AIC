@@ -10,73 +10,73 @@ const publishablePackages = [
   {
     hasBin: false,
     hasClientExport: false,
-    name: "@aic/spec",
+    name: "@aicorg/spec",
     path: "packages/spec"
   },
   {
     hasBin: false,
     hasClientExport: false,
-    name: "@aic/runtime",
+    name: "@aicorg/runtime",
     path: "packages/runtime"
   },
   {
     hasBin: false,
     hasClientExport: true,
-    name: "@aic/sdk-react",
+    name: "@aicorg/sdk-react",
     path: "packages/sdk-react"
   },
   {
     hasBin: false,
     hasClientExport: false,
-    name: "@aic/automation-core",
+    name: "@aicorg/automation-core",
     path: "packages/automation-core"
   },
   {
     hasBin: true,
     hasClientExport: false,
-    name: "@aic/cli",
+    name: "@aicorg/cli",
     path: "packages/cli"
   },
   {
     hasBin: false,
     hasClientExport: false,
-    name: "@aic/plugin-vite",
+    name: "@aicorg/plugin-vite",
     path: "packages/plugin-vite"
   },
   {
     hasBin: false,
     hasClientExport: false,
-    name: "@aic/plugin-next",
+    name: "@aicorg/plugin-next",
     path: "packages/plugin-next"
   },
   {
     hasBin: false,
     hasClientExport: false,
-    name: "@aic/integrations-radix",
+    name: "@aicorg/integrations-radix",
     path: "packages/integrations-radix"
   },
   {
     hasBin: false,
     hasClientExport: true,
-    name: "@aic/integrations-shadcn",
+    name: "@aicorg/integrations-shadcn",
     path: "packages/integrations-shadcn"
   },
   {
     hasBin: false,
     hasClientExport: false,
-    name: "@aic/ai-bootstrap",
+    name: "@aicorg/ai-bootstrap",
     path: "packages/ai-bootstrap"
   },
   {
     hasBin: false,
     hasClientExport: false,
-    name: "@aic/ai-bootstrap-http",
+    name: "@aicorg/ai-bootstrap-http",
     path: "packages/ai-bootstrap-http"
   },
   {
     hasBin: false,
     hasClientExport: false,
-    name: "@aic/ai-bootstrap-openai",
+    name: "@aicorg/ai-bootstrap-openai",
     path: "packages/ai-bootstrap-openai"
   }
 ];

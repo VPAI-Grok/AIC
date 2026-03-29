@@ -4,23 +4,23 @@ The repo is now aligned to the master-spec core platform rather than the earlier
 
 ## Current Core Packages
 
-- `@aic/spec`
+- `@aicorg/spec`
   The source of truth for discovery, runtime UI, permissions, workflows, semantic actions, action contracts, entity refs, execution metadata, recovery metadata, confirmation, validation, and browser-safe manifest diff helpers.
-- `@aic/automation-core`
+- `@aicorg/automation-core`
   The shared source-to-artifact layer. It scans source files, emits deterministic diagnostics, generates project manifests, writes artifact files, creates review reports, and reuses the shared manifest diff helpers.
-- `@aic/runtime`
+- `@aicorg/runtime`
   The live registry and serializer layer. It merges provenance sources in this order: `ai_suggested`, `inferred`, `authored`.
-- `@aic/sdk-react`
+- `@aicorg/sdk-react`
   The React-first API surface. `AICProvider`, `useAICRegistry`, `useAICElement`, and `AIC.*` wrappers are preferred. `Agent*` exports remain compatibility aliases.
-- `@aic/plugin-next` and `@aic/plugin-vite`
+- `@aicorg/plugin-next` and `@aicorg/plugin-vite`
   Framework-facing wrappers over the shared automation core.
-- `@aic/cli`
+- `@aicorg/cli`
   Source scanning, validation, project generation, diffing, manifest inspection, and Playwright-backed bootstrap entrypoints.
-- `@aic/devtools`
+- `@aicorg/devtools`
   The development-time inspection and authoring layer. It now supports an opt-in React bridge, an in-app overlay, DOM discovery helpers, and a Chrome-first extension shell with popup plus DevTools panel assets.
-- `@aic/ai-bootstrap-http`
+- `@aicorg/ai-bootstrap-http`
   A concrete HTTP adapter that turns the generic bootstrap model-client contract into a simple JSON POST integration.
-- `@aic/ai-bootstrap-openai`
+- `@aicorg/ai-bootstrap-openai`
   A provider-specific adapter that targets the OpenAI Responses API with Structured Outputs.
 
 ## Contract Model
@@ -173,7 +173,7 @@ The intended baseline workflow for contributors is:
 
 ## Bootstrap Provider Path
 
-`@aic/ai-bootstrap` now supports three suggestion modes:
+`@aicorg/ai-bootstrap` now supports three suggestion modes:
 
 - heuristic generation directly from captures
 - static/file-backed suggestions for offline review workflows
@@ -188,8 +188,8 @@ The intended production flow is:
 
 The concrete reference implementations for step 3 now live in two places:
 
-- `@aic/ai-bootstrap-http` for generic JSON POST providers
-- `@aic/ai-bootstrap-openai` for OpenAI Responses API integrations using Structured Outputs
+- `@aicorg/ai-bootstrap-http` for generic JSON POST providers
+- `@aicorg/ai-bootstrap-openai` for OpenAI Responses API integrations using Structured Outputs
 
 The repo also now includes a runnable reference workflow in [examples/bootstrap-openai/README.md](/mnt/c/Users/vatsa/agentinteractioncontrol/examples/bootstrap-openai/README.md#L1), backed by a saved capture file and CLI artifact emission.
 

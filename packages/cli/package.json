@@ -1,5 +1,5 @@
 {
-  "name": "@aic/cli",
+  "name": "@aicorg/cli",
   "version": "0.1.0-alpha.0",
   "type": "module",
   "description": "CLI for scanning, generating, bootstrapping, and inspecting AIC artifacts.",
@@ -27,12 +27,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@aic/ai-bootstrap": "workspace:*",
-    "@aic/ai-bootstrap-http": "workspace:*",
-    "@aic/ai-bootstrap-openai": "workspace:*",
-    "@aic/automation-core": "workspace:*",
-    "@aic/plugin-vite": "workspace:*",
-    "@aic/runtime": "workspace:*",
-    "@aic/spec": "workspace:*"
+    "@aicorg/ai-bootstrap": "workspace:*",
+    "@aicorg/ai-bootstrap-http": "workspace:*",
+    "@aicorg/ai-bootstrap-openai": "workspace:*",
+    "@aicorg/automation-core": "workspace:*",
+    "@aicorg/plugin-vite": "workspace:*",
+    "@aicorg/runtime": "workspace:*",
+    "@aicorg/spec": "workspace:*"
   }
 }

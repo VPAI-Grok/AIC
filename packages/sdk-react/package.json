@@ -1,5 +1,5 @@
 {
-  "name": "@aic/sdk-react",
+  "name": "@aicorg/sdk-react",
   "version": "0.1.0-alpha.0",
   "type": "module",
   "description": "React SDK for authoring AIC metadata and runtime registrations.",
@@ -36,8 +36,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@aic/runtime": "workspace:*",
-    "@aic/spec": "workspace:*"
+    "@aicorg/runtime": "workspace:*",
+    "@aicorg/spec": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AICDevtoolsBridge, AICDevtoolsOverlay } from "@aic/devtools";
+import { AICDevtoolsBridge, AICDevtoolsOverlay } from "@aicorg/devtools";
 import {
   ShadcnAICButton,
   ShadcnAICCheckbox,
@@ -15,9 +15,9 @@ import {
   ShadcnAICSelectTrigger,
   ShadcnAICTabsContent,
   ShadcnAICTabsTrigger
-} from "@aic/integrations-shadcn";
-import { AIC, AICProvider, useAICRegistry } from "@aic/sdk-react";
-import type { AICRuntimeUiManifest } from "@aic/spec";
+} from "@aicorg/integrations-shadcn";
+import { AIC, AICProvider, useAICRegistry } from "@aicorg/sdk-react";
+import type { AICRuntimeUiManifest } from "@aicorg/spec";
 import {
   ACCOUNT_STATUS_OPTIONS_PROPS,
   ACCOUNT_STATUS_ACTIVE_PROPS,

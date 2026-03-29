@@ -1,4 +1,4 @@
-import type { AICElementManifest } from "@aic/spec";
+import type { AICElementManifest } from "@aicorg/spec";
 
 export function createAICDataAttributes(element: AICElementManifest): Record<string, string> {
   const attributes: Record<string, string> = {

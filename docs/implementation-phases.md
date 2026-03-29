@@ -17,22 +17,22 @@ The master spec defined these implementation phases:
 
 The current repo has all of those package families implemented:
 
-- `@aic/spec`
-- `@aic/runtime`
-- `@aic/sdk-react`
-- `@aic/plugin-next`
-- `@aic/plugin-vite`
-- `@aic/cli`
-- `@aic/devtools`
-- `@aic/ai-bootstrap`
-- `@aic/integrations-radix`
-- `@aic/integrations-shadcn`
+- `@aicorg/spec`
+- `@aicorg/runtime`
+- `@aicorg/sdk-react`
+- `@aicorg/plugin-next`
+- `@aicorg/plugin-vite`
+- `@aicorg/cli`
+- `@aicorg/devtools`
+- `@aicorg/ai-bootstrap`
+- `@aicorg/integrations-radix`
+- `@aicorg/integrations-shadcn`
 
 It also includes:
 
-- `@aic/automation-core`
-- `@aic/ai-bootstrap-http`
-- `@aic/ai-bootstrap-openai`
+- `@aicorg/automation-core`
+- `@aicorg/ai-bootstrap-http`
+- `@aicorg/ai-bootstrap-openai`
 
 ## Current Milestone
 

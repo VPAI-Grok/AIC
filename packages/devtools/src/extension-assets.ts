@@ -1,7 +1,7 @@
 import {
   buildAICAuthoringPatchPlan,
   renderAICAuthoringPatchPlanSummary
-} from "@aic/spec";
+} from "@aicorg/spec";
 
 const SNAPSHOT_EVENT = "aic:devtools:snapshot";
 

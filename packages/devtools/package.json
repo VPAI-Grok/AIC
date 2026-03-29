@@ -1,5 +1,5 @@
 {
-  "name": "@aic/devtools",
+  "name": "@aicorg/devtools",
   "version": "0.1.0",
   "type": "module",
   "private": true,
@@ -22,9 +22,9 @@
     "check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@aic/runtime": "workspace:*",
-    "@aic/sdk-react": "workspace:*",
-    "@aic/spec": "workspace:*"
+    "@aicorg/runtime": "workspace:*",
+    "@aicorg/sdk-react": "workspace:*",
+    "@aicorg/spec": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0"

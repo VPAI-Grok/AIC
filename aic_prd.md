@@ -68,14 +68,14 @@ SDK should auto-inject:
 
 ## Packages
 
-- @aic/spec
-- @aic/runtime
-- @aic/sdk-react
-- @aic/plugin-next
-- @aic/plugin-vite
-- @aic/cli
-- @aic/devtools
-- @aic/ai-bootstrap
+- @aicorg/spec
+- @aicorg/runtime
+- @aicorg/sdk-react
+- @aicorg/plugin-next
+- @aicorg/plugin-vite
+- @aicorg/cli
+- @aicorg/devtools
+- @aicorg/ai-bootstrap
 
 ---
 

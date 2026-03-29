@@ -4,7 +4,7 @@ import {
   ShadcnAICDropdownMenuItem,
   ShadcnAICDropdownMenuTrigger,
   ShadcnAICSelectItem
-} from "@aic/integrations-shadcn";
+} from "@aicorg/integrations-shadcn";
 import { importedAgentId } from "./external";
 
 const agentTokens = {

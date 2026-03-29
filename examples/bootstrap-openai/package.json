@@ -1,5 +1,5 @@
 {
-  "name": "@aic/example-bootstrap-openai",
+  "name": "@aicorg/example-bootstrap-openai",
   "version": "0.1.0",
   "private": true,
   "type": "module",

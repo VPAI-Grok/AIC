@@ -1,5 +1,5 @@
 {
-  "name": "@aic/integrations-radix",
+  "name": "@aicorg/integrations-radix",
   "version": "0.1.0-alpha.0",
   "type": "module",
   "description": "Radix UI helper factories for attaching AIC metadata.",
@@ -31,7 +31,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@aic/sdk-react": "workspace:*",
-    "@aic/spec": "workspace:*"
+    "@aicorg/sdk-react": "workspace:*",
+    "@aicorg/spec": "workspace:*"
   }
 }

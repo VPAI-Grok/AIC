@@ -1,5 +1,5 @@
 {
-  "name": "@aic/spec",
+  "name": "@aicorg/spec",
   "version": "0.1.0-alpha.0",
   "type": "module",
   "description": "Core AIC manifest types, validators, and diff helpers.",

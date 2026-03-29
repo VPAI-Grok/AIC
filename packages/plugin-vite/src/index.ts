@@ -7,8 +7,8 @@ import {
   type AICProjectArtifacts,
   type AICProjectScanResult,
   type AICSourceScanMatch
-} from "@aic/automation-core";
-import type { AICPermissionsManifest, AICWorkflowManifest } from "@aic/spec";
+} from "@aicorg/automation-core";
+import type { AICPermissionsManifest, AICWorkflowManifest } from "@aicorg/spec";
 
 export type ViteScanMatch = AICSourceScanMatch;
 export type AICViteScanResult = AICProjectScanResult;

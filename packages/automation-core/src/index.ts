@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, relative, resolve } from "node:path";
 import ts from "typescript";
-import { AICRegistry } from "@aic/runtime";
+import { AICRegistry } from "@aicorg/runtime";
 import {
   type AICAgentOnboardingFileStatus,
   type AICAgentOnboardingReport,
@@ -36,7 +36,7 @@ import {
   validateRuntimeUiManifest,
   validateSemanticActionsManifest,
   validateWorkflowManifest
-} from "@aic/spec";
+} from "@aicorg/spec";
 
 export type AICAutomationSeverity = "warning" | "error";
 export type AICAutomationManifestKind = AICManifestKind;

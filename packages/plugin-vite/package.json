@@ -1,5 +1,5 @@
 {
-  "name": "@aic/plugin-vite",
+  "name": "@aicorg/plugin-vite",
   "version": "0.1.0-alpha.0",
   "type": "module",
   "description": "Vite project scanning and artifact generation helpers for AIC.",
@@ -31,9 +31,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@aic/automation-core": "workspace:*",
-    "@aic/runtime": "workspace:*",
-    "@aic/spec": "workspace:*",
+    "@aicorg/automation-core": "workspace:*",
+    "@aicorg/runtime": "workspace:*",
+    "@aicorg/spec": "workspace:*",
     "typescript": "^5.8.2"
   }
 }

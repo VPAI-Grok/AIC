@@ -9,9 +9,9 @@ const nextConfig = {
   webpack(config) {
     config.resolve.alias = {
       ...(config.resolve.alias ?? {}),
-      "@aic/spec": path.resolve(__dirname, "../../packages/spec/dist/index.js"),
-      "@aic/runtime": path.resolve(__dirname, "../../packages/runtime/dist/runtime/src/index.js"),
-      "@aic/sdk-react": path.resolve(
+      "@aicorg/spec": path.resolve(__dirname, "../../packages/spec/dist/index.js"),
+      "@aicorg/runtime": path.resolve(__dirname, "../../packages/runtime/dist/runtime/src/index.js"),
+      "@aicorg/sdk-react": path.resolve(
         __dirname,
         "../../packages/sdk-react/dist/sdk-react/src/index.js"
       )

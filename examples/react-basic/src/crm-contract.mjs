@@ -1,4 +1,4 @@
-/** @typedef {import("@aic/sdk-react").AICMetadataProps} AICMetadataProps */
+/** @typedef {import("@aicorg/sdk-react").AICMetadataProps} AICMetadataProps */
 
 export const CRM_VIEW = /** @type {{
   pageTitle: string;

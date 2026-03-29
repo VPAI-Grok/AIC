@@ -11,9 +11,9 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 - guarded CLI apply for exact-match source edits
 - offline bootstrap from saved captures with reviewed outputs
 - reference consumer proof showing external resolution by contract instead of selector-first fallbacks
-- explicit `@aic/*/client` entrypoints for Next/RSC-aware consumption of React-facing packages
+- explicit `@aicorg/*/client` entrypoints for Next/RSC-aware consumption of React-facing packages
 - coding-agent onboarding templates plus `aic init` and `aic doctor` for app repos adopting AIC
-- alpha npm packaging prep for the core `@aic/*` publish wave, including tarball smoke tests and a release workflow
+- alpha npm packaging prep for the core `@aicorg/*` publish wave, including tarball smoke tests and a release workflow
 
 ## Not Guaranteed Yet
 
@@ -41,36 +41,36 @@ It is currently optimized for teams instrumenting **owned React/Next/Vite apps**
 
 ## npm Alpha Packaging
 
-- The first npm wave targets the core publishable packages under the existing `@aic/*` scope.
-- `@aic/devtools` and the example apps remain repo-only for now.
+- The first npm wave targets the core publishable packages under the existing `@aicorg/*` scope.
+- `@aicorg/devtools` and the example apps remain repo-only for now.
 - Package release plumbing uses Changesets plus a manual GitHub Actions publish workflow.
 - See [npm-packages.md](./docs/npm-packages.md) for the package matrix and install targets after publish.
 
 ## What Exists Now
 
-- `@aic/spec`
+- `@aicorg/spec`
   Rich discovery, runtime UI, permissions, workflows, action-contract, execution, recovery, validation, and browser-safe manifest diff models/helpers.
-- `@aic/automation-core`
+- `@aicorg/automation-core`
   Shared deterministic source scanning, diagnostics, project artifact generation, artifact writing, onboarding init/doctor helpers, and CLI-facing manifest diff wrappers.
-- `@aic/runtime`
+- `@aicorg/runtime`
   Provenance-aware in-browser registry with runtime serialization helpers and event hooks.
-- `@aic/sdk-react`
+- `@aicorg/sdk-react`
   React-first AIC APIs, wrapped primitives, and compatibility aliases for the earlier `Agent*` surface.
-- `@aic/plugin-next`
+- `@aicorg/plugin-next`
   Baseline Next artifact-generation plus real source scanning helpers.
-- `@aic/plugin-vite`
+- `@aicorg/plugin-vite`
   Baseline Vite artifact-generation plus real source scanning helpers.
-- `@aic/cli`
+- `@aicorg/cli`
   Scan, init, doctor, validate, project generation, authoring-plan generation/apply, manifest diffing, bootstrap, and inspection commands.
-- `@aic/devtools`
+- `@aicorg/devtools`
   Runtime inspector overlay, opt-in live bridge, DOM discovery helpers, authoring patch-plan exports, and a browser-extension shell with popup plus DevTools panel assets.
-- `@aic/ai-bootstrap`
+- `@aicorg/ai-bootstrap`
   Playwright-backed capture helpers plus heuristic/model-provider review generation, prompt payload helpers, and human-review reports.
-- `@aic/ai-bootstrap-http`
+- `@aicorg/ai-bootstrap-http`
   Concrete HTTP transport adapter for model-backed bootstrap suggestion providers.
-- `@aic/ai-bootstrap-openai`
+- `@aicorg/ai-bootstrap-openai`
   OpenAI Responses/Structured Outputs adapter for bootstrap suggestion generation.
-- `@aic/integrations-radix` and `@aic/integrations-shadcn`
+- `@aicorg/integrations-radix` and `@aicorg/integrations-shadcn`
   Practical adapter coverage for common dialog, dropdown/menu, select, checkbox, switch, and tabs usage.
 - examples
   A Vite CRM demo, a Next checkout demo proving serious-workflow metadata, and an OpenAI bootstrap example from saved captures.
@@ -113,7 +113,7 @@ Expose what the page means, not what the DOM looks like.
 ## Bootstrap Flow
 
 - Capture routes with Playwright or provide saved captures to the CLI.
-- Generate a structured prompt payload from `@aic/ai-bootstrap`.
+- Generate a structured prompt payload from `@aicorg/ai-bootstrap`.
 - Feed that payload to your model provider and save the returned suggestion JSON.
 - Or point the CLI at an HTTP model endpoint with `--provider-endpoint` and `--provider-model`.
 - Or use the OpenAI shortcut with `--provider-kind openai --provider-model <model>`.

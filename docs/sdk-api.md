@@ -4,7 +4,7 @@ This document describes the current React-first surface that is stable enough fo
 
 ## Core Provider
 
-`@aic/sdk-react` exposes:
+`@aicorg/sdk-react` exposes:
 
 - `AICProvider`
 - `useAICRegistry()`
@@ -16,8 +16,8 @@ This document describes the current React-first surface that is stable enough fo
 
 For framework-aware client boundaries:
 
-- use `@aic/sdk-react/client` in Next.js or other React Server Components-aware apps
-- use `@aic/sdk-react` in plain client-only React/Vite apps
+- use `@aicorg/sdk-react/client` in Next.js or other React Server Components-aware apps
+- use `@aicorg/sdk-react` in plain client-only React/Vite apps
 
 ## Element Annotation Props
 
@@ -52,7 +52,7 @@ Compatibility aliases remain available for the earlier naming scheme:
 
 ## Runtime Helpers
 
-`@aic/runtime` currently exposes:
+`@aicorg/runtime` currently exposes:
 
 - `AICRegistry`
 - `createAICDataAttributes(...)`
@@ -69,7 +69,7 @@ Compatibility aliases remain available for the earlier naming scheme:
 
 ## Devtools Bridge
 
-`@aic/devtools` adds the development-time surfaces:
+`@aicorg/devtools` adds the development-time surfaces:
 
 - `AICDevtoolsBridge`
 - `AICDevtoolsOverlay`
@@ -80,14 +80,14 @@ Compatibility aliases remain available for the earlier naming scheme:
 
 The bridge emits live registry snapshots to the extension or overlay. Repo mutation remains outside the extension and goes through the CLI apply flow.
 
-For Next.js or other RSC-aware apps, import bridge/overlay usage from `@aic/devtools/client`.
+For Next.js or other RSC-aware apps, import bridge/overlay usage from `@aicorg/devtools/client`.
 
-`@aic/integrations-shadcn/client` is also available for explicit client-boundary imports when needed, while plain client-only apps can keep using `@aic/integrations-shadcn`.
+`@aicorg/integrations-shadcn/client` is also available for explicit client-boundary imports when needed, while plain client-only apps can keep using `@aicorg/integrations-shadcn`.
 
 The current integration layer is practical rather than exhaustive:
 
-- `@aic/integrations-radix` covers common dialog, dropdown/menu, select, checkbox, switch, and tabs control semantics through prop factories
-- `@aic/integrations-shadcn` mirrors the same control families through thin wrapped components
+- `@aicorg/integrations-radix` covers common dialog, dropdown/menu, select, checkbox, switch, and tabs control semantics through prop factories
+- `@aicorg/integrations-shadcn` mirrors the same control families through thin wrapped components
 
 ## Extraction Boundaries
 

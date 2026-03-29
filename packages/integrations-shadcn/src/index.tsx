@@ -1,4 +1,4 @@
-import { AICButton, AICInput, type AICComponentProps } from "@aic/sdk-react";
+import { AICButton, AICInput, type AICComponentProps } from "@aicorg/sdk-react";
 
 export function ShadcnAICButton(props: AICComponentProps<"button">) {
   return (

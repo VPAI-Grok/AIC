@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAICRegistry } from "@aic/sdk-react";
+import { useAICRegistry } from "@aicorg/sdk-react";
 import {
   buildAICAuthoringPatchPlan,
   diffAICManifestDetailed,
@@ -14,7 +14,7 @@ import {
   type AICRisk,
   type AICRole,
   type AICRuntimeUiManifest
-} from "@aic/spec";
+} from "@aicorg/spec";
 import { extensionFileMap, extensionManifest } from "./extension-assets.js";
 
 export const AIC_DEVTOOLS_SNAPSHOT_EVENT = "aic:devtools:snapshot";

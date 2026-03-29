@@ -8,9 +8,9 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@aic/devtools",
-    "@aic/example-bootstrap-openai",
-    "@aic/example-nextjs-checkout-demo",
-    "@aic/example-vite-crm-demo"
+    "@aicorg/devtools",
+    "@aicorg/example-bootstrap-openai",
+    "@aicorg/example-nextjs-checkout-demo",
+    "@aicorg/example-vite-crm-demo"
   ]
 }

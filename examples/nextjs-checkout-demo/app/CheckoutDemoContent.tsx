@@ -1,6 +1,6 @@
 "use client";
 
-import { AICButton, AICForm, AICInput } from "@aic/sdk-react/client";
+import { AICButton, AICForm, AICInput } from "@aicorg/sdk-react/client";
 import {
   APPLY_COUPON_PROPS,
   COUPON_INPUT_PROPS,

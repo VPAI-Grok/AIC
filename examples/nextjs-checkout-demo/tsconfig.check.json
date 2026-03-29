@@ -3,12 +3,12 @@
   "compilerOptions": {
     "baseUrl": "../../",
     "paths": {
-      "@aic/spec": ["packages/spec/src/index.ts"],
-      "@aic/runtime": ["packages/runtime/src/index.ts"],
-      "@aic/sdk-react": ["packages/sdk-react/src/index.tsx"],
-      "@aic/sdk-react/client": ["packages/sdk-react/src/client.ts"],
-      "@aic/devtools": ["packages/devtools/src/index.tsx"],
-      "@aic/devtools/client": ["packages/devtools/src/client.ts"]
+      "@aicorg/spec": ["packages/spec/src/index.ts"],
+      "@aicorg/runtime": ["packages/runtime/src/index.ts"],
+      "@aicorg/sdk-react": ["packages/sdk-react/src/index.tsx"],
+      "@aicorg/sdk-react/client": ["packages/sdk-react/src/client.ts"],
+      "@aicorg/devtools": ["packages/devtools/src/index.tsx"],
+      "@aicorg/devtools/client": ["packages/devtools/src/client.ts"]
     }
   }
 }

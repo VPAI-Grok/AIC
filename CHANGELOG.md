@@ -12,7 +12,7 @@
 
 ### Current Boundaries
 
-- `@aic/devtools` and example apps remain private.
+- `@aicorg/devtools` and example apps remain private.
 - Supported target is owned React/Next/Vite apps.
 - Dynamic inference and heuristic repo mutation remain out of scope.
 - Actual npm publication still requires a release run with credentials.

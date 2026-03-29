@@ -5,8 +5,8 @@ import {
   createModelBootstrapSuggestionProvider,
   type AICBootstrapStructuredModelClient,
   type AICModelBootstrapProviderOptions
-} from "@aic/ai-bootstrap";
-import type { JsonObject, JsonValue } from "@aic/spec";
+} from "@aicorg/ai-bootstrap";
+import type { JsonObject, JsonValue } from "@aicorg/spec";
 
 export interface AICOpenAIStructuredModelClientOptions {
   apiKey?: string;

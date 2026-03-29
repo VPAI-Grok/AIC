@@ -1,5 +1,5 @@
 {
-  "name": "@aic/ai-bootstrap-http",
+  "name": "@aicorg/ai-bootstrap-http",
   "version": "0.1.0-alpha.0",
   "type": "module",
   "description": "Generic HTTP provider adapter for AIC bootstrap suggestions.",
@@ -31,7 +31,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@aic/ai-bootstrap": "workspace:*",
-    "@aic/spec": "workspace:*"
+    "@aicorg/ai-bootstrap": "workspace:*",
+    "@aicorg/spec": "workspace:*"
   }
 }

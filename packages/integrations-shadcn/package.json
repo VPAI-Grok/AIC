@@ -1,5 +1,5 @@
 {
-  "name": "@aic/integrations-shadcn",
+  "name": "@aicorg/integrations-shadcn",
   "version": "0.1.0-alpha.0",
   "type": "module",
   "description": "shadcn/ui wrapper components for attaching AIC metadata.",
@@ -36,8 +36,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@aic/sdk-react": "workspace:*",
-    "@aic/spec": "workspace:*"
+    "@aicorg/sdk-react": "workspace:*",
+    "@aicorg/spec": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0"

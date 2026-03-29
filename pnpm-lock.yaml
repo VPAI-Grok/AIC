@@ -43,10 +43,10 @@ importers:
 
   examples/nextjs-checkout-demo:
     dependencies:
-      '@aic/devtools':
+      '@aicorg/devtools':
         specifier: workspace:*
         version: link:../../packages/devtools
-      '@aic/sdk-react':
+      '@aicorg/sdk-react':
         specifier: workspace:*
         version: link:../../packages/sdk-react
       next:
@@ -61,13 +61,13 @@ importers:
 
   examples/react-basic:
     dependencies:
-      '@aic/devtools':
+      '@aicorg/devtools':
         specifier: workspace:*
         version: link:../../packages/devtools
-      '@aic/integrations-shadcn':
+      '@aicorg/integrations-shadcn':
         specifier: workspace:*
         version: link:../../packages/integrations-shadcn
-      '@aic/sdk-react':
+      '@aicorg/sdk-react':
         specifier: workspace:*
         version: link:../../packages/sdk-react
       react:
@@ -83,7 +83,7 @@ importers:
 
   packages/ai-bootstrap:
     dependencies:
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
       playwright:
@@ -92,28 +92,28 @@ importers:
 
   packages/ai-bootstrap-http:
     dependencies:
-      '@aic/ai-bootstrap':
+      '@aicorg/ai-bootstrap':
         specifier: workspace:*
         version: link:../ai-bootstrap
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
 
   packages/ai-bootstrap-openai:
     dependencies:
-      '@aic/ai-bootstrap':
+      '@aicorg/ai-bootstrap':
         specifier: workspace:*
         version: link:../ai-bootstrap
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
 
   packages/automation-core:
     dependencies:
-      '@aic/runtime':
+      '@aicorg/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
       typescript:
@@ -122,37 +122,37 @@ importers:
 
   packages/cli:
     dependencies:
-      '@aic/ai-bootstrap':
+      '@aicorg/ai-bootstrap':
         specifier: workspace:*
         version: link:../ai-bootstrap
-      '@aic/ai-bootstrap-http':
+      '@aicorg/ai-bootstrap-http':
         specifier: workspace:*
         version: link:../ai-bootstrap-http
-      '@aic/ai-bootstrap-openai':
+      '@aicorg/ai-bootstrap-openai':
         specifier: workspace:*
         version: link:../ai-bootstrap-openai
-      '@aic/automation-core':
+      '@aicorg/automation-core':
         specifier: workspace:*
         version: link:../automation-core
-      '@aic/plugin-vite':
+      '@aicorg/plugin-vite':
         specifier: workspace:*
         version: link:../plugin-vite
-      '@aic/runtime':
+      '@aicorg/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
 
   packages/devtools:
     dependencies:
-      '@aic/runtime':
+      '@aicorg/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@aic/sdk-react':
+      '@aicorg/sdk-react':
         specifier: workspace:*
         version: link:../sdk-react
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
       react:
@@ -161,19 +161,19 @@ importers:
 
   packages/integrations-radix:
     dependencies:
-      '@aic/sdk-react':
+      '@aicorg/sdk-react':
         specifier: workspace:*
         version: link:../sdk-react
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
 
   packages/integrations-shadcn:
     dependencies:
-      '@aic/sdk-react':
+      '@aicorg/sdk-react':
         specifier: workspace:*
         version: link:../sdk-react
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
       react:
@@ -182,13 +182,13 @@ importers:
 
   packages/plugin-next:
     dependencies:
-      '@aic/automation-core':
+      '@aicorg/automation-core':
         specifier: workspace:*
         version: link:../automation-core
-      '@aic/runtime':
+      '@aicorg/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
       typescript:
@@ -197,13 +197,13 @@ importers:
 
   packages/plugin-vite:
     dependencies:
-      '@aic/automation-core':
+      '@aicorg/automation-core':
         specifier: workspace:*
         version: link:../automation-core
-      '@aic/runtime':
+      '@aicorg/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
       typescript:
@@ -212,16 +212,16 @@ importers:
 
   packages/runtime:
     dependencies:
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
 
   packages/sdk-react:
     dependencies:
-      '@aic/runtime':
+      '@aicorg/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@aic/spec':
+      '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
       react:

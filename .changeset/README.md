@@ -1,6 +1,6 @@
 # Changesets
 
-This repo uses Changesets to manage alpha npm releases for the publishable `@aic/*` packages.
+This repo uses Changesets to manage alpha npm releases for the publishable `@aicorg/*` packages.
 
 Typical flow:
 

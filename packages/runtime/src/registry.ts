@@ -12,7 +12,7 @@ import {
   type AICRuntimeUiManifest,
   type AICWorkflowManifest,
   type JsonObject
-} from "@aic/spec";
+} from "@aicorg/spec";
 
 export interface AICRegistration {
   element: AICElementManifest;
