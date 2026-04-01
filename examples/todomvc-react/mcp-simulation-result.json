@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"success\":false,\"error\":\"HTTP 404 Not Found from http://localhost:5173/.well-known/agent/ui\"}"
+    }
+  ]
+}

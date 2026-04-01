@@ -1,0 +1,1010 @@
+{
+  "agent_onboarding": {
+    "files": [
+      {
+        "kind": "canonical",
+        "path": "AGENTS.md",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "wrapper",
+        "path": "CLAUDE.md",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "wrapper",
+        "path": "GEMINI.md",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "copilot_instructions",
+        "path": ".github/copilot-instructions.md",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "cursor_rule",
+        "path": ".cursor/rules/aic.mdc",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "wrapper",
+        "path": ".github/skills/aic-onboarding/SKILL.md",
+        "recommended": false,
+        "status": "present",
+        "template_version": "1"
+      }
+    ],
+    "summary": {
+      "missing": 0,
+      "present": 5,
+      "recommended": 5,
+      "stale": 0,
+      "warnings": 0
+    },
+    "template_version": "1",
+    "warnings": []
+  },
+  "diagnostics": [
+    {
+      "code": "unsupported_expression",
+      "column": 9,
+      "file": "examples/nextjs-checkout-demo/app/CheckoutDemoContent.tsx",
+      "line": 86,
+      "message": "Element label uses unsupported dynamic content. Use literal child text or a supported same-file deterministic string expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "value",
+      "code": "unresolved_identifier",
+      "column": 16,
+      "file": "examples/todomvc-react/src/components/Header.tsx",
+      "line": 28,
+      "message": "value references \"title\", which is not a same-file deterministic static value.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_expression",
+      "column": 28,
+      "file": "examples/todomvc-react/src/components/Main.tsx",
+      "line": 76,
+      "message": "agentId uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentDescription",
+      "code": "unsupported_expression",
+      "column": 37,
+      "file": "examples/todomvc-react/src/components/Main.tsx",
+      "line": 78,
+      "message": "agentDescription uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_expression",
+      "column": 28,
+      "file": "examples/todomvc-react/src/components/Main.tsx",
+      "line": 87,
+      "message": "agentId uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentDescription",
+      "code": "unsupported_expression",
+      "column": 37,
+      "file": "examples/todomvc-react/src/components/Main.tsx",
+      "line": 89,
+      "message": "agentDescription uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "value",
+      "code": "unresolved_identifier",
+      "column": 26,
+      "file": "examples/todomvc-react/src/components/Main.tsx",
+      "line": 98,
+      "message": "value references \"editText\", which is not a same-file deterministic static value.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_expression",
+      "column": 28,
+      "file": "examples/todomvc-react/src/components/Main.tsx",
+      "line": 103,
+      "message": "agentId uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentDescription",
+      "code": "unsupported_expression",
+      "column": 37,
+      "file": "examples/todomvc-react/src/components/Main.tsx",
+      "line": 105,
+      "message": "agentDescription uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "code": "unsupported_expression",
+      "column": 12,
+      "file": "packages/devtools/src/index.tsx",
+      "line": 448,
+      "message": "Element label uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 36,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 35,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 55,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 54,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 75,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 74,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 94,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 93,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 114,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 113,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 137,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 136,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 155,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 154,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 177,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 176,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 197,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 196,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 219,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 218,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 242,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 241,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentRole",
+      "code": "unsupported_expression",
+      "column": 18,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 262,
+      "message": "agentRole uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentAction",
+      "code": "unsupported_expression",
+      "column": 20,
+      "file": "packages/integrations-shadcn/src/index.tsx",
+      "line": 261,
+      "message": "agentAction uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_import_reference",
+      "column": 24,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "line": 86,
+      "message": "agentId references imported symbol \"importedAgentId\", which is outside same-file deterministic extraction.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_member_expression",
+      "column": 3,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "line": 26,
+      "message": "agentId uses an unsupported object literal key. Use identifier or string-literal keys only.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_call_expression",
+      "column": 24,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "line": 92,
+      "message": "agentId uses helper \"withArgs\" with arguments. Use a same-file zero-arg helper with a single static return expression.",
+      "severity": "warning"
+    },
+    {
+      "attribute": "agentId",
+      "code": "unsupported_expression",
+      "column": 19,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "line": 29,
+      "message": "agentId uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
+      "severity": "warning"
+    }
+  ],
+  "filesScanned": 53,
+  "framework": "vite",
+  "matches": [
+    {
+      "agentDescription": "Reviews and applies coupon codes before the order is submitted",
+      "agentId": "checkout.discount_form",
+      "column": 9,
+      "file": "examples/nextjs-checkout-demo/app/CheckoutDemoContent.tsx",
+      "line": 86,
+      "risk": "low",
+      "role": "generic",
+      "source_key": "examples/nextjs-checkout-demo/app/CheckoutDemoContent.tsx:86:9:AICForm",
+      "tagName": "AICForm"
+    },
+    {
+      "agentDescription": "Edits the coupon code before checkout discounts are applied",
+      "agentId": "checkout.coupon_code",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "line": 6,
+      "risk": "low",
+      "role": "generic",
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:6:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "action": "submit",
+      "agentDescription": "Applies the current coupon code to the in-progress checkout",
+      "agentId": "checkout.apply_coupon",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "line": 12,
+      "risk": "low",
+      "role": "generic",
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:12:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Saves the current cart, shipping, and payment selections without charging the order",
+      "agentId": "checkout.save_cart",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "line": 20,
+      "risk": "medium",
+      "role": "generic",
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:20:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "submit",
+      "agentDescription": "Completes checkout and charges the selected payment method",
+      "agentId": "checkout.submit_order",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "line": 28,
+      "risk": "critical",
+      "role": "generic",
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:28:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Removes the Starter Kit line before submitting the order",
+      "agentId": "checkout.order_line.remove.line_starter_kit",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "line": 36,
+      "risk": "medium",
+      "role": "generic",
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:36:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Opens the archive confirmation dialog for the selected customer",
+      "agentId": "customer.archive",
+      "column": 7,
+      "file": "examples/react-basic/src/contract-proof.tsx",
+      "line": 6,
+      "risk": "high",
+      "role": "generic",
+      "source_key": "examples/react-basic/src/contract-proof.tsx:6:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Sends a renewal reminder email to the current customer",
+      "agentId": "customer.send_renewal_email",
+      "column": 7,
+      "file": "examples/react-basic/src/contract-proof.tsx",
+      "line": 14,
+      "risk": "medium",
+      "role": "generic",
+      "source_key": "examples/react-basic/src/contract-proof.tsx:14:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "agentDescription": "Captures the next renewal follow-up note for the selected customer",
+      "agentId": "customer.renewal_note",
+      "column": 7,
+      "file": "examples/react-basic/src/contract-proof.tsx",
+      "line": 22,
+      "risk": "low",
+      "role": "generic",
+      "source_key": "examples/react-basic/src/contract-proof.tsx:22:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "action": "submit",
+      "agentDescription": "Stores the current renewal note on the customer record",
+      "agentId": "customer.renewal_note.save",
+      "column": 7,
+      "file": "examples/react-basic/src/contract-proof.tsx",
+      "line": 28,
+      "risk": "medium",
+      "role": "generic",
+      "source_key": "examples/react-basic/src/contract-proof.tsx:28:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Show all todo items",
+      "agentId": "filter-all",
+      "column": 11,
+      "file": "examples/todomvc-react/src/components/Footer.tsx",
+      "line": 29,
+      "role": "generic",
+      "source_key": "examples/todomvc-react/src/components/Footer.tsx:29:11:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Show only active (uncompleted) todo items",
+      "agentId": "filter-active",
+      "column": 11,
+      "file": "examples/todomvc-react/src/components/Footer.tsx",
+      "line": 42,
+      "role": "generic",
+      "source_key": "examples/todomvc-react/src/components/Footer.tsx:42:11:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Show only completed todo items",
+      "agentId": "filter-completed",
+      "column": 11,
+      "file": "examples/todomvc-react/src/components/Footer.tsx",
+      "line": 55,
+      "role": "generic",
+      "source_key": "examples/todomvc-react/src/components/Footer.tsx:55:11:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Clear all completed todo items",
+      "agentId": "clear-completed",
+      "column": 9,
+      "file": "examples/todomvc-react/src/components/Footer.tsx",
+      "line": 69,
+      "role": "generic",
+      "source_key": "examples/todomvc-react/src/components/Footer.tsx:69:9:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "input",
+      "agentDescription": "Input field to add a new todo. Type your todo and hit enter.",
+      "agentId": "new-todo-input",
+      "column": 7,
+      "file": "examples/todomvc-react/src/components/Header.tsx",
+      "line": 24,
+      "role": "generic",
+      "source_key": "examples/todomvc-react/src/components/Header.tsx:24:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Toggle all items as completed or active",
+      "agentId": "toggle-all",
+      "column": 7,
+      "file": "examples/todomvc-react/src/components/Main.tsx",
+      "line": 50,
+      "role": "generic",
+      "source_key": "examples/todomvc-react/src/components/Main.tsx:50:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Open customer actions",
+      "agentId": "customer.actions",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "line": 41,
+      "risk": "low",
+      "role": "generic",
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:41:7:ShadcnAICDropdownMenuTrigger",
+      "tagName": "ShadcnAICDropdownMenuTrigger"
+    },
+    {
+      "action": "read",
+      "agentDescription": "Read customer actions menu",
+      "agentId": "customer.actions.menu",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "line": 49,
+      "risk": "low",
+      "role": "menu",
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:49:7:ShadcnAICDropdownMenuContent",
+      "tagName": "ShadcnAICDropdownMenuContent"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Archive customer",
+      "agentId": "customer.archive",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "line": 58,
+      "risk": "high",
+      "role": "menuitem",
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:58:7:ShadcnAICDropdownMenuItem",
+      "tagName": "ShadcnAICDropdownMenuItem"
+    },
+    {
+      "action": "read",
+      "agentDescription": "Archive customer dialog",
+      "agentId": "customer.archive.dialog",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "line": 67,
+      "risk": "medium",
+      "role": "dialog",
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:67:7:ShadcnAICDialogContent",
+      "tagName": "ShadcnAICDialogContent"
+    },
+    {
+      "action": "select",
+      "agentDescription": "View customer",
+      "agentId": "customer.view",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "line": 76,
+      "risk": "low",
+      "role": "option",
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:76:7:ShadcnAICSelectItem",
+      "tagName": "ShadcnAICSelectItem"
+    }
+  ],
+  "source_inventory": [
+    {
+      "annotated_agent_id": "checkout.discount_form",
+      "column": 9,
+      "file": "examples/nextjs-checkout-demo/app/CheckoutDemoContent.tsx",
+      "label": "Reviews and applies coupon codes before the order is submitted",
+      "line": 86,
+      "opening_tag_signature": "<AICForm agentDescription=\"Reviews and applies coupon codes before the order is submitted\" agentId=\"checkout.discount_form\" agentRisk=\"low\" agentWorkflowStep=\"checkout.review.discount\" style={{ display: \"grid\", gap: 12 }} >",
+      "role": "generic",
+      "selectors": {},
+      "source_key": "examples/nextjs-checkout-demo/app/CheckoutDemoContent.tsx:86:9:AICForm",
+      "tagName": "AICForm"
+    },
+    {
+      "annotated_agent_id": "checkout.coupon_code",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "label": "Edits the coupon code before checkout discounts are applied",
+      "line": 6,
+      "opening_tag_signature": "<AICInput agentDescription=\"Edits the coupon code before checkout discounts are applied\" agentId=\"checkout.coupon_code\" agentLabel=\"Coupon code\" agentRisk=\"low\" />",
+      "role": "generic",
+      "selectors": {},
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:6:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "annotated_agent_id": "checkout.apply_coupon",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "label": "Apply coupon",
+      "line": 12,
+      "opening_tag_signature": "<AICButton agentAction=\"submit\" agentDescription=\"Applies the current coupon code to the in-progress checkout\" agentId=\"checkout.apply_coupon\" agentRisk=\"low\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Apply coupon"
+      },
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:12:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "checkout.save_cart",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "label": "Save cart",
+      "line": 20,
+      "opening_tag_signature": "<AICButton agentAction=\"click\" agentDescription=\"Saves the current cart, shipping, and payment selections without charging the order\" agentId=\"checkout.save_cart\" agentRisk=\"medium\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Save cart"
+      },
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:20:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "checkout.submit_order",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "label": "Submit order",
+      "line": 28,
+      "opening_tag_signature": "<AICButton agentAction=\"submit\" agentDescription=\"Completes checkout and charges the selected payment method\" agentId=\"checkout.submit_order\" agentRisk=\"critical\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Submit order"
+      },
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:28:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "checkout.order_line.remove.line_starter_kit",
+      "column": 7,
+      "file": "examples/nextjs-checkout-demo/app/ContractProof.tsx",
+      "label": "Remove Starter Kit",
+      "line": 36,
+      "opening_tag_signature": "<AICButton agentAction=\"click\" agentDescription=\"Removes the Starter Kit line before submitting the order\" agentId=\"checkout.order_line.remove.line_starter_kit\" agentRisk=\"medium\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Remove Starter Kit"
+      },
+      "source_key": "examples/nextjs-checkout-demo/app/ContractProof.tsx:36:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "customer.archive",
+      "column": 7,
+      "file": "examples/react-basic/src/contract-proof.tsx",
+      "label": "Archive customer",
+      "line": 6,
+      "opening_tag_signature": "<AICButton agentAction=\"click\" agentDescription=\"Opens the archive confirmation dialog for the selected customer\" agentId=\"customer.archive\" agentRisk=\"high\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Archive customer"
+      },
+      "source_key": "examples/react-basic/src/contract-proof.tsx:6:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "customer.send_renewal_email",
+      "column": 7,
+      "file": "examples/react-basic/src/contract-proof.tsx",
+      "label": "Send renewal reminder",
+      "line": 14,
+      "opening_tag_signature": "<AICButton agentAction=\"click\" agentDescription=\"Sends a renewal reminder email to the current customer\" agentId=\"customer.send_renewal_email\" agentRisk=\"medium\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Send renewal reminder"
+      },
+      "source_key": "examples/react-basic/src/contract-proof.tsx:14:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "customer.renewal_note",
+      "column": 7,
+      "file": "examples/react-basic/src/contract-proof.tsx",
+      "label": "Captures the next renewal follow-up note for the selected customer",
+      "line": 22,
+      "opening_tag_signature": "<AICInput agentDescription=\"Captures the next renewal follow-up note for the selected customer\" agentId=\"customer.renewal_note\" agentLabel=\"Renewal note\" agentRisk=\"low\" />",
+      "role": "generic",
+      "selectors": {},
+      "source_key": "examples/react-basic/src/contract-proof.tsx:22:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "annotated_agent_id": "customer.renewal_note.save",
+      "column": 7,
+      "file": "examples/react-basic/src/contract-proof.tsx",
+      "label": "Save renewal note",
+      "line": 28,
+      "opening_tag_signature": "<AICButton agentAction=\"submit\" agentDescription=\"Stores the current renewal note on the customer record\" agentId=\"customer.renewal_note.save\" agentRisk=\"medium\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Save renewal note"
+      },
+      "source_key": "examples/react-basic/src/contract-proof.tsx:28:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "filter-all",
+      "column": 11,
+      "file": "examples/todomvc-react/src/components/Footer.tsx",
+      "label": "All",
+      "line": 29,
+      "opening_tag_signature": "<AICButton as=\"a\" href=\"#/\" className={filter === 'all' ? 'selected' : ''} onClick={(e: React.MouseEvent) => { e.preventDefault(); setFilter('all'); }} agentId=\"filter-all\" agentAction=\"click\" agentDescription=\"Show all todo items\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "All"
+      },
+      "source_key": "examples/todomvc-react/src/components/Footer.tsx:29:11:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "filter-active",
+      "column": 11,
+      "file": "examples/todomvc-react/src/components/Footer.tsx",
+      "label": "Active",
+      "line": 42,
+      "opening_tag_signature": "<AICButton as=\"a\" href=\"#/active\" className={filter === 'active' ? 'selected' : ''} onClick={(e: React.MouseEvent) => { e.preventDefault(); setFilter('active'); }} agentId=\"filter-active\" agentAction=\"click\" agentDescription=\"Show only active (uncompleted) todo items\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Active"
+      },
+      "source_key": "examples/todomvc-react/src/components/Footer.tsx:42:11:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "filter-completed",
+      "column": 11,
+      "file": "examples/todomvc-react/src/components/Footer.tsx",
+      "label": "Completed",
+      "line": 55,
+      "opening_tag_signature": "<AICButton as=\"a\" href=\"#/completed\" className={filter === 'completed' ? 'selected' : ''} onClick={(e: React.MouseEvent) => { e.preventDefault(); setFilter('completed'); }} agentId=\"filter-completed\" agentAction=\"click\" agentDescription=\"Show only completed todo items\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Completed"
+      },
+      "source_key": "examples/todomvc-react/src/components/Footer.tsx:55:11:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "clear-completed",
+      "column": 9,
+      "file": "examples/todomvc-react/src/components/Footer.tsx",
+      "label": "Clear completed",
+      "line": 69,
+      "opening_tag_signature": "<AICButton className=\"clear-completed\" onClick={clearCompleted} agentId=\"clear-completed\" agentAction=\"click\" agentDescription=\"Clear all completed todo items\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Clear completed"
+      },
+      "source_key": "examples/todomvc-react/src/components/Footer.tsx:69:9:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "new-todo-input",
+      "column": 7,
+      "file": "examples/todomvc-react/src/components/Header.tsx",
+      "label": "Input field to add a new todo. Type your todo and hit enter.",
+      "line": 24,
+      "opening_tag_signature": "<AICInput className=\"new-todo\" placeholder=\"What needs to be done?\" autoFocus value={title} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)} onKeyDown={handleKeyDown} agentId=\"new-todo-input\" agentAction=\"input\" agentDescription=\"Input field to add a new todo. Type your todo and hit enter.\" />",
+      "role": "generic",
+      "selectors": {},
+      "source_key": "examples/todomvc-react/src/components/Header.tsx:24:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "annotated_agent_id": "toggle-all",
+      "column": 7,
+      "file": "examples/todomvc-react/src/components/Main.tsx",
+      "label": "Toggle all items as completed or active",
+      "line": 50,
+      "opening_tag_signature": "<AICInput id=\"toggle-all\" className=\"toggle-all\" type=\"checkbox\" checked={activeTodoCount === 0} onChange={(e: React.ChangeEvent<HTMLInputElement>) => toggleAll(e.target.checked)} agentId=\"toggle-all\" agentAction=\"click\" agentDescription=\"Toggle all items as completed or active\" />",
+      "role": "generic",
+      "selectors": {},
+      "source_key": "examples/todomvc-react/src/components/Main.tsx:50:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "annotated_agent_id": "customer.actions",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "Customer actions",
+      "line": 41,
+      "opening_tag_signature": "<ShadcnAICDropdownMenuTrigger agentId=\"customer.actions\" agentDescription=\"Open customer actions\" agentAction=\"click\" agentRisk=\"low\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Customer actions"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:41:7:ShadcnAICDropdownMenuTrigger",
+      "tagName": "ShadcnAICDropdownMenuTrigger"
+    },
+    {
+      "annotated_agent_id": "customer.actions.menu",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "Menu content",
+      "line": 49,
+      "opening_tag_signature": "<ShadcnAICDropdownMenuContent agentId=\"customer.actions.menu\" agentDescription=\"Read customer actions menu\" agentAction=\"read\" agentRisk=\"low\" agentRole=\"menu\" >",
+      "role": "menu",
+      "selectors": {
+        "text": "Menu content"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:49:7:ShadcnAICDropdownMenuContent",
+      "tagName": "ShadcnAICDropdownMenuContent"
+    },
+    {
+      "annotated_agent_id": "customer.archive",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "Archive customer",
+      "line": 58,
+      "opening_tag_signature": "<ShadcnAICDropdownMenuItem agentId={archiveId} agentDescription=\"Archive customer\" agentAction={agentTokens.archive.action} agentRisk={archiveRisk} agentRole=\"menuitem\" >",
+      "role": "menuitem",
+      "selectors": {
+        "text": "Archive customer"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:58:7:ShadcnAICDropdownMenuItem",
+      "tagName": "ShadcnAICDropdownMenuItem"
+    },
+    {
+      "annotated_agent_id": "customer.archive.dialog",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "Review archive impact",
+      "line": 67,
+      "opening_tag_signature": "<ShadcnAICDialogContent agentId=\"customer.archive.dialog\" agentDescription=\"Archive customer dialog\" agentAction=\"read\" agentRisk=\"medium\" agentRole=\"dialog\" >",
+      "role": "dialog",
+      "selectors": {
+        "text": "Review archive impact"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:67:7:ShadcnAICDialogContent",
+      "tagName": "ShadcnAICDialogContent"
+    },
+    {
+      "annotated_agent_id": "customer.view",
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "View customer",
+      "line": 76,
+      "opening_tag_signature": "<ShadcnAICSelectItem agentId={getViewId()} agentDescription={getViewDescription()} agentAction=\"select\" agentRisk=\"low\" agentRole=\"option\" >",
+      "role": "option",
+      "selectors": {
+        "text": "View customer"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:76:7:ShadcnAICSelectItem",
+      "tagName": "ShadcnAICSelectItem"
+    },
+    {
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "Send renewal email",
+      "line": 85,
+      "opening_tag_signature": "<button data-testid=\"send-renewal\">",
+      "role": "button",
+      "selectors": {
+        "testId": "send-renewal",
+        "text": "Send renewal email"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:85:7:button",
+      "tagName": "button"
+    },
+    {
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "Skip imported",
+      "line": 86,
+      "opening_tag_signature": "<button agentId={importedAgentId} agentDescription=\"Imported unsupported control\">",
+      "role": "button",
+      "selectors": {
+        "text": "Skip imported"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:86:7:button",
+      "tagName": "button",
+      "unsupported_aic_props": [
+        "agentId"
+      ]
+    },
+    {
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "Skip computed",
+      "line": 89,
+      "opening_tag_signature": "<button agentId={withComputedKey.badId} agentDescription=\"Computed key unsupported\">",
+      "role": "button",
+      "selectors": {
+        "text": "Skip computed"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:89:7:button",
+      "tagName": "button",
+      "unsupported_aic_props": [
+        "agentId"
+      ]
+    },
+    {
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "Skip helper args",
+      "line": 92,
+      "opening_tag_signature": "<button agentId={withArgs(\"helper\")} agentDescription=\"Helper args unsupported\">",
+      "role": "button",
+      "selectors": {
+        "text": "Skip helper args"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:92:7:button",
+      "tagName": "button",
+      "unsupported_aic_props": [
+        "agentId"
+      ]
+    },
+    {
+      "column": 7,
+      "file": "tests/fixtures/plugin-app/src/App.tsx",
+      "label": "Skip dynamic",
+      "line": 95,
+      "opening_tag_signature": "<button agentId={dynamicId} agentDescription=\"Skipped dynamic control\">",
+      "role": "button",
+      "selectors": {
+        "text": "Skip dynamic"
+      },
+      "source_key": "tests/fixtures/plugin-app/src/App.tsx:95:7:button",
+      "tagName": "button",
+      "unsupported_aic_props": [
+        "agentId"
+      ]
+    }
+  ]
+}

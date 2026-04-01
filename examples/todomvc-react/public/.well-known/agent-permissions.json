@@ -1,0 +1,24 @@
+{
+  "0": {
+    "id": "todos.manage",
+    "description": "Allows the agent to view, create, edit, and delete todos.",
+    "level": "read_write"
+  },
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "generated_at": "2026-04-01T18:45:12.229Z",
+  "riskBands": {
+    "low": {
+      "requiresConfirmation": false
+    },
+    "medium": {
+      "requiresConfirmation": false
+    },
+    "high": {
+      "requiresConfirmation": true
+    },
+    "critical": {
+      "requiresConfirmation": true
+    }
+  }
+}

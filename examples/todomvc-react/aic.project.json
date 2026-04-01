@@ -1,0 +1,31 @@
+{
+  "project": {
+    "name": "todomvc-react",
+    "description": "TodoMVC benchmark app natively instrumented with AIC for AI agents.",
+    "version": "1.0.0",
+    "capabilities": ["element_action"],
+    "privacy": {
+      "data_collection": false
+    }
+  },
+  "permissions": [
+    {
+      "id": "todos.manage",
+      "description": "Allows the agent to view, create, edit, and delete todos.",
+      "level": "read_write"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "manage-todos",
+      "description": "The complete workflow for managing the todo list.",
+      "steps": [
+        "View existing todos",
+        "Add new todos",
+        "Toggle completion",
+        "Edit descriptions",
+        "Delete todos"
+      ]
+    }
+  ]
+}

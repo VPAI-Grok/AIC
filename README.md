@@ -48,6 +48,7 @@ See [docs/mcp-server.md](./docs/mcp-server.md) for full setup and tool reference
 - [MCP Server (Claude Desktop / Cursor)](./docs/mcp-server.md)
 - [Next checkout example](./examples/nextjs-checkout-demo)
 - [Vite CRM example](./examples/react-basic)
+- [TodoMVC MCP Benchmark](./examples/todomvc-react)
 - [Bootstrap example](./examples/bootstrap-openai)
 - [Coding Agent Onboarding](./docs/coding-agents.md)
 - [npm Packages](./docs/npm-packages.md)
@@ -96,7 +97,7 @@ See [docs/mcp-server.md](./docs/mcp-server.md) for full setup and tool reference
 - `@aicorg/mcp-server`
   MCP server exposing AIC manifests to Claude Desktop, Cursor, and other MCP-compatible agents with 6 read-only tools for discovery, UI inspection, element filtering, permissions, workflows, and semantic actions.
 - examples
-  A Vite CRM demo, a Next checkout demo proving serious-workflow metadata, and an OpenAI bootstrap example from saved captures.
+  A Vite CRM demo, a Next checkout demo proving serious-workflow metadata, an OpenAI bootstrap example from saved captures, and a TodoMVC benchmark proving out autonomous MCP interoperability.
 
 ## Core Outputs
 

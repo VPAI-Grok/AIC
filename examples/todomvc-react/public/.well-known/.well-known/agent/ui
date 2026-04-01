@@ -1,0 +1,433 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "updated_at": "2026-04-01T18:45:12.229Z",
+  "page": {
+    "url": "http://localhost:3000"
+  },
+  "view": {
+    "view_id": "vite.root"
+  },
+  "elements": [
+    {
+      "id": "checkout.discount_form",
+      "label": "Reviews and applies coupon codes before the order is submitted",
+      "description": "Reviews and applies coupon codes before the order is submitted",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "checkout.discount_form",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/nextjs-checkout-demo/app/CheckoutDemoContent.tsx:86"
+      ]
+    },
+    {
+      "id": "checkout.coupon_code",
+      "label": "Edits the coupon code before checkout discounts are applied",
+      "description": "Edits the coupon code before checkout discounts are applied",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "checkout.coupon_code",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/nextjs-checkout-demo/app/ContractProof.tsx:6"
+      ]
+    },
+    {
+      "id": "checkout.apply_coupon",
+      "label": "Applies the current coupon code to the in-progress checkout",
+      "description": "Applies the current coupon code to the in-progress checkout",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "submit",
+          "target": "checkout.apply_coupon",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/nextjs-checkout-demo/app/ContractProof.tsx:12"
+      ]
+    },
+    {
+      "id": "checkout.save_cart",
+      "label": "Saves the current cart, shipping, and payment selections without charging the order",
+      "description": "Saves the current cart, shipping, and payment selections without charging the order",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "checkout.save_cart",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/nextjs-checkout-demo/app/ContractProof.tsx:20"
+      ]
+    },
+    {
+      "id": "checkout.submit_order",
+      "label": "Completes checkout and charges the selected payment method",
+      "description": "Completes checkout and charges the selected payment method",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "submit",
+          "target": "checkout.submit_order",
+          "type": "element_action"
+        }
+      ],
+      "risk": "critical",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/nextjs-checkout-demo/app/ContractProof.tsx:28"
+      ]
+    },
+    {
+      "id": "checkout.order_line.remove.line_starter_kit",
+      "label": "Removes the Starter Kit line before submitting the order",
+      "description": "Removes the Starter Kit line before submitting the order",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "checkout.order_line.remove.line_starter_kit",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/nextjs-checkout-demo/app/ContractProof.tsx:36"
+      ]
+    },
+    {
+      "id": "customer.archive",
+      "label": "Opens the archive confirmation dialog for the selected customer",
+      "description": "Opens the archive confirmation dialog for the selected customer",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.archive",
+          "type": "element_action"
+        }
+      ],
+      "risk": "high",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/react-basic/src/contract-proof.tsx:6"
+      ]
+    },
+    {
+      "id": "customer.send_renewal_email",
+      "label": "Sends a renewal reminder email to the current customer",
+      "description": "Sends a renewal reminder email to the current customer",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.send_renewal_email",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/react-basic/src/contract-proof.tsx:14"
+      ]
+    },
+    {
+      "id": "customer.renewal_note",
+      "label": "Captures the next renewal follow-up note for the selected customer",
+      "description": "Captures the next renewal follow-up note for the selected customer",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.renewal_note",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/react-basic/src/contract-proof.tsx:22"
+      ]
+    },
+    {
+      "id": "customer.renewal_note.save",
+      "label": "Stores the current renewal note on the customer record",
+      "description": "Stores the current renewal note on the customer record",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "submit",
+          "target": "customer.renewal_note.save",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/react-basic/src/contract-proof.tsx:28"
+      ]
+    },
+    {
+      "id": "filter-all",
+      "label": "Show all todo items",
+      "description": "Show all todo items",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "filter-all",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/todomvc-react/src/components/Footer.tsx:29"
+      ]
+    },
+    {
+      "id": "filter-active",
+      "label": "Show only active (uncompleted) todo items",
+      "description": "Show only active (uncompleted) todo items",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "filter-active",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/todomvc-react/src/components/Footer.tsx:42"
+      ]
+    },
+    {
+      "id": "filter-completed",
+      "label": "Show only completed todo items",
+      "description": "Show only completed todo items",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "filter-completed",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/todomvc-react/src/components/Footer.tsx:55"
+      ]
+    },
+    {
+      "id": "clear-completed",
+      "label": "Clear all completed todo items",
+      "description": "Clear all completed todo items",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "clear-completed",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/todomvc-react/src/components/Footer.tsx:69"
+      ]
+    },
+    {
+      "id": "new-todo-input",
+      "label": "Input field to add a new todo. Type your todo and hit enter.",
+      "description": "Input field to add a new todo. Type your todo and hit enter.",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "input",
+          "target": "new-todo-input",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/todomvc-react/src/components/Header.tsx:24"
+      ]
+    },
+    {
+      "id": "toggle-all",
+      "label": "Toggle all items as completed or active",
+      "description": "Toggle all items as completed or active",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "toggle-all",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from examples/todomvc-react/src/components/Main.tsx:50"
+      ]
+    },
+    {
+      "id": "customer.actions",
+      "label": "Open customer actions",
+      "description": "Open customer actions",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.actions",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from tests/fixtures/plugin-app/src/App.tsx:41"
+      ]
+    },
+    {
+      "id": "customer.actions.menu",
+      "label": "Read customer actions menu",
+      "description": "Read customer actions menu",
+      "role": "menu",
+      "actions": [
+        {
+          "name": "read",
+          "target": "customer.actions.menu",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from tests/fixtures/plugin-app/src/App.tsx:49"
+      ]
+    },
+    {
+      "id": "customer.archive",
+      "label": "Archive customer",
+      "description": "Archive customer",
+      "role": "menuitem",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.archive",
+          "type": "element_action"
+        }
+      ],
+      "risk": "high",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from tests/fixtures/plugin-app/src/App.tsx:58"
+      ]
+    },
+    {
+      "id": "customer.archive.dialog",
+      "label": "Archive customer dialog",
+      "description": "Archive customer dialog",
+      "role": "dialog",
+      "actions": [
+        {
+          "name": "read",
+          "target": "customer.archive.dialog",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from tests/fixtures/plugin-app/src/App.tsx:67"
+      ]
+    },
+    {
+      "id": "customer.view",
+      "label": "View customer",
+      "description": "View customer",
+      "role": "option",
+      "actions": [
+        {
+          "name": "select",
+          "target": "customer.view",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from tests/fixtures/plugin-app/src/App.tsx:76"
+      ]
+    }
+  ]
+}

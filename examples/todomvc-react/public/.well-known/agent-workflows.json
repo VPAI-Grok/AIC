@@ -1,0 +1,18 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "generated_at": "2026-04-01T18:45:12.229Z",
+  "workflows": [
+    {
+      "id": "manage-todos",
+      "description": "The complete workflow for managing the todo list.",
+      "steps": [
+        "View existing todos",
+        "Add new todos",
+        "Toggle completion",
+        "Edit descriptions",
+        "Delete todos"
+      ]
+    }
+  ]
+}
