@@ -2,7 +2,27 @@
 
 AIC (Agent Interaction Contract) is an open contract and tooling stack for making web apps reliably operable by AI agents.
 
-It is currently optimized for teams instrumenting **owned React/Next/Vite apps** with explicit AIC metadata.
+At a high level, AIC gives an app a stable, machine-readable interface for agent operation. Instead of forcing an agent to guess intent from brittle selectors, DOM structure, screenshots, or button text, AIC lets the app publish explicit semantics: what an element is, what action it performs, how risky it is, whether it needs confirmation, what entity it acts on, which workflow it belongs to, and what completion or recovery conditions apply.
+
+The core idea is simple: expose what the UI means, not just what it looks like. In an AIC-instrumented app, important controls get stable contract IDs and explicit metadata, the runtime can emit a live UI manifest describing what is currently available, and the build/generation toolchain can emit discovery, actions, permissions, and workflow artifacts that external agents can consume without relying on selector-first automation.
+
+In practice, AIC is made of a few layers that work together:
+
+- a spec layer that defines the manifest shapes and validation rules
+- a runtime/UI layer that serializes the current app state into agent-readable manifests
+- a React SDK and integration helpers for adding explicit `agent*` metadata in real app code
+- a CLI and automation layer for scanning source, generating artifacts, validating manifests, bootstrapping reviewed suggestions, and auditing adoption readiness
+- an MCP server that lets tools like Claude Desktop, Cursor, and other MCP-compatible agents query AIC-enabled apps directly
+
+This repo does not try to make arbitrary websites magically agent-safe. The current product boundary is much narrower and more honest: AIC is optimized for teams instrumenting **owned React/Next/Vite apps** with explicit metadata, reviewed generation, and contract-first agent operations.
+
+If you are evaluating the project quickly, the shortest useful mental model is:
+
+- developers annotate important UI controls with stable IDs and semantics
+- AIC turns that into runtime and generated manifests
+- agents use those manifests to discover capabilities and operate the app more reliably than raw DOM scraping alone
+
+That makes AIC useful anywhere an app owner wants stronger guarantees around agent behavior, especially for risky actions, record-scoped operations, multi-step workflows, and UI flows where “click the thing that looks right” is not good enough.
 
 ## What Works Today
 
