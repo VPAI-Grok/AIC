@@ -3,7 +3,7 @@
   "version": "0.1.0-alpha.0",
   "type": "module",
   "description": "OpenAI provider adapter for AIC bootstrap suggestions.",
-  "license": "MIT",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/VPAI-Grok/AIC.git"

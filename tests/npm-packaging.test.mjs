@@ -172,7 +172,7 @@ test("publish wave package manifests are public and alpha-versioned", async () =
     assert.equal(packageJson.publishConfig?.access, "public");
     assert.deepEqual(packageJson.files, ["dist"]);
     assert.equal(typeof packageJson.description, "string");
-    assert.equal(packageJson.license, "MIT");
+    assert.equal(packageJson.license, "PolyForm-Noncommercial-1.0.0");
     assert.equal(packageJson.repository?.url, "https://github.com/VPAI-Grok/AIC.git");
     assert.equal(packageJson.bugs?.url, "https://github.com/VPAI-Grok/AIC/issues");
     assert.ok(Array.isArray(packageJson.keywords));

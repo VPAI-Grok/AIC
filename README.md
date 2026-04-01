@@ -24,6 +24,8 @@ If you are evaluating the project quickly, the shortest useful mental model is:
 
 That makes AIC useful anywhere an app owner wants stronger guarantees around agent behavior, especially for risky actions, record-scoped operations, multi-step workflows, and UI flows where “click the thing that looks right” is not good enough.
 
+The repository is source-available under `PolyForm-Noncommercial-1.0.0`. Personal, research, evaluation, and other noncommercial use is allowed under that license, but direct commercial monetization is not.
+
 ## What Works Today
 
 - runtime UI manifests with stable IDs, confirmation, entity, workflow, execution, recovery, and validation metadata
