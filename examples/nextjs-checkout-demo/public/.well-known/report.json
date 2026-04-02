@@ -1,0 +1,248 @@
+{
+  "agent_onboarding": {
+    "files": [
+      {
+        "kind": "canonical",
+        "path": "AGENTS.md",
+        "recommended": true,
+        "status": "missing"
+      },
+      {
+        "kind": "wrapper",
+        "path": "CLAUDE.md",
+        "recommended": true,
+        "status": "missing"
+      },
+      {
+        "kind": "wrapper",
+        "path": "GEMINI.md",
+        "recommended": true,
+        "status": "missing"
+      },
+      {
+        "kind": "copilot_instructions",
+        "path": ".github/copilot-instructions.md",
+        "recommended": true,
+        "status": "missing"
+      },
+      {
+        "kind": "cursor_rule",
+        "path": ".cursor/rules/aic.mdc",
+        "recommended": true,
+        "status": "missing"
+      },
+      {
+        "kind": "wrapper",
+        "path": ".github/skills/aic-onboarding/SKILL.md",
+        "recommended": false,
+        "status": "missing"
+      }
+    ],
+    "summary": {
+      "missing": 5,
+      "present": 0,
+      "recommended": 5,
+      "stale": 0,
+      "warnings": 5
+    },
+    "template_version": "1",
+    "warnings": [
+      {
+        "code": "missing_agent_onboarding_file",
+        "file": "AGENTS.md",
+        "message": "Recommended AIC agent onboarding file is missing: AGENTS.md",
+        "severity": "warning"
+      },
+      {
+        "code": "missing_agent_onboarding_file",
+        "file": "CLAUDE.md",
+        "message": "Recommended AIC agent onboarding file is missing: CLAUDE.md",
+        "severity": "warning"
+      },
+      {
+        "code": "missing_agent_onboarding_file",
+        "file": "GEMINI.md",
+        "message": "Recommended AIC agent onboarding file is missing: GEMINI.md",
+        "severity": "warning"
+      },
+      {
+        "code": "missing_agent_onboarding_file",
+        "file": ".github/copilot-instructions.md",
+        "message": "Recommended AIC agent onboarding file is missing: .github/copilot-instructions.md",
+        "severity": "warning"
+      },
+      {
+        "code": "missing_agent_onboarding_file",
+        "file": ".cursor/rules/aic.mdc",
+        "message": "Recommended AIC agent onboarding file is missing: .cursor/rules/aic.mdc",
+        "severity": "warning"
+      }
+    ]
+  },
+  "diagnostics": [
+    {
+      "code": "unsupported_expression",
+      "column": 9,
+      "file": "app/CheckoutDemoContent.tsx",
+      "line": 86,
+      "message": "Element label uses unsupported dynamic content. Use literal child text or a supported same-file deterministic string expression.",
+      "severity": "warning"
+    }
+  ],
+  "filesScanned": 5,
+  "framework": "nextjs",
+  "matches": [
+    {
+      "agentDescription": "Reviews and applies coupon codes before the order is submitted",
+      "agentId": "checkout.discount_form",
+      "column": 9,
+      "file": "app/CheckoutDemoContent.tsx",
+      "line": 86,
+      "risk": "low",
+      "role": "generic",
+      "source_key": "app/CheckoutDemoContent.tsx:86:9:AICForm",
+      "tagName": "AICForm"
+    },
+    {
+      "agentDescription": "Edits the coupon code before checkout discounts are applied",
+      "agentId": "checkout.coupon_code",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "line": 6,
+      "risk": "low",
+      "role": "generic",
+      "source_key": "app/ContractProof.tsx:6:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "action": "submit",
+      "agentDescription": "Applies the current coupon code to the in-progress checkout",
+      "agentId": "checkout.apply_coupon",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "line": 12,
+      "risk": "low",
+      "role": "generic",
+      "source_key": "app/ContractProof.tsx:12:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Saves the current cart, shipping, and payment selections without charging the order",
+      "agentId": "checkout.save_cart",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "line": 20,
+      "risk": "medium",
+      "role": "generic",
+      "source_key": "app/ContractProof.tsx:20:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "submit",
+      "agentDescription": "Completes checkout and charges the selected payment method",
+      "agentId": "checkout.submit_order",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "line": 28,
+      "risk": "critical",
+      "role": "generic",
+      "source_key": "app/ContractProof.tsx:28:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Removes the Starter Kit line before submitting the order",
+      "agentId": "checkout.order_line.remove.line_starter_kit",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "line": 36,
+      "risk": "medium",
+      "role": "generic",
+      "source_key": "app/ContractProof.tsx:36:7:AICButton",
+      "tagName": "AICButton"
+    }
+  ],
+  "source_inventory": [
+    {
+      "annotated_agent_id": "checkout.discount_form",
+      "column": 9,
+      "file": "app/CheckoutDemoContent.tsx",
+      "label": "Reviews and applies coupon codes before the order is submitted",
+      "line": 86,
+      "opening_tag_signature": "<AICForm agentDescription=\"Reviews and applies coupon codes before the order is submitted\" agentId=\"checkout.discount_form\" agentRisk=\"low\" agentWorkflowStep=\"checkout.review.discount\" style={{ display: \"grid\", gap: 12 }} >",
+      "role": "generic",
+      "selectors": {},
+      "source_key": "app/CheckoutDemoContent.tsx:86:9:AICForm",
+      "tagName": "AICForm"
+    },
+    {
+      "annotated_agent_id": "checkout.coupon_code",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "label": "Edits the coupon code before checkout discounts are applied",
+      "line": 6,
+      "opening_tag_signature": "<AICInput agentDescription=\"Edits the coupon code before checkout discounts are applied\" agentId=\"checkout.coupon_code\" agentLabel=\"Coupon code\" agentRisk=\"low\" />",
+      "role": "generic",
+      "selectors": {},
+      "source_key": "app/ContractProof.tsx:6:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "annotated_agent_id": "checkout.apply_coupon",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "label": "Apply coupon",
+      "line": 12,
+      "opening_tag_signature": "<AICButton agentAction=\"submit\" agentDescription=\"Applies the current coupon code to the in-progress checkout\" agentId=\"checkout.apply_coupon\" agentRisk=\"low\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Apply coupon"
+      },
+      "source_key": "app/ContractProof.tsx:12:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "checkout.save_cart",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "label": "Save cart",
+      "line": 20,
+      "opening_tag_signature": "<AICButton agentAction=\"click\" agentDescription=\"Saves the current cart, shipping, and payment selections without charging the order\" agentId=\"checkout.save_cart\" agentRisk=\"medium\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Save cart"
+      },
+      "source_key": "app/ContractProof.tsx:20:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "checkout.submit_order",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "label": "Submit order",
+      "line": 28,
+      "opening_tag_signature": "<AICButton agentAction=\"submit\" agentDescription=\"Completes checkout and charges the selected payment method\" agentId=\"checkout.submit_order\" agentRisk=\"critical\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Submit order"
+      },
+      "source_key": "app/ContractProof.tsx:28:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "checkout.order_line.remove.line_starter_kit",
+      "column": 7,
+      "file": "app/ContractProof.tsx",
+      "label": "Remove Starter Kit",
+      "line": 36,
+      "opening_tag_signature": "<AICButton agentAction=\"click\" agentDescription=\"Removes the Starter Kit line before submitting the order\" agentId=\"checkout.order_line.remove.line_starter_kit\" agentRisk=\"medium\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Remove Starter Kit"
+      },
+      "source_key": "app/ContractProof.tsx:36:7:AICButton",
+      "tagName": "AICButton"
+    }
+  ]
+}

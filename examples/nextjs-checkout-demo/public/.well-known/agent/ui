@@ -1,0 +1,133 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "updated_at": "2026-03-28T00:00:00.000Z",
+  "page": {
+    "url": "https://demo.example/checkout"
+  },
+  "view": {
+    "view_id": "next.checkout"
+  },
+  "elements": [
+    {
+      "id": "checkout.discount_form",
+      "label": "Reviews and applies coupon codes before the order is submitted",
+      "description": "Reviews and applies coupon codes before the order is submitted",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "checkout.discount_form",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from app/CheckoutDemoContent.tsx:86"
+      ]
+    },
+    {
+      "id": "checkout.coupon_code",
+      "label": "Edits the coupon code before checkout discounts are applied",
+      "description": "Edits the coupon code before checkout discounts are applied",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "checkout.coupon_code",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from app/ContractProof.tsx:6"
+      ]
+    },
+    {
+      "id": "checkout.apply_coupon",
+      "label": "Applies the current coupon code to the in-progress checkout",
+      "description": "Applies the current coupon code to the in-progress checkout",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "submit",
+          "target": "checkout.apply_coupon",
+          "type": "element_action"
+        }
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from app/ContractProof.tsx:12"
+      ]
+    },
+    {
+      "id": "checkout.save_cart",
+      "label": "Saves the current cart, shipping, and payment selections without charging the order",
+      "description": "Saves the current cart, shipping, and payment selections without charging the order",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "checkout.save_cart",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from app/ContractProof.tsx:20"
+      ]
+    },
+    {
+      "id": "checkout.submit_order",
+      "label": "Completes checkout and charges the selected payment method",
+      "description": "Completes checkout and charges the selected payment method",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "submit",
+          "target": "checkout.submit_order",
+          "type": "element_action"
+        }
+      ],
+      "risk": "critical",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from app/ContractProof.tsx:28"
+      ]
+    },
+    {
+      "id": "checkout.order_line.remove.line_starter_kit",
+      "label": "Removes the Starter Kit line before submitting the order",
+      "description": "Removes the Starter Kit line before submitting the order",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "checkout.order_line.remove.line_starter_kit",
+          "type": "element_action"
+        }
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      },
+      "notes": [
+        "Extracted from app/ContractProof.tsx:36"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "generated_at": "2026-03-28T00:00:00.000Z",
+  "actions": [
+    {
+      "name": "checkout.discount_form",
+      "title": "Reviews and applies coupon codes before the order is submitted",
+      "target": "checkout.discount_form",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "checkout.discount_form.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "checkout.coupon_code",
+      "title": "Edits the coupon code before checkout discounts are applied",
+      "target": "checkout.coupon_code",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "checkout.coupon_code.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "checkout.apply_coupon",
+      "title": "Applies the current coupon code to the in-progress checkout",
+      "target": "checkout.apply_coupon",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "checkout.apply_coupon.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "checkout.save_cart",
+      "title": "Saves the current cart, shipping, and payment selections without charging the order",
+      "target": "checkout.save_cart",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "checkout.save_cart.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "checkout.submit_order",
+      "title": "Completes checkout and charges the selected payment method",
+      "target": "checkout.submit_order",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "checkout.submit_order.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "checkout.order_line.remove.line_starter_kit",
+      "title": "Removes the Starter Kit line before submitting the order",
+      "target": "checkout.order_line.remove.line_starter_kit",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "checkout.order_line.remove.line_starter_kit.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    }
+  ]
+}
