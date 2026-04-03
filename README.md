@@ -26,6 +26,27 @@ That makes AIC useful anywhere an app owner wants stronger guarantees around age
 
 The repository is open under `Apache-2.0`. The immediate goal is adoption: let teams use AIC freely, including in commercial environments, and build the business around implementation, support, integration work, and hosted value around the ecosystem rather than permission to use the code.
 
+## Benchmark Results
+
+The strongest benchmark result in the repo today comes from the TailAdmin dashboard testbed using `Claude Sonnet 4.6`:
+
+- `calendar_event_creation`
+  - baseline success: `33.3%`
+  - AIC success: `100.0%`
+  - median completion time: `134s` -> `64s`
+  - median interaction steps: `12` -> `3`
+- `profile_modal_edit`
+  - baseline success: `100.0%`
+  - AIC success: `100.0%`
+  - median completion time: `99s` -> `70s`
+  - median interaction steps: `20` -> `6`
+
+Full report:
+
+- [TailAdmin benchmark report](./docs/tailadmin-benchmark-claude-2026-04-02.md)
+
+These results are from real browser-agent runs, not just synthetic selectors or unit tests.
+
 ## What Works Today
 
 - runtime UI manifests with stable IDs, confirmation, entity, workflow, execution, recovery, and validation metadata
@@ -37,6 +58,7 @@ The repository is open under `Apache-2.0`. The immediate goal is adoption: let t
 - coding-agent onboarding templates plus `aic init` and `aic doctor` for app repos adopting AIC
 - alpha npm packages are live for the core `@aicorg/*` publish wave, with tarball smoke tests and a release workflow backing the release process
 - **MCP server** lets Claude Desktop, Cursor, and other MCP-compatible agents discover and reason about AIC-instrumented apps natively
+- TailAdmin benchmark evidence now shows a real browser agent improving from `33.3%` to `100.0%` success on calendar creation when using AIC semantics
 
 ## MCP Server
 
@@ -70,6 +92,7 @@ See [docs/mcp-server.md](./docs/mcp-server.md) for full setup and tool reference
 - [MCP Server (Claude Desktop / Cursor)](./docs/mcp-server.md)
 - [Next checkout example](./examples/nextjs-checkout-demo)
 - [Vite CRM example](./examples/react-basic)
+- [TailAdmin benchmark report](./docs/tailadmin-benchmark-claude-2026-04-02.md)
 - [TodoMVC MCP Benchmark](./examples/todomvc-react)
 - [Bootstrap example](./examples/bootstrap-openai)
 - [Coding Agent Onboarding](./docs/coding-agents.md)
@@ -205,6 +228,8 @@ See [examples/bootstrap-openai/README.md](./examples/bootstrap-openai/README.md)
   Proves structured confirmation on a critical checkout action, async save plus recovery metadata, validation guidance on coupon entry, and entity-bound order-line actions.
 - `examples/react-basic`
   Proves CRM-style confirmation, async execution plus recovery, entity identity, workflow-linked controls, and validation-bearing note capture using the shadcn wrapper surface.
+- `examples/tailadmin-dashboard`
+  Proves benchmarkable gains from semantic targeting in a production-style dashboard. In the first Claude Sonnet 4.6 run, AIC improved calendar-event success from `33.3%` to `100.0%`, reduced median time from `134s` to `64s`, and reduced median steps from `12` to `3`.
 
 ## Verification
 
