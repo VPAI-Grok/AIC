@@ -182,7 +182,7 @@ const { attributes } = useAICElement({
 | 🤖 Connect Claude Desktop or Cursor | [MCP Server Setup](./docs/mcp-server.md) |
 | ⚛️ Instrument a React/Next.js app | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
 | ⚡ Instrument a Vite/React app | [Vite CRM Example](./examples/react-basic) |
-| 📊 See real benchmark results | [TailAdmin Benchmark Report](./docs/tailadmin-benchmark-claude-2026-04-02.md) |
+| 📊 Read case studies and benchmark proof | [AIC Case Studies](./docs/case-studies.md) |
 | 🧪 See the real-app Twenty benchmark | [Twenty Official Benchmark Report](./benchmarks/twenty-adoption/benchmark-report-official.md) |
 | 🧪 Plan a real-app adoption benchmark | [Twenty Adoption Benchmark](./benchmarks/twenty-adoption/README.md) |
 | 🧩 See the real Twenty integration map | [Twenty Instrumentation Plan](./benchmarks/twenty-adoption/instrumentation-plan.md) |
@@ -235,7 +235,7 @@ For the copyable app-integration path, use [Adopt AIC In An Existing App](./docs
 ## 📈 Benchmarks And Proof
 
 If you want proof before adoption, start with these:
-- [TailAdmin Benchmark Report](./docs/tailadmin-benchmark-claude-2026-04-02.md)
+- [AIC Case Studies](./docs/case-studies.md)
 - [Twenty Official Benchmark Report](./benchmarks/twenty-adoption/benchmark-report-official.md)
 
 We ran a real browser agent benchmark on the [TailAdmin dashboard](./examples/tailadmin-dashboard) using **Claude Sonnet 4.6**.
