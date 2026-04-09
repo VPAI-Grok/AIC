@@ -1,7 +1,7 @@
 <!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
 # Gemini Wrapper
 
-Read [AGENTS.md](/mnt/c/users/vatsa/agentinteractioncontrol/AGENTS.md) first and follow it as the canonical AIC policy.
+Read [AGENTS.md](./AGENTS.md) first and follow it as the canonical AIC policy.
 
 Focus on:
 
