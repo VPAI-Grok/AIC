@@ -29,34 +29,51 @@ The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 
 ## Install Targets
 
-Core runtime and React adoption:
+### Most Common: Existing App Adoption
+
+For a React, Next.js, or Vite app that you own:
+
+```bash
+pnpm add @aicorg/spec @aicorg/runtime @aicorg/sdk-react
+pnpm add -D @aicorg/cli
+```
+
+Add framework helpers if you want project generation and scanning support:
+
+```bash
+pnpm add @aicorg/plugin-vite @aicorg/plugin-next
+```
+
+### Runtime And React SDK
 
 ```bash
 pnpm add @aicorg/spec @aicorg/runtime @aicorg/sdk-react
 ```
 
-CLI-driven onboarding and artifact generation:
+### CLI-Driven Onboarding And Artifact Generation
 
 ```bash
 pnpm add -D @aicorg/cli
 ```
 
-Framework and integration helpers:
+### Framework And Integration Helpers
 
 ```bash
 pnpm add @aicorg/plugin-vite @aicorg/plugin-next @aicorg/integrations-radix @aicorg/integrations-shadcn
 ```
 
-Bootstrap providers:
+### MCP Consumer Path
 
-```bash
-pnpm add @aicorg/ai-bootstrap @aicorg/ai-bootstrap-http @aicorg/ai-bootstrap-openai
-```
-
-MCP server for AI agent integration (Claude Desktop, Cursor, etc.):
+For AI-agent integration without changing your app runtime dependencies:
 
 ```bash
 npx @aicorg/mcp-server
+```
+
+### Bootstrap Providers
+
+```bash
+pnpm add @aicorg/ai-bootstrap @aicorg/ai-bootstrap-http @aicorg/ai-bootstrap-openai
 ```
 
 ## Release Notes
@@ -64,3 +81,4 @@ npx @aicorg/mcp-server
 - The current npm release uses the `alpha` tag.
 - Workspace examples and deferred packages are intentionally not published.
 - Package tarballs are validated with local smoke tests before any publish step runs in CI.
+- `@aicorg/devtools` remains repo-only for now.

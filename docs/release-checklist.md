@@ -6,6 +6,16 @@
 - `pnpm build`
 - `pnpm test`
 - `pnpm test:goldens`
+- `pnpm smoke:init`
+- `pnpm smoke:adoption`
+- `pnpm smoke:mcp`
+- `pnpm smoke:mcp:stdio`
+
+## Clean Workspace Gate
+
+- the documented verification flow does not leave unexpected tracked diffs
+- common generated local outputs are ignored or cleaned up
+- README and docs links resolve to committed files, not local-only notes
 
 ## Contract Proof Gates
 
@@ -25,7 +35,23 @@
 - first-wave package manifests are public and include publish metadata
 - tarball smoke tests are green
 - package matrix docs match the current publish wave
-- manual publish workflow is configured with npm-token expectations documented
+- publish workflow is configured with npm-token expectations documented
+- the publish workflow runs:
+  - `pnpm check`
+  - `pnpm build`
+  - `pnpm test:contracts`
+  - `pnpm test:goldens`
+  - `pnpm test:packaging`
+
+## Workflow Roles
+
+- `ci.yml`
+  - fast mainline verification for the workspace
+  - includes adoption and MCP handler smokes
+- `mcp-stdio-smoke.yml`
+  - real stdio transport verification for `@aicorg/mcp-server`
+- `publish-packages.yml`
+  - manual npm alpha publish path after verification succeeds
 
 ## Not In This Release
 

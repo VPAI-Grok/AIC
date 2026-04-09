@@ -322,6 +322,8 @@ Imagine hiring a new employee to use your software. Without documentation, they'
 | [manifest-spec.md](./docs/manifest-spec.md) | Full manifest shape reference |
 | [sdk-api.md](./docs/sdk-api.md) | React SDK hooks and props |
 | [mcp-server.md](./docs/mcp-server.md) | MCP server setup and tool reference |
+| [release-status.md](./docs/release-status.md) | What is ready to evaluate right now |
+| [release-checklist.md](./docs/release-checklist.md) | Verification and release gates |
 | [coding-agents.md](./docs/coding-agents.md) | Agent onboarding templates |
 | [npm-packages.md](./docs/npm-packages.md) | Published package matrix |
 | [supported-today.md](./docs/supported-today.md) | Implementation boundaries |
@@ -339,6 +341,7 @@ JSON Schemas live under [`schemas/`](./schemas/).
 - ✅ First-wave `@aicorg/*` packages published to npm under `alpha` tag
 - ✅ MCP server live and MCP-compatible with Claude Desktop, Cursor, and others
 - ✅ TailAdmin benchmark validates real agent improvement with AIC semantics
+- ✅ Release and evaluator docs now reflect the current alpha surface
 - 🔄 Further package releases go through the GitHub publish workflow
 - 📋 Apache-2.0 for the repo and all publishable packages
 
