@@ -98,6 +98,7 @@ Agent: ✅ Executes safely
 If you already have a React, Next.js, or Vite app, start here:
 
 - [Adopt AIC In An Existing App](./docs/adopt-existing-app.md)
+- [Auth0 For AI Agents With AIC](./docs/auth0-ai-agents.md)
 
 ### Connect any MCP-compatible AI agent (Claude Desktop, Cursor, etc.)
 
@@ -175,6 +176,7 @@ const { attributes } = useAICElement({
 | I want to… | Go here |
 |------------|---------|
 | 🧩 Adopt AIC in an existing app | [Adopt AIC In An Existing App](./docs/adopt-existing-app.md) |
+| 🔐 Add Auth0 to an agent-enabled app | [Auth0 For AI Agents With AIC](./docs/auth0-ai-agents.md) |
 | 🚀 Try AIC in 15 minutes | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
 | 🚀 Try AIC in 15 minutes with Vite | [Vite CRM Example](./examples/react-basic) |
 | 🤖 Connect Claude Desktop or Cursor | [MCP Server Setup](./docs/mcp-server.md) |
@@ -205,6 +207,7 @@ pnpm --dir examples/react-basic run aic:doctor
 pnpm smoke:init
 pnpm smoke:adoption
 pnpm smoke:mcp
+pnpm smoke:mcp:stdio
 ```
 
 Outside this repo, use the published alpha CLI:
@@ -220,6 +223,12 @@ When those commands pass, you have the minimum AIC adoption loop working:
 - onboarding files for coding agents
 - generated discovery/UI/permissions/workflow artifacts
 - a doctor report with no blocking errors
+
+What you should have after the first pass:
+- `aic.project.json`
+- onboarding files like `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md`
+- generated discovery, UI, permissions, and workflow artifacts
+- an app contract that an MCP-compatible agent can read without guessing
 
 For the copyable app-integration path, use [Adopt AIC In An Existing App](./docs/adopt-existing-app.md).
 

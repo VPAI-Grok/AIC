@@ -44,6 +44,17 @@ If you have the monorepo checked out:
 node packages/mcp-server/dist/index.js
 ```
 
+## Authentication
+
+`@aicorg/mcp-server` is read-only and auth-agnostic.
+
+Recommended pattern:
+- protect your app and APIs with your normal auth layer
+- let the MCP client or browser session access the app as an authenticated user
+- let `@aicorg/mcp-server` read AIC manifests over HTTP from that app
+
+If you use Auth0 for user login, API protection, or delegated third-party API access, keep that in the app/auth layer rather than coupling it directly into the MCP server. See [Auth0 For AI Agents With AIC](/mnt/c/users/vatsa/agentinteractioncontrol/docs/auth0-ai-agents.md).
+
 ## Available Tools
 
 The MCP server exposes 6 read-only tools that let an AI agent understand any AIC-instrumented web app:

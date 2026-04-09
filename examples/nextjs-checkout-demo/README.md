@@ -8,6 +8,8 @@ This example proves that an AI agent using the standard MCP protocol can autonom
 
 Here is the repo's canonical Next.js AIC starter. It demonstrates generated manifests, MCP discovery, and a critical-action contract with structured confirmation.
 
+If you are adopting AIC into an existing app instead of exploring this starter, use [Adopt AIC In An Existing App](/mnt/c/users/vatsa/agentinteractioncontrol/docs/adopt-existing-app.md).
+
 ## Getting Started
 
 1. Install dependencies from the repository root:
@@ -42,6 +44,12 @@ To verify the MCP integration layer against this Next.js app:
    node simulate-mcp-client.mjs
    ```
 3. The script calls the same MCP tool handlers shipped in `@aicorg/mcp-server` against the running app and writes the result bundle to `mcp-simulation-result.json`.
+
+For a real stdio MCP server validation, use the repo-level smoke command from the root:
+
+```bash
+pnpm smoke:mcp:stdio
+```
 
 You can override the target with:
 

@@ -2,6 +2,8 @@
 
 This is the canonical Vite starter for AIC in this repo. It demonstrates shadcn-style integration, runtime manifests, devtools surfaces, and generated project artifacts.
 
+If you are adopting AIC into an existing app instead of exploring this starter, use [Adopt AIC In An Existing App](/mnt/c/users/vatsa/agentinteractioncontrol/docs/adopt-existing-app.md).
+
 ## Getting Started
 
 1. Install dependencies from the repository root:

@@ -27,6 +27,7 @@
     "smoke:adoption": "node scripts/smoke-adoption.mjs",
     "smoke:init": "node scripts/smoke-init.mjs",
     "smoke:mcp": "node scripts/smoke-mcp.mjs",
+    "smoke:mcp:stdio": "node scripts/smoke-mcp-stdio.mjs",
     "test": "pnpm build && pnpm test:contracts",
     "test:contracts": "node --test tests/*.test.mjs",
     "test:goldens": "pnpm build && node tests/goldens.mjs verify",

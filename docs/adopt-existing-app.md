@@ -2,6 +2,8 @@
 
 Use this when you already have a React, Next.js, or Vite app and want the shortest path to an AIC-ready slice.
 
+This is the canonical adopter path for the current repo.
+
 ## Scope
 
 Supported today:
@@ -130,11 +132,22 @@ Minimum fields to review after `init`:
 
 ## 5. Run The Review Loop
 
+Outside this repo:
+
 ```bash
-aic doctor ./my-app
-aic scan ./my-app/src
-aic generate project ./my-app/aic.project.json --out-dir ./my-app/public
-aic inspect ./my-app/public/report.json
+npx @aicorg/cli@alpha doctor ./my-app
+npx @aicorg/cli@alpha scan ./my-app/src
+npx @aicorg/cli@alpha generate project ./my-app/aic.project.json --out-dir ./my-app/public
+npx @aicorg/cli@alpha inspect ./my-app/public/report.json
+```
+
+Inside this repo:
+
+```bash
+pnpm aic doctor ./my-app
+pnpm aic scan ./my-app/src
+pnpm aic generate project ./my-app/aic.project.json --out-dir ./my-app/public
+pnpm aic inspect ./my-app/public/report.json
 ```
 
 What good looks like:
@@ -164,6 +177,8 @@ Then the agent can read:
 - permissions
 - workflows
 
+If your app is already protected by an auth layer like Auth0, keep AIC auth-agnostic and let the authenticated app session protect access to manifests and APIs. See [Auth0 For AI Agents With AIC](/mnt/c/users/vatsa/agentinteractioncontrol/docs/auth0-ai-agents.md).
+
 ## Copyable Starter Paths
 
 - Next.js starter: [examples/nextjs-checkout-demo](/mnt/c/users/vatsa/agentinteractioncontrol/examples/nextjs-checkout-demo)
@@ -180,3 +195,9 @@ You are done with the first slice when:
 - `doctor` has no errors
 - generated artifacts are current
 - an agent can resolve the slice through AIC instead of guessing from text or selectors
+
+Expected output after the first slice:
+- a valid `aic.project.json`
+- onboarding files for coding agents
+- current discovery/UI/actions/permissions/workflows artifacts
+- an MCP-readable contract for the workflow you instrumented
