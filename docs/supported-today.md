@@ -7,8 +7,10 @@ This project currently targets **owned React/Next/Vite apps** where the team can
 - explicit `agent*` metadata authored in React source
 - runtime UI manifests as the authoritative source for rich per-element metadata
 - generated discovery, action, permissions, and workflow manifests from project configs
+- deterministic extraction of static aliases, object-member reads, spreads, template interpolation, and zero-arg helpers
+- published devtools bridge and overlay helpers plus proposal export from the browser inspector
 - CLI-only repo mutation through guarded authoring-plan apply
-- offline bootstrap from saved captures with human-reviewed outputs
+- bootstrap review bundles from saved captures with authoring-plan handoff and human-reviewed outputs
 - coding-agent onboarding through `AGENTS.md`-style templates, `aic init`, and `aic doctor`
 
 ## Not Guaranteed Yet

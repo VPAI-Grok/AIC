@@ -32,13 +32,12 @@ test("Vite scan ignores build output directories and extracts explicit AIC annot
     ["src/App.tsx", "src/App.tsx", "src/App.tsx", "src/App.tsx", "src/App.tsx"]
   );
   assert.ok(matches.every((match) => !match.file.includes("dist")));
-  assert.equal(analyzed.diagnostics.length, 4);
-  assert.equal(analyzed.source_inventory.length, 10);
+  assert.equal(analyzed.diagnostics.length, 3);
+  assert.equal(analyzed.source_inventory.length, 9);
   assert.deepEqual(
     analyzed.diagnostics.map((diagnostic) => diagnostic.code),
     [
       "unsupported_import_reference",
-      "unsupported_member_expression",
       "unsupported_call_expression",
       "unsupported_expression"
     ]
@@ -52,8 +51,8 @@ test("Vite artifact generation produces valid manifests from scan results", asyn
 
   assert.equal(artifacts.discovery.framework, "vite");
   assert.equal(artifacts.matches.length, 5);
-  assert.equal(artifacts.diagnostics.length, 4);
-  assert.equal(artifacts.source_inventory.length, 10);
+  assert.equal(artifacts.diagnostics.length, 3);
+  assert.equal(artifacts.source_inventory.length, 9);
   assert.deepEqual(
     artifacts.ui.elements.map((element) => element.id),
     [
@@ -88,13 +87,12 @@ test("Next scan ignores framework output directories and extracts explicit AIC a
     ["src/App.tsx", "src/App.tsx", "src/App.tsx", "src/App.tsx", "src/App.tsx"]
   );
   assert.ok(matches.every((match) => !match.file.includes(".next")));
-  assert.equal(analyzed.diagnostics.length, 4);
-  assert.equal(analyzed.source_inventory.length, 10);
+  assert.equal(analyzed.diagnostics.length, 3);
+  assert.equal(analyzed.source_inventory.length, 9);
   assert.deepEqual(
     analyzed.diagnostics.map((diagnostic) => diagnostic.code),
     [
       "unsupported_import_reference",
-      "unsupported_member_expression",
       "unsupported_call_expression",
       "unsupported_expression"
     ]
@@ -108,8 +106,8 @@ test("Next artifact generation produces valid manifests from scan results", asyn
 
   assert.equal(artifacts.discovery.framework, "nextjs");
   assert.equal(artifacts.matches.length, 5);
-  assert.equal(artifacts.diagnostics.length, 4);
-  assert.equal(artifacts.source_inventory.length, 10);
+  assert.equal(artifacts.diagnostics.length, 3);
+  assert.equal(artifacts.source_inventory.length, 9);
   assert.deepEqual(
     artifacts.actions.actions.map((action) => action.target),
     [

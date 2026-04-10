@@ -32,6 +32,13 @@ const publishablePackages = [
     path: "packages/automation-core"
   },
   {
+    hasBin: false,
+    hasClientExport: true,
+    hasExtensionAssets: true,
+    name: "@aicorg/devtools",
+    path: "packages/devtools"
+  },
+  {
     hasBin: true,
     hasClientExport: false,
     name: "@aicorg/cli",
@@ -88,7 +95,6 @@ const publishablePackages = [
 ];
 
 const deferredPrivatePackages = [
-  "packages/devtools/package.json",
   "examples/bootstrap-openai/package.json",
   "examples/nextjs-checkout-demo/package.json",
   "examples/react-basic/package.json"
@@ -229,7 +235,15 @@ test("packed npm tarballs rewrite workspace dependencies and only ship built fil
     }
 
     if (pkg.hasClientExport) {
-      assert.ok(members.includes("package/dist/sdk-react/src/client.js") || members.includes("package/dist/integrations-shadcn/src/client.js"));
+      assert.ok(
+        members.includes("package/dist/sdk-react/src/client.js") ||
+          members.includes("package/dist/integrations-shadcn/src/client.js") ||
+          members.includes("package/dist/devtools/src/client.js")
+      );
+    }
+
+    if (pkg.hasExtensionAssets) {
+      assert.ok(members.includes("package/dist/devtools/src/extension-assets.js"));
     }
 
     if (pkg.hasBin) {

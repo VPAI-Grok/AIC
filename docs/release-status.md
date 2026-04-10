@@ -21,13 +21,14 @@ This is not a toy repo anymore, but it is also not claiming GA maturity.
   - `validate`
 - React SDK instrumentation through explicit `agent*` metadata
 - generated discovery, UI, actions, permissions, and workflow artifacts
+- published devtools bridge/overlay helpers for in-app inspection and proposal export
 - `@aicorg/mcp-server`
   - handler-level MCP validation
   - real stdio transport validation
 - starter adoption paths for:
   - Next.js
   - Vite/React
-- offline bootstrap from saved captures
+- bootstrap review bundles from saved captures plus guarded authoring-plan/apply handoff
 
 ## What The Repo Verifies Today
 
@@ -75,7 +76,6 @@ Use [AIC Case Studies](/mnt/c/users/vatsa/agentinteractioncontrol/docs/case-stud
 ## What Is Still Intentionally Rough
 
 - npm surface is still alpha-tagged
-- devtools are repo-only, not part of the published package wave
 - dynamic inference is intentionally conservative
 - write-back mutation remains guarded and limited
 - auth is documented as an integration path, not built into core packages

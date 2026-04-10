@@ -85,17 +85,8 @@
       "code": "unsupported_import_reference",
       "column": 24,
       "file": "src/App.tsx",
-      "line": 86,
+      "line": 100,
       "message": "agentId references imported symbol \"importedAgentId\", which is outside same-file deterministic extraction.",
-      "severity": "warning"
-    },
-    {
-      "attribute": "agentId",
-      "code": "unsupported_member_expression",
-      "column": 3,
-      "file": "src/App.tsx",
-      "line": 26,
-      "message": "agentId uses an unsupported object literal key. Use identifier or string-literal keys only.",
       "severity": "warning"
     },
     {
@@ -103,7 +94,7 @@
       "code": "unsupported_call_expression",
       "column": 24,
       "file": "src/App.tsx",
-      "line": 92,
+      "line": 103,
       "message": "agentId uses helper \"withArgs\" with arguments. Use a same-file zero-arg helper with a single static return expression.",
       "severity": "warning"
     },
@@ -112,7 +103,7 @@
       "code": "unsupported_expression",
       "column": 19,
       "file": "src/App.tsx",
-      "line": 29,
+      "line": 30,
       "message": "agentId uses an unsupported dynamic expression. Use a string literal, template literal, or supported same-file deterministic expression.",
       "severity": "warning"
     }
@@ -126,10 +117,10 @@
       "agentId": "customer.actions",
       "column": 7,
       "file": "src/App.tsx",
-      "line": 41,
+      "line": 52,
       "risk": "low",
       "role": "generic",
-      "source_key": "src/App.tsx:41:7:ShadcnAICDropdownMenuTrigger",
+      "source_key": "src/App.tsx:52:7:ShadcnAICDropdownMenuTrigger",
       "tagName": "ShadcnAICDropdownMenuTrigger"
     },
     {
@@ -138,10 +129,10 @@
       "agentId": "customer.actions.menu",
       "column": 7,
       "file": "src/App.tsx",
-      "line": 49,
+      "line": 60,
       "risk": "low",
       "role": "menu",
-      "source_key": "src/App.tsx:49:7:ShadcnAICDropdownMenuContent",
+      "source_key": "src/App.tsx:60:7:ShadcnAICDropdownMenuContent",
       "tagName": "ShadcnAICDropdownMenuContent"
     },
     {
@@ -150,10 +141,10 @@
       "agentId": "customer.archive",
       "column": 7,
       "file": "src/App.tsx",
-      "line": 58,
+      "line": 69,
       "risk": "high",
       "role": "menuitem",
-      "source_key": "src/App.tsx:58:7:ShadcnAICDropdownMenuItem",
+      "source_key": "src/App.tsx:69:7:ShadcnAICDropdownMenuItem",
       "tagName": "ShadcnAICDropdownMenuItem"
     },
     {
@@ -162,10 +153,10 @@
       "agentId": "customer.archive.dialog",
       "column": 7,
       "file": "src/App.tsx",
-      "line": 67,
+      "line": 80,
       "risk": "medium",
       "role": "dialog",
-      "source_key": "src/App.tsx:67:7:ShadcnAICDialogContent",
+      "source_key": "src/App.tsx:80:7:ShadcnAICDialogContent",
       "tagName": "ShadcnAICDialogContent"
     },
     {
@@ -174,10 +165,10 @@
       "agentId": "customer.view",
       "column": 7,
       "file": "src/App.tsx",
-      "line": 76,
+      "line": 89,
       "risk": "low",
       "role": "option",
-      "source_key": "src/App.tsx:76:7:ShadcnAICSelectItem",
+      "source_key": "src/App.tsx:89:7:ShadcnAICSelectItem",
       "tagName": "ShadcnAICSelectItem"
     }
   ],
@@ -187,13 +178,13 @@
       "column": 7,
       "file": "src/App.tsx",
       "label": "Customer actions",
-      "line": 41,
+      "line": 52,
       "opening_tag_signature": "<ShadcnAICDropdownMenuTrigger agentId=\"customer.actions\" agentDescription=\"Open customer actions\" agentAction=\"click\" agentRisk=\"low\" >",
       "role": "generic",
       "selectors": {
         "text": "Customer actions"
       },
-      "source_key": "src/App.tsx:41:7:ShadcnAICDropdownMenuTrigger",
+      "source_key": "src/App.tsx:52:7:ShadcnAICDropdownMenuTrigger",
       "tagName": "ShadcnAICDropdownMenuTrigger"
     },
     {
@@ -201,13 +192,13 @@
       "column": 7,
       "file": "src/App.tsx",
       "label": "Menu content",
-      "line": 49,
+      "line": 60,
       "opening_tag_signature": "<ShadcnAICDropdownMenuContent agentId=\"customer.actions.menu\" agentDescription=\"Read customer actions menu\" agentAction=\"read\" agentRisk=\"low\" agentRole=\"menu\" >",
       "role": "menu",
       "selectors": {
         "text": "Menu content"
       },
-      "source_key": "src/App.tsx:49:7:ShadcnAICDropdownMenuContent",
+      "source_key": "src/App.tsx:60:7:ShadcnAICDropdownMenuContent",
       "tagName": "ShadcnAICDropdownMenuContent"
     },
     {
@@ -215,13 +206,13 @@
       "column": 7,
       "file": "src/App.tsx",
       "label": "Archive customer",
-      "line": 58,
-      "opening_tag_signature": "<ShadcnAICDropdownMenuItem agentId={archiveId} agentDescription=\"Archive customer\" agentAction={agentTokens.archive.action} agentRisk={archiveRisk} agentRole=\"menuitem\" >",
+      "line": 69,
+      "opening_tag_signature": "<ShadcnAICDropdownMenuItem agentId={archiveId} agentDescription=\"Archive customer\" agentAction={agentTokens.archive.action} agentConfirmation={archiveConfirmation} agentRequiresConfirmation agentRisk={archiveRisk} agentRole=\"menuitem\" >",
       "role": "menuitem",
       "selectors": {
         "text": "Archive customer"
       },
-      "source_key": "src/App.tsx:58:7:ShadcnAICDropdownMenuItem",
+      "source_key": "src/App.tsx:69:7:ShadcnAICDropdownMenuItem",
       "tagName": "ShadcnAICDropdownMenuItem"
     },
     {
@@ -229,13 +220,13 @@
       "column": 7,
       "file": "src/App.tsx",
       "label": "Review archive impact",
-      "line": 67,
+      "line": 80,
       "opening_tag_signature": "<ShadcnAICDialogContent agentId=\"customer.archive.dialog\" agentDescription=\"Archive customer dialog\" agentAction=\"read\" agentRisk=\"medium\" agentRole=\"dialog\" >",
       "role": "dialog",
       "selectors": {
         "text": "Review archive impact"
       },
-      "source_key": "src/App.tsx:67:7:ShadcnAICDialogContent",
+      "source_key": "src/App.tsx:80:7:ShadcnAICDialogContent",
       "tagName": "ShadcnAICDialogContent"
     },
     {
@@ -243,56 +234,40 @@
       "column": 7,
       "file": "src/App.tsx",
       "label": "View customer",
-      "line": 76,
-      "opening_tag_signature": "<ShadcnAICSelectItem agentId={getViewId()} agentDescription={getViewDescription()} agentAction=\"select\" agentRisk=\"low\" agentRole=\"option\" >",
+      "line": 89,
+      "opening_tag_signature": "<ShadcnAICSelectItem agentId={getViewId()} agentDescription={getViewDescription()} agentAction={getViewNavigationAction()} agentAliases={mergedSelectAliases} agentRisk=\"low\" agentRole=\"option\" >",
       "role": "option",
       "selectors": {
         "text": "View customer"
       },
-      "source_key": "src/App.tsx:76:7:ShadcnAICSelectItem",
+      "source_key": "src/App.tsx:89:7:ShadcnAICSelectItem",
       "tagName": "ShadcnAICSelectItem"
     },
     {
       "column": 7,
       "file": "src/App.tsx",
       "label": "Send renewal email",
-      "line": 85,
+      "line": 99,
       "opening_tag_signature": "<button data-testid=\"send-renewal\">",
       "role": "button",
       "selectors": {
         "testId": "send-renewal",
         "text": "Send renewal email"
       },
-      "source_key": "src/App.tsx:85:7:button",
+      "source_key": "src/App.tsx:99:7:button",
       "tagName": "button"
     },
     {
       "column": 7,
       "file": "src/App.tsx",
       "label": "Skip imported",
-      "line": 86,
+      "line": 100,
       "opening_tag_signature": "<button agentId={importedAgentId} agentDescription=\"Imported unsupported control\">",
       "role": "button",
       "selectors": {
         "text": "Skip imported"
       },
-      "source_key": "src/App.tsx:86:7:button",
-      "tagName": "button",
-      "unsupported_aic_props": [
-        "agentId"
-      ]
-    },
-    {
-      "column": 7,
-      "file": "src/App.tsx",
-      "label": "Skip computed",
-      "line": 89,
-      "opening_tag_signature": "<button agentId={withComputedKey.badId} agentDescription=\"Computed key unsupported\">",
-      "role": "button",
-      "selectors": {
-        "text": "Skip computed"
-      },
-      "source_key": "src/App.tsx:89:7:button",
+      "source_key": "src/App.tsx:100:7:button",
       "tagName": "button",
       "unsupported_aic_props": [
         "agentId"
@@ -302,13 +277,13 @@
       "column": 7,
       "file": "src/App.tsx",
       "label": "Skip helper args",
-      "line": 92,
+      "line": 103,
       "opening_tag_signature": "<button agentId={withArgs(\"helper\")} agentDescription=\"Helper args unsupported\">",
       "role": "button",
       "selectors": {
         "text": "Skip helper args"
       },
-      "source_key": "src/App.tsx:92:7:button",
+      "source_key": "src/App.tsx:103:7:button",
       "tagName": "button",
       "unsupported_aic_props": [
         "agentId"
@@ -318,13 +293,13 @@
       "column": 7,
       "file": "src/App.tsx",
       "label": "Skip dynamic",
-      "line": 95,
+      "line": 106,
       "opening_tag_signature": "<button agentId={dynamicId} agentDescription=\"Skipped dynamic control\">",
       "role": "button",
       "selectors": {
         "text": "Skip dynamic"
       },
-      "source_key": "src/App.tsx:95:7:button",
+      "source_key": "src/App.tsx:106:7:button",
       "tagName": "button",
       "unsupported_aic_props": [
         "agentId"

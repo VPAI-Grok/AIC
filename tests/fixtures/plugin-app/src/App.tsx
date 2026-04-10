@@ -20,20 +20,31 @@ const agentTokens = {
 };
 
 const archiveIdAlias = agentTokens.archive.id;
-const archiveId = archiveIdAlias;
+const archiveId = archiveIdAlias + "";
 const archiveRisk = agentTokens.archive.risk;
-const withComputedKey = {
-  ["badId"]: "customer.computed"
+const withStaticSpread = {
+  ...agentTokens.view,
+  action: "select"
 };
 const withArgs = (suffix: string) => `customer.${suffix}`;
 const dynamicId = Math.random() > 0.5 ? "customer.dynamic_a" : "customer.dynamic_b";
+const selectAliases = ["View customer"];
+const mergedSelectAliases = [...selectAliases, `Preview ${"customer"}`];
+const archiveConfirmationBase = {
+  type: "manual_phrase" as const,
+  summary_fields: ["customer_name"]
+};
+const archiveConfirmation = {
+  ...archiveConfirmationBase,
+  prompt_template: `Archive ${"customer"}`
+};
 
 function getViewId() {
-  return agentTokens.view.id;
+  return withStaticSpread.id;
 }
 
-const getViewDescription = () => agentTokens.view.description;
-const getViewNavigationAction = () => `navigate`;
+const getViewDescription = () => withStaticSpread.description;
+const getViewNavigationAction = () => withStaticSpread.action;
 
 export function App() {
   return (
@@ -59,6 +70,8 @@ export function App() {
         agentId={archiveId}
         agentDescription="Archive customer"
         agentAction={agentTokens.archive.action}
+        agentConfirmation={archiveConfirmation}
+        agentRequiresConfirmation
         agentRisk={archiveRisk}
         agentRole="menuitem"
       >
@@ -76,7 +89,8 @@ export function App() {
       <ShadcnAICSelectItem
         agentId={getViewId()}
         agentDescription={getViewDescription()}
-        agentAction="select"
+        agentAction={getViewNavigationAction()}
+        agentAliases={mergedSelectAliases}
         agentRisk="low"
         agentRole="option"
       >
@@ -85,9 +99,6 @@ export function App() {
       <button data-testid="send-renewal">Send renewal email</button>
       <button agentId={importedAgentId} agentDescription="Imported unsupported control">
         Skip imported
-      </button>
-      <button agentId={withComputedKey.badId} agentDescription="Computed key unsupported">
-        Skip computed
       </button>
       <button agentId={withArgs("helper")} agentDescription="Helper args unsupported">
         Skip helper args

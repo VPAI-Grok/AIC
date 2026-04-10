@@ -286,9 +286,15 @@ pnpm aic diff ui before.json after.json   # review changes before committing
 
 pnpm aic bootstrap <url> \
   --captures-file captures.json \
-  --suggestions-file suggestions.json \
   --provider-kind openai \
   --provider-model gpt-4o
+
+pnpm aic generate authoring-plan runtime-snapshot.json \
+  --report public/report.json \
+  --bootstrap-review bootstrap-review.json
+
+pnpm aic apply authoring-plan aic-authoring-plan.json \
+  --project-root ./my-app --write
 ```
 
 → [Full bootstrap guide](./examples/bootstrap-openai/README.md)
@@ -340,6 +346,7 @@ JSON Schemas live under [`schemas/`](./schemas/).
 
 - ✅ Public GitHub launch ready
 - ✅ First-wave `@aicorg/*` packages published to npm under `alpha` tag
+- ✅ `@aicorg/devtools` included in the publishable alpha package surface
 - ✅ MCP server live and MCP-compatible with Claude Desktop, Cursor, and others
 - ✅ TailAdmin benchmark validates real agent improvement with AIC semantics
 - ✅ Release and evaluator docs now reflect the current alpha surface

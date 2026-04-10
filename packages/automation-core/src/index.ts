@@ -1192,6 +1192,38 @@ function getObjectPropertyKey(name: ts.PropertyName): string | undefined {
   return undefined;
 }
 
+function cloneStaticValue(value: StaticValue): StaticValue {
+  switch (value.kind) {
+    case "string":
+    case "boolean":
+    case "number":
+      return value;
+    case "array":
+      return {
+        kind: "array",
+        values: value.values.map((entry) => cloneStaticValue(entry))
+      };
+    case "object":
+      return {
+        kind: "object",
+        properties: new Map(
+          Array.from(value.properties.entries()).map(([key, entry]) => [key, cloneStaticValue(entry)])
+        )
+      };
+  }
+}
+
+function readStaticPrimitive(value: StaticValue): string | number | boolean | undefined {
+  switch (value.kind) {
+    case "string":
+    case "boolean":
+    case "number":
+      return value.value;
+    default:
+      return undefined;
+  }
+}
+
 function getHelperReturnExpression(
   helper: ts.ArrowFunction | ts.FunctionDeclaration | ts.FunctionExpression
 ): ts.Expression | undefined {
@@ -1312,6 +1344,26 @@ function resolveStaticValue(
     const properties = new Map<string, StaticValue>();
 
     for (const property of currentExpression.properties) {
+      if (ts.isSpreadAssignment(property)) {
+        const resolvedSpread = resolveStaticValue(property.expression, resolver, contextLabel, state);
+        if (!resolvedSpread.ok) {
+          return resolvedSpread;
+        }
+
+        if (resolvedSpread.value.kind !== "object") {
+          return createStaticResolutionError(
+            "unsupported_member_expression",
+            property.expression,
+            `${contextLabel} spreads a non-object static value. Use same-file const object literals only.`
+          );
+        }
+
+        resolvedSpread.value.properties.forEach((entry, key) => {
+          properties.set(key, cloneStaticValue(entry));
+        });
+        continue;
+      }
+
       if (!ts.isPropertyAssignment(property)) {
         return createStaticResolutionError(
           "unsupported_member_expression",
@@ -1356,11 +1408,21 @@ function resolveStaticValue(
 
     for (const element of currentExpression.elements) {
       if (ts.isSpreadElement(element)) {
-        return createStaticResolutionError(
-          "unsupported_expression",
-          element,
-          `${contextLabel} uses an unsupported array spread. Use plain same-file array literals only.`
-        );
+        const resolvedSpread = resolveStaticValue(element.expression, resolver, contextLabel, state);
+        if (!resolvedSpread.ok) {
+          return resolvedSpread;
+        }
+
+        if (resolvedSpread.value.kind !== "array") {
+          return createStaticResolutionError(
+            "unsupported_expression",
+            element.expression,
+            `${contextLabel} spreads a non-array static value. Use plain same-file array literals only.`
+          );
+        }
+
+        values.push(...resolvedSpread.value.values.map((entry) => cloneStaticValue(entry)));
+        continue;
       }
 
       const resolvedElement = resolveStaticValue(element, resolver, contextLabel, state);
@@ -1425,6 +1487,86 @@ function resolveStaticValue(
       ok: true,
       value: resolvedProperty
     };
+  }
+
+  if (ts.isTemplateExpression(currentExpression)) {
+    let text = currentExpression.head.text;
+
+    for (const span of currentExpression.templateSpans) {
+      const resolvedSpan = resolveStaticValue(span.expression, resolver, contextLabel, state);
+      if (!resolvedSpan.ok) {
+        return resolvedSpan;
+      }
+
+      const primitive = readStaticPrimitive(resolvedSpan.value);
+      if (primitive === undefined) {
+        return createStaticResolutionError(
+          "unsupported_expression",
+          span.expression,
+          `${contextLabel} uses a template interpolation that does not resolve to a static primitive value.`
+        );
+      }
+
+      text += String(primitive);
+      text += span.literal.text;
+    }
+
+    return {
+      ok: true,
+      value: {
+        kind: "string",
+        value: text
+      }
+    };
+  }
+
+  if (ts.isBinaryExpression(currentExpression) && currentExpression.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+    const resolvedLeft = resolveStaticValue(currentExpression.left, resolver, contextLabel, state);
+    if (!resolvedLeft.ok) {
+      return resolvedLeft;
+    }
+
+    const resolvedRight = resolveStaticValue(currentExpression.right, resolver, contextLabel, state);
+    if (!resolvedRight.ok) {
+      return resolvedRight;
+    }
+
+    const leftPrimitive = readStaticPrimitive(resolvedLeft.value);
+    const rightPrimitive = readStaticPrimitive(resolvedRight.value);
+
+    if (leftPrimitive === undefined || rightPrimitive === undefined) {
+      return createStaticResolutionError(
+        "unsupported_expression",
+        currentExpression,
+        `${contextLabel} uses "+" on non-primitive static values.`
+      );
+    }
+
+    if (typeof leftPrimitive === "string" || typeof rightPrimitive === "string") {
+      return {
+        ok: true,
+        value: {
+          kind: "string",
+          value: String(leftPrimitive) + String(rightPrimitive)
+        }
+      };
+    }
+
+    if (typeof leftPrimitive === "number" && typeof rightPrimitive === "number") {
+      return {
+        ok: true,
+        value: {
+          kind: "number",
+          value: leftPrimitive + rightPrimitive
+        }
+      };
+    }
+
+    return createStaticResolutionError(
+      "unsupported_expression",
+      currentExpression,
+      `${contextLabel} uses "+" with unsupported primitive types.`
+    );
   }
 
   if (ts.isCallExpression(currentExpression)) {

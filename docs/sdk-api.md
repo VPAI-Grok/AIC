@@ -86,17 +86,20 @@ For Next.js or other RSC-aware apps, import bridge/overlay usage from `@aicorg/d
 
 The current integration layer is practical rather than exhaustive:
 
-- `@aicorg/integrations-radix` covers common dialog, dropdown/menu, select, checkbox, switch, and tabs control semantics through prop factories
-- `@aicorg/integrations-shadcn` mirrors the same control families through thin wrapped components
+- `@aicorg/integrations-radix` covers common dialog, dropdown/menu, select, checkbox, switch, tabs, link, form, search, textarea, radio, and entity-action semantics through prop factories
+- `@aicorg/integrations-shadcn` mirrors the same control families through thin wrapped components for common owned-app flows
 
 ## Extraction Boundaries
 
 The current build-time extraction path is intentionally deterministic:
 
 - string literals
+- template literals with static same-file interpolations
+- string/number `+` expressions over static same-file values
 - no-substitution template literals
 - same-file const alias chains
 - same-file const object-member reads
+- same-file object and array spreads over static same-file values
 - same-file zero-arg helpers with a single static return expression
 
 Dynamic expressions are skipped with diagnostics rather than inferred.

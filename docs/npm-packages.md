@@ -18,12 +18,11 @@ The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 | `@aicorg/ai-bootstrap` | Bootstrap prompt and review tooling |
 | `@aicorg/ai-bootstrap-http` | Generic HTTP bootstrap provider adapter |
 | `@aicorg/ai-bootstrap-openai` | OpenAI bootstrap provider adapter |
+| `@aicorg/devtools` | Browser devtools bridge, overlay, and inspector helpers |
 | `@aicorg/mcp-server` | MCP server exposing AIC manifests to AI agents |
 
 ## Deferred From The First npm Wave
 
-- `@aicorg/devtools`
-  Remains repo-only for now because its extension-shell packaging needs a separate release story.
 - `examples/*`
   Stay private as demos, proof surfaces, and test fixtures.
 
@@ -62,6 +61,12 @@ pnpm add -D @aicorg/cli
 pnpm add @aicorg/plugin-vite @aicorg/plugin-next @aicorg/integrations-radix @aicorg/integrations-shadcn
 ```
 
+### Devtools And Inspector Helpers
+
+```bash
+pnpm add @aicorg/devtools
+```
+
 ### MCP Consumer Path
 
 For AI-agent integration without changing your app runtime dependencies:
@@ -81,4 +86,4 @@ pnpm add @aicorg/ai-bootstrap @aicorg/ai-bootstrap-http @aicorg/ai-bootstrap-ope
 - The current npm release uses the `alpha` tag.
 - Workspace examples and deferred packages are intentionally not published.
 - Package tarballs are validated with local smoke tests before any publish step runs in CI.
-- `@aicorg/devtools` remains repo-only for now.
+- `@aicorg/devtools` is part of the publishable alpha package surface.

@@ -1,4 +1,4 @@
-import { AICButton, AICInput, type AICComponentProps } from "@aicorg/sdk-react";
+import { AIC, AICButton, AICInput, useAICElement, type AICComponentProps } from "@aicorg/sdk-react";
 
 export function ShadcnAICButton(props: AICComponentProps<"button">) {
   return (
@@ -28,6 +28,149 @@ export function ShadcnAICInput(props: AICComponentProps<"input">) {
   );
 }
 
+export function ShadcnAICSearchInput(props: AICComponentProps<"input">) {
+  return (
+    <AICInput
+      {...props}
+      agentAction={props.agentAction ?? "input"}
+      agentRole={props.agentRole ?? "searchbox"}
+      style={{
+        border: "1px solid rgba(15, 23, 42, 0.16)",
+        borderRadius: 999,
+        padding: "10px 14px",
+        ...(props.style ?? {})
+      }}
+      type={props.type ?? "search"}
+    />
+  );
+}
+
+export function ShadcnAICTable(props: AICComponentProps<"table">) {
+  return (
+    <AIC.Table
+      {...props}
+      style={{
+        borderCollapse: "separate",
+        borderSpacing: 0,
+        width: "100%",
+        ...(props.style ?? {})
+      }}
+    />
+  );
+}
+
+export function ShadcnAICLink(props: AICComponentProps<"a">) {
+  return (
+    <AICButton
+      {...props}
+      agentAction={props.agentAction ?? "navigate"}
+      agentRole={props.agentRole ?? "link"}
+      as="a"
+      style={{
+        color: "#0f766e",
+        fontWeight: 600,
+        textDecoration: "none",
+        ...(props.style ?? {})
+      }}
+    />
+  );
+}
+
+export function ShadcnAICForm(props: AICComponentProps<"form">) {
+  return (
+    <AIC.Form
+      {...props}
+      style={{
+        display: "grid",
+        gap: 12,
+        ...(props.style ?? {})
+      }}
+    />
+  );
+}
+
+export function ShadcnAICTextarea(props: AICComponentProps<"textarea">) {
+  const {
+    children,
+    style,
+    agentAction,
+    agentAliases,
+    agentConfirmation,
+    agentDescription,
+    agentEffects,
+    agentEntityId,
+    agentEntityLabel,
+    agentEntityType,
+    agentExamples,
+    agentExecution,
+    agentId,
+    agentLabel,
+    agentNotes,
+    agentPermissions,
+    agentRecovery,
+    agentRequiresConfirmation,
+    agentRisk,
+    agentRole,
+    agentValidation,
+    agentWorkflowStep,
+    state,
+    defaultValue,
+    value,
+    ...nativeProps
+  } = props;
+  const initialValue =
+    value === undefined && defaultValue === undefined && (typeof children === "string" || typeof children === "number")
+      ? String(children)
+      : undefined;
+  const { attributes } = useAICElement(
+    {
+      agentAction,
+      agentAliases,
+      agentConfirmation,
+      agentDescription,
+      agentEffects,
+      agentEntityId,
+      agentEntityLabel,
+      agentEntityType,
+      agentExamples,
+      agentExecution,
+      agentId,
+      agentLabel,
+      agentNotes,
+      agentPermissions,
+      agentRecovery,
+      agentRequiresConfirmation,
+      agentRisk,
+      agentRole: agentRole ?? "textarea",
+      agentValidation,
+      agentWorkflowStep,
+      children,
+      state
+    },
+    {
+      defaultAction: "input",
+      role: "textarea"
+    }
+  );
+
+  return (
+    <textarea
+      {...nativeProps}
+      {...attributes}
+      defaultValue={defaultValue ?? initialValue}
+      style={{
+        border: "1px solid rgba(15, 23, 42, 0.16)",
+        borderRadius: 12,
+        minHeight: 112,
+        padding: "12px 14px",
+        resize: "vertical",
+        ...(style ?? {})
+      }}
+      value={value}
+    />
+  );
+}
+
 export function ShadcnAICCheckbox(props: AICComponentProps<"input">) {
   return (
     <AICInput
@@ -43,6 +186,24 @@ export function ShadcnAICCheckbox(props: AICComponentProps<"input">) {
         ...(props.style ?? {})
       }}
       type={props.type ?? "checkbox"}
+    />
+  );
+}
+
+export function ShadcnAICRadio(props: AICComponentProps<"input">) {
+  return (
+    <AICInput
+      {...props}
+      agentAction={props.agentAction ?? "select"}
+      agentRole={props.agentRole ?? "radio"}
+      style={{
+        accentColor: "#0f766e",
+        cursor: "pointer",
+        height: 18,
+        width: 18,
+        ...(props.style ?? {})
+      }}
+      type={props.type ?? "radio"}
     />
   );
 }

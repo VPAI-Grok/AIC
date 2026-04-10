@@ -19,6 +19,17 @@ test("scanSourceForAICAnnotations resolves same-file alias, object-member, helpe
   }
 };
 const archiveAlias = metadata.archive.id;
+const archiveIdWithSuffix = archiveAlias + ".primary";
+const extraAliases = ["archive customer"];
+const mergedAliases = [...extraAliases, \`customer \${"archive"}\`];
+const baseConfirmation = {
+  type: "manual_phrase",
+  summary_fields: ["customer_name"]
+};
+const archiveConfirmation = {
+  ...baseConfirmation,
+  prompt_template: \`Archive \${"customer"}\`
+};
 function getArchiveAction() {
   return "click";
 }
@@ -29,9 +40,11 @@ export function App() {
   return (
     <main>
       <button
-        agentId={archiveAlias}
+        agentId={archiveIdWithSuffix}
         agentAction={getArchiveAction()}
         agentDescription={getArchiveDescription()}
+        agentAliases={mergedAliases}
+        agentConfirmation={archiveConfirmation}
         agentRisk={metadata.archive.risk}
       >
         Archive customer
@@ -49,18 +62,19 @@ export function App() {
     {
       action: "click",
       agentDescription: "Archive customer",
-      agentId: "customer.archive",
+      agentId: "customer.archive.primary",
       column: 7,
       file: "src/App.tsx",
-      line: 20,
+      line: 31,
       role: "button",
       risk: "high",
-      source_key: "src/App.tsx:20:7:button",
+      source_key: "src/App.tsx:31:7:button",
       tagName: "button"
     }
   ]);
   assert.equal(result.source_inventory.length, 2);
   assert.equal(result.source_inventory[0].label, "Archive customer");
+  assert.equal(result.matches[0].agentId, "customer.archive.primary");
   assert.equal(result.source_inventory[1].label, "Preview customer");
   assert.equal(result.source_inventory[1].selectors?.testId, "preview");
 });

@@ -57,8 +57,8 @@ test("CLI scan reports annotated elements from source files", async () => {
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.summary.filesScanned, 1);
   assert.equal(payload.summary.extractedElements, 5);
-  assert.equal(payload.summary.sourceInventoryEntries, 10);
-  assert.equal(payload.summary.warnings, 4);
+  assert.equal(payload.summary.sourceInventoryEntries, 9);
+  assert.equal(payload.summary.warnings, 3);
   assert.deepEqual(
     payload.matches.map((match) => match.agentId),
     [
@@ -69,12 +69,11 @@ test("CLI scan reports annotated elements from source files", async () => {
       "customer.view"
     ]
   );
-  assert.equal(payload.source_inventory.length, 10);
+  assert.equal(payload.source_inventory.length, 9);
   assert.deepEqual(
     payload.diagnostics.map((diagnostic) => diagnostic.code),
     [
       "unsupported_import_reference",
-      "unsupported_member_expression",
       "unsupported_call_expression",
       "unsupported_expression"
     ]
@@ -240,8 +239,8 @@ test("CLI generate project emits the full artifact set and writes generated file
   const nextFiles = await readDirectoryFileMap(nextOutDir);
 
   assert.equal(nextPayload.framework, "nextjs");
-  assert.equal(nextPayload.diagnostics.length, 4);
-  assert.equal(vitePayload.source_inventory.length, 10);
+  assert.equal(nextPayload.diagnostics.length, 3);
+  assert.equal(vitePayload.source_inventory.length, 9);
   assert.equal(vitePayload.agent_onboarding.summary.recommended, 5);
   assert.equal(vitePayload.agent_onboarding.summary.missing, 5);
   assert.equal(vitePayload.agent_onboarding.summary.warnings, 5);

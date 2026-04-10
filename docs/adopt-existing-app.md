@@ -77,6 +77,12 @@ In development, mount devtools next to the provider when useful:
 import { AICDevtoolsBridge } from "@aicorg/devtools/client";
 ```
 
+If you want the visual inspector overlay in a plain client app, install and mount:
+
+```tsx
+import { AICDevtoolsOverlay } from "@aicorg/devtools";
+```
+
 ## 3. Annotate One Real Flow
 
 Start with a risky or business-critical control, not every button on the page.
@@ -154,6 +160,16 @@ What good looks like:
 - `doctor` has no errors
 - generated UI/actions/permissions/workflows are current
 - the report has no onboarding or extraction surprises you want to block on
+
+Optional backfill loop for partially annotated apps:
+
+```bash
+npx @aicorg/cli@alpha bootstrap https://demo.example --captures-file ./captures.json --review-file ./bootstrap-review.json
+npx @aicorg/cli@alpha generate authoring-plan ./runtime-snapshot.json --report ./my-app/public/report.json --bootstrap-review ./bootstrap-review.json
+npx @aicorg/cli@alpha apply authoring-plan ./aic-authoring-plan.json --project-root ./my-app --write
+```
+
+Use that flow when you want AI-suggested review bundles and guarded source edits, but keep authored metadata as the final source of truth.
 
 ## 6. Connect An Agent
 

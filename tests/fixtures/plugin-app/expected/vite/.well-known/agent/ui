@@ -22,7 +22,7 @@
         }
       ],
       "notes": [
-        "Extracted from src/App.tsx:41"
+        "Extracted from src/App.tsx:52"
       ],
       "risk": "low",
       "state": {
@@ -42,7 +42,7 @@
         }
       ],
       "notes": [
-        "Extracted from src/App.tsx:49"
+        "Extracted from src/App.tsx:60"
       ],
       "risk": "low",
       "state": {
@@ -61,9 +61,17 @@
           "type": "element_action"
         }
       ],
+      "confirmation": {
+        "type": "manual_phrase",
+        "summary_fields": [
+          "customer_name"
+        ],
+        "prompt_template": "Archive customer"
+      },
       "notes": [
-        "Extracted from src/App.tsx:58"
+        "Extracted from src/App.tsx:69"
       ],
+      "requires_confirmation": true,
       "risk": "high",
       "state": {
         "visible": true
@@ -82,7 +90,7 @@
         }
       ],
       "notes": [
-        "Extracted from src/App.tsx:67"
+        "Extracted from src/App.tsx:80"
       ],
       "risk": "medium",
       "state": {
@@ -102,7 +110,7 @@
         }
       ],
       "notes": [
-        "Extracted from src/App.tsx:76"
+        "Extracted from src/App.tsx:89"
       ],
       "risk": "low",
       "state": {

@@ -1,10 +1,29 @@
 {
   "name": "@aicorg/devtools",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
-  "private": true,
+  "description": "Browser devtools bridge, overlay, and inspector helpers for AIC instrumented apps.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/AIC.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/AIC",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/AIC/issues"
+  },
+  "keywords": [
+    "aic",
+    "agents",
+    "devtools",
+    "react",
+    "browser-extension"
+  ],
   "main": "./dist/devtools/src/index.js",
   "types": "./dist/devtools/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/devtools/src/index.d.ts",
@@ -20,6 +39,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && node ./scripts/sync-extension-assets.mjs",
     "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@aicorg/runtime": "workspace:*",
