@@ -1004,8 +1004,8 @@ function buildDraftFromSuggestions(
     endpoints: {
       ui: "/.well-known/agent/ui",
       actions: "/.well-known/agent/actions",
-      permissions: "/.well-known/agent-permissions.json",
-      workflows: "/.well-known/agent-workflows.json"
+      permissions: "/agent-permissions.json",
+      workflows: "/agent-workflows.json"
     },
     notes: [
       "AI bootstrap draft. Human review required before merge.",

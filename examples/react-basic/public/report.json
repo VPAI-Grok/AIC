@@ -1,0 +1,198 @@
+{
+  "agent_onboarding": {
+    "files": [
+      {
+        "kind": "canonical",
+        "path": "AGENTS.md",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "wrapper",
+        "path": "CLAUDE.md",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "wrapper",
+        "path": "GEMINI.md",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "copilot_instructions",
+        "path": ".github/copilot-instructions.md",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "cursor_rule",
+        "path": ".cursor/rules/aic.mdc",
+        "recommended": true,
+        "status": "present",
+        "template_version": "1"
+      },
+      {
+        "kind": "wrapper",
+        "path": ".github/skills/aic-onboarding/SKILL.md",
+        "recommended": false,
+        "status": "missing"
+      }
+    ],
+    "summary": {
+      "missing": 0,
+      "present": 5,
+      "recommended": 5,
+      "stale": 0,
+      "warnings": 0
+    },
+    "template_version": "1",
+    "warnings": []
+  },
+  "diagnostics": [],
+  "filesScanned": 3,
+  "framework": "vite",
+  "generated_manifests": {
+    "findings": [],
+    "summary": {
+      "invalid": 0
+    }
+  },
+  "matches": [
+    {
+      "action": "click",
+      "agentDescription": "Opens the archive review dialog for the selected customer",
+      "agentId": "customer.archive.dialog.open",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "line": 6,
+      "risk": "medium",
+      "role": "generic",
+      "source_key": "src/contract-proof.tsx:6:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "submit",
+      "agentDescription": "Archives the selected customer after the archive impact review is accepted",
+      "agentId": "customer.archive",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "line": 14,
+      "risk": "high",
+      "role": "generic",
+      "source_key": "src/contract-proof.tsx:14:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "action": "click",
+      "agentDescription": "Sends a renewal reminder email to the current customer",
+      "agentId": "customer.send_renewal_email",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "line": 22,
+      "risk": "medium",
+      "role": "generic",
+      "source_key": "src/contract-proof.tsx:22:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "agentDescription": "Captures the next renewal follow-up note for the selected customer",
+      "agentId": "customer.renewal_note",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "line": 30,
+      "risk": "low",
+      "role": "generic",
+      "source_key": "src/contract-proof.tsx:30:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "action": "submit",
+      "agentDescription": "Stores the current renewal note on the customer record",
+      "agentId": "customer.renewal_note.save",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "line": 36,
+      "risk": "medium",
+      "role": "generic",
+      "source_key": "src/contract-proof.tsx:36:7:AICButton",
+      "tagName": "AICButton"
+    }
+  ],
+  "source_inventory": [
+    {
+      "annotated_agent_id": "customer.archive.dialog.open",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "label": "Archive customer",
+      "line": 6,
+      "opening_tag_signature": "<AICButton agentAction=\"click\" agentDescription=\"Opens the archive review dialog for the selected customer\" agentId=\"customer.archive.dialog.open\" agentRisk=\"medium\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Archive customer"
+      },
+      "source_key": "src/contract-proof.tsx:6:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "customer.archive",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "label": "Confirm archive",
+      "line": 14,
+      "opening_tag_signature": "<AICButton agentAction=\"submit\" agentDescription=\"Archives the selected customer after the archive impact review is accepted\" agentId=\"customer.archive\" agentRisk=\"high\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Confirm archive"
+      },
+      "source_key": "src/contract-proof.tsx:14:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "customer.send_renewal_email",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "label": "Send renewal reminder",
+      "line": 22,
+      "opening_tag_signature": "<AICButton agentAction=\"click\" agentDescription=\"Sends a renewal reminder email to the current customer\" agentId=\"customer.send_renewal_email\" agentRisk=\"medium\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Send renewal reminder"
+      },
+      "source_key": "src/contract-proof.tsx:22:7:AICButton",
+      "tagName": "AICButton"
+    },
+    {
+      "annotated_agent_id": "customer.renewal_note",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "label": "Renewal note",
+      "line": 30,
+      "opening_tag_signature": "<AICInput agentDescription=\"Captures the next renewal follow-up note for the selected customer\" agentId=\"customer.renewal_note\" agentLabel=\"Renewal note\" agentRisk=\"low\" />",
+      "role": "generic",
+      "selectors": {
+        "text": "Renewal note"
+      },
+      "source_key": "src/contract-proof.tsx:30:7:AICInput",
+      "tagName": "AICInput"
+    },
+    {
+      "annotated_agent_id": "customer.renewal_note.save",
+      "column": 7,
+      "file": "src/contract-proof.tsx",
+      "label": "Save renewal note",
+      "line": 36,
+      "opening_tag_signature": "<AICButton agentAction=\"submit\" agentDescription=\"Stores the current renewal note on the customer record\" agentId=\"customer.renewal_note.save\" agentRisk=\"medium\" >",
+      "role": "generic",
+      "selectors": {
+        "text": "Save renewal note"
+      },
+      "source_key": "src/contract-proof.tsx:36:7:AICButton",
+      "tagName": "AICButton"
+    }
+  ]
+}

@@ -13,19 +13,15 @@ export const CRM_VIEW = /** @type {{
 });
 
 export const ARCHIVE_CUSTOMER_PROPS = /** @type {AICMetadataProps} */ ({
-  agentConfirmation: {
-    prompt_template: "Archive customer {{customer_id}}? This hides the record from active views.",
-    type: "human_review"
-  },
-  agentDescription: "Opens the archive confirmation dialog for the selected customer",
+  agentAction: "click",
+  agentDescription: "Opens the archive review dialog for the selected customer",
   agentEntityId: "cus_2048",
   agentEntityLabel: "Northwind Traders",
   agentEntityType: "customer",
-  agentId: "customer.archive",
+  agentId: "customer.archive.dialog.open",
   agentLabel: "Archive customer",
   agentNotes: ["Requires billing_manager role", "Appears in row actions"],
-  agentRequiresConfirmation: true,
-  agentRisk: "high",
+  agentRisk: "medium",
   agentWorkflowStep: "customer.archive.review"
 });
 
@@ -74,12 +70,14 @@ export const SEND_RENEWAL_REMINDER_PROPS = /** @type {AICMetadataProps} */ ({
 });
 
 export const ARCHIVE_DIALOG_PROPS = /** @type {AICMetadataProps} */ ({
-  agentDescription: "Shows the archive impact summary for the selected customer",
+  agentDescription: "Shows the archive impact summary for the selected customer before confirmation",
   agentEntityId: "cus_2048",
   agentEntityLabel: "Northwind Traders",
   agentEntityType: "customer",
   agentId: "customer.archive.dialog",
-  agentRisk: "medium"
+  agentRisk: "medium",
+  agentRole: "dialog",
+  agentWorkflowStep: "customer.archive.review"
 });
 
 export const ARCHIVE_DIALOG_CLOSE_PROPS = /** @type {AICMetadataProps} */ ({
@@ -91,6 +89,35 @@ export const ARCHIVE_DIALOG_CLOSE_PROPS = /** @type {AICMetadataProps} */ ({
   agentId: "customer.archive.dialog.close",
   agentLabel: "Cancel archive",
   agentRisk: "low",
+  agentWorkflowStep: "customer.archive.review"
+});
+
+export const ARCHIVE_CONFIRM_PROPS = /** @type {AICMetadataProps} */ ({
+  agentAction: "submit",
+  agentConfirmation: {
+    prompt_template: "Archive customer {{customer_id}} after reviewing downstream impacts?",
+    summary_fields: ["customer_id", "customer_name"],
+    type: "human_review"
+  },
+  agentDescription: "Archives the selected customer after the archive impact review is accepted",
+  agentEffects: ["customer.archived = true", "customer.visible_in_active_list = false"],
+  agentEntityId: "cus_2048",
+  agentEntityLabel: "Northwind Traders",
+  agentEntityType: "customer",
+  agentExecution: {
+    estimated_latency_ms: 2200,
+    settled_when: ["toast.visible = true", "customer.archived = true"]
+  },
+  agentId: "customer.archive",
+  agentLabel: "Confirm archive",
+  agentRecovery: {
+    error_code: "archive_customer_timeout",
+    recovery: "retry_archive_customer",
+    retry_after_ms: 4000,
+    retryable: true
+  },
+  agentRequiresConfirmation: true,
+  agentRisk: "high",
   agentWorkflowStep: "customer.archive.review"
 });
 

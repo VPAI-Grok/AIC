@@ -17,12 +17,18 @@
     }
   },
   "actionPolicies": {
-    "checkout.save_cart": {
+    "customer.archive": {
+      "requiresConfirmation": true,
+      "risk": "high",
+      "roleRequirements": [
+        "billing_manager"
+      ]
+    },
+    "customer.archive.dialog.open": {
       "risk": "medium"
     },
-    "checkout.submit_order": {
-      "requiresConfirmation": true,
-      "risk": "critical"
+    "customer.send_renewal_email": {
+      "risk": "medium"
     }
   }
 }

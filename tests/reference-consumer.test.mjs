@@ -69,8 +69,8 @@ test("reference consumer resolves crm contract bundle by stable ids, entities, a
   const bundle = await buildCrmContractBundle();
   const consumer = createReferenceConsumer(bundle);
 
-  assert.equal(consumer.getEndpoint("permissions"), "/.well-known/agent-permissions.json");
-  assert.equal(consumer.getEndpoint("workflows"), "/.well-known/agent-workflows.json");
+  assert.equal(consumer.getEndpoint("permissions"), "/agent-permissions.json");
+  assert.equal(consumer.getEndpoint("workflows"), "/agent-workflows.json");
 
   const archive = consumer.getElement("customer.archive");
   assert.equal(archive.entity_ref?.entity_id, "cus_2048");

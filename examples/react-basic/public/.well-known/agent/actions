@@ -1,0 +1,97 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "generated_at": "2026-03-28T00:00:00.000Z",
+  "actions": [
+    {
+      "name": "customer.archive.dialog.open",
+      "title": "Opens the archive review dialog for the selected customer",
+      "target": "customer.archive.dialog.open",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "customer.archive.dialog.open.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "customer.archive",
+      "title": "Archives the selected customer after the archive impact review is accepted",
+      "target": "customer.archive",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "customer.archive.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "customer.send_renewal_email",
+      "title": "Sends a renewal reminder email to the current customer",
+      "target": "customer.send_renewal_email",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "customer.send_renewal_email.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "customer.renewal_note",
+      "title": "Captures the next renewal follow-up note for the selected customer",
+      "target": "customer.renewal_note",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "customer.renewal_note.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    },
+    {
+      "name": "customer.renewal_note.save",
+      "title": "Stores the current renewal note on the customer record",
+      "target": "customer.renewal_note.save",
+      "preconditions": [],
+      "postconditions": [],
+      "side_effects": [],
+      "idempotent": false,
+      "undoable": false,
+      "estimated_latency_ms": 1000,
+      "completion_signal": {
+        "type": "state_change",
+        "value": "customer.renewal_note.save.completed = true"
+      },
+      "failure_modes": [
+        "unknown_failure"
+      ]
+    }
+  ]
+}

@@ -21,6 +21,9 @@ const checkoutContract = await import(
 const crmContract = await import(
   pathToFileURL(resolveFromRepo("examples/react-basic/src/crm-contract.mjs")).href
 );
+const todoContract = await import(
+  pathToFileURL(resolveFromRepo("examples/todomvc-react/src/todo-contract.js")).href
+);
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -203,6 +206,14 @@ test("crm example emits confirmation, validation, execution, recovery, entity, a
                     type: "button"
                   },
                   "Cancel archive"
+                ),
+                React.createElement(
+                  shadcn.ShadcnAICButton,
+                  {
+                    ...crmContract.ARCHIVE_CONFIRM_PROPS,
+                    type: "button"
+                  },
+                  "Confirm archive"
                 )
               )
             ),
@@ -271,10 +282,16 @@ test("crm example emits confirmation, validation, execution, recovery, entity, a
     0
   );
 
+  const openArchive = getElement(manifest, "customer.archive.dialog.open");
+  assert.equal(openArchive.risk, "medium");
+  assert.equal(openArchive.workflow_ref, "customer.archive.review");
+
   const archive = getElement(manifest, "customer.archive");
   assert.equal(archive.confirmation?.type, "human_review");
   assert.equal(archive.requires_confirmation, true);
   assert.equal(archive.entity_ref?.entity_id, "cus_2048");
+  assert.equal(archive.execution?.estimated_latency_ms, 2200);
+  assert.equal(archive.recovery?.recovery, "retry_archive_customer");
   assert.equal(archive.workflow_ref, "customer.archive.review");
 
   const actionsMenu = getElement(manifest, "customer.actions_menu");
@@ -293,6 +310,10 @@ test("crm example emits confirmation, validation, execution, recovery, entity, a
   assert.equal(closeArchive.role, "button");
   assert.equal(closeArchive.workflow_ref, "customer.archive.review");
 
+  const archiveDialog = getElement(manifest, "customer.archive.dialog");
+  assert.equal(archiveDialog.role, "dialog");
+  assert.equal(archiveDialog.workflow_ref, "customer.archive.review");
+
   const renewalNote = getElement(manifest, "customer.renewal_note");
   assert.equal(renewalNote.validation?.required, true);
   assert.equal(renewalNote.validation?.max_length, 240);
@@ -306,6 +327,127 @@ test("crm example emits confirmation, validation, execution, recovery, entity, a
   assert.equal(saveNote.entity_ref?.entity_type, "customer");
   assert.equal(saveNote.execution?.estimated_latency_ms, 1600);
   assert.equal(saveNote.workflow_ref, "customer.renewal.note.capture");
+
+  await withWarningsSuppressed(async () => {
+    await act(async () => {
+      renderer.unmount();
+    });
+  });
+});
+
+test("todomvc example emits explicit bulk, destructive, validation, and workflow metadata", async () => {
+  const registry = new runtime.AICRegistry();
+  let renderer;
+  const todo = {
+    completed: true,
+    id: "todo_1",
+    title: "Ship release notes"
+  };
+
+  await withWarningsSuppressed(async () => {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        React.createElement(
+          sdkReact.AICProvider,
+          { registry },
+          React.createElement(
+            React.Fragment,
+            null,
+            React.createElement(sdkReact.AICInput, {
+              ...todoContract.NEW_TODO_INPUT_PROPS,
+              value: "",
+              onChange: () => {},
+              onKeyDown: () => {}
+            }),
+            React.createElement(sdkReact.AICInput, {
+              ...todoContract.TOGGLE_ALL_PROPS,
+              checked: false,
+              onChange: () => {},
+              type: "checkbox"
+            }),
+            React.createElement(sdkReact.AICInput, {
+              ...todoContract.createTodoToggleProps(todo),
+              checked: todo.completed,
+              onChange: () => {},
+              type: "checkbox"
+            }),
+            React.createElement(
+              sdkReact.AICButton,
+              {
+                ...todoContract.createTodoDeleteProps(todo),
+                type: "button"
+              },
+              "Delete todo"
+            ),
+            React.createElement(sdkReact.AICInput, {
+              ...todoContract.createTodoEditInputProps(todo),
+              onBlur: () => {},
+              onChange: () => {},
+              onKeyDown: () => {},
+              value: todo.title
+            }),
+            React.createElement(
+              sdkReact.AICButton,
+              {
+                ...todoContract.FILTER_ALL_PROPS,
+                as: "a",
+                href: "#/"
+              },
+              "All"
+            ),
+            React.createElement(
+              sdkReact.AICButton,
+              {
+                ...todoContract.createClearCompletedProps(1),
+                type: "button"
+              },
+              "Clear completed"
+            )
+          )
+        )
+      );
+    });
+  });
+
+  const manifest = registry.serializeRuntimeUi(todoContract.TODO_VIEW);
+  const validation = spec.validateRuntimeUiManifest(manifest);
+  assert.equal(validation.ok, true);
+  assert.equal(
+    validation.issues.filter((issue) => issue.severity === "error" || issue.severity === "fatal").length,
+    0
+  );
+
+  const newTodo = getElement(manifest, "todos.create.title");
+  assert.equal(newTodo.validation?.required, true);
+  assert.equal(newTodo.validation?.max_length, 120);
+  assert.equal(newTodo.workflow_ref, "todos.capture.add");
+
+  const toggleAll = getElement(manifest, "todos.toggle_all");
+  assert.equal(toggleAll.risk, "medium");
+  assert.equal(toggleAll.workflow_ref, "todos.bulk.toggle");
+
+  const toggleTodo = getElement(manifest, "todo.toggle.todo_1");
+  assert.equal(toggleTodo.entity_ref?.entity_type, "todo");
+  assert.equal(toggleTodo.entity_ref?.entity_label, "Ship release notes");
+  assert.equal(toggleTodo.workflow_ref, "todos.item.toggle");
+
+  const deleteTodo = getElement(manifest, "todo.delete.todo_1");
+  assert.equal(deleteTodo.risk, "high");
+  assert.equal(deleteTodo.entity_ref?.entity_id, "todo_1");
+  assert.equal(deleteTodo.workflow_ref, "todos.item.delete");
+
+  const editTodo = getElement(manifest, "todo.edit.todo_1");
+  assert.equal(editTodo.risk, "medium");
+  assert.equal(editTodo.validation?.required, true);
+  assert.equal(editTodo.notes?.includes("Submitting an empty title deletes the todo."), true);
+  assert.equal(editTodo.workflow_ref, "todos.item.edit");
+
+  const clearCompleted = getElement(manifest, "todos.clear_completed");
+  assert.equal(clearCompleted.risk, "critical");
+  assert.equal(clearCompleted.requires_confirmation, true);
+  assert.equal(clearCompleted.confirmation?.type, "human_review");
+  assert.equal(clearCompleted.confirmation?.prompt_template, "Clear {{completed_count}} completed todos from the list?");
+  assert.equal(clearCompleted.workflow_ref, "todos.bulk.clear_completed.review");
 
   await withWarningsSuppressed(async () => {
     await act(async () => {

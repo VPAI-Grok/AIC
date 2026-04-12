@@ -1,30 +1,7 @@
 {
-  "appName": "AIC CRM Demo",
-  "framework": "vite",
-  "generatedAt": "2026-03-28T00:00:00.000Z",
-  "hmr": true,
-  "notes": ["example project", "crm proof harness"],
-  "permissions": {
-    "actionPolicies": {
-      "customer.archive": {
-        "requiresConfirmation": true,
-        "risk": "high",
-        "roleRequirements": [
-          "billing_manager"
-        ]
-      },
-      "customer.archive.dialog.open": {
-        "risk": "medium"
-      },
-      "customer.send_renewal_email": {
-        "risk": "medium"
-      }
-    }
-  },
-  "projectRoot": ".",
-  "updatedAt": "2026-03-28T00:00:00.000Z",
-  "viewId": "crm.customers",
-  "viewUrl": "https://demo.example/customers",
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "generated_at": "2026-03-28T00:00:00.000Z",
   "workflows": [
     {
       "entry_points": [

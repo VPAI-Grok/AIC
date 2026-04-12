@@ -155,7 +155,27 @@ export async function buildCrmContractBundle() {
       React.createElement(
         shadcn.ShadcnAICDialogContent,
         crmContract.ARCHIVE_DIALOG_PROPS,
-        "Archiving Northwind Traders pauses reminder workflows."
+        React.createElement(
+          React.Fragment,
+          null,
+          "Archiving Northwind Traders pauses reminder workflows.",
+          React.createElement(
+            shadcn.ShadcnAICDialogClose,
+            {
+              ...crmContract.ARCHIVE_DIALOG_CLOSE_PROPS,
+              type: "button"
+            },
+            "Cancel archive"
+          ),
+          React.createElement(
+            shadcn.ShadcnAICButton,
+            {
+              ...crmContract.ARCHIVE_CONFIRM_PROPS,
+              type: "button"
+            },
+            "Confirm archive"
+          )
+        )
       ),
       React.createElement(
         shadcn.ShadcnAICButton,

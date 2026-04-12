@@ -1,6 +1,12 @@
 import React from 'react';
 import { AICButton } from '@aicorg/sdk-react';
 import type { FilterType } from '../types';
+import {
+  createClearCompletedProps,
+  FILTER_ACTIVE_PROPS,
+  FILTER_ALL_PROPS,
+  FILTER_COMPLETED_PROPS,
+} from '../todo-contract.js';
 
 interface Props {
   completedCount: number;
@@ -27,39 +33,33 @@ export const Footer: React.FC<Props> = ({
       <ul className="filters">
         <li>
           <AICButton
+            {...FILTER_ALL_PROPS}
             as="a"
             href="#/"
             className={filter === 'all' ? 'selected' : ''}
             onClick={(e: React.MouseEvent) => { e.preventDefault(); setFilter('all'); }}
-            agentId="filter-all"
-            agentAction="click"
-            agentDescription="Show all todo items"
           >
             All
           </AICButton>
         </li>
         <li>
           <AICButton
+            {...FILTER_ACTIVE_PROPS}
             as="a"
             href="#/active"
             className={filter === 'active' ? 'selected' : ''}
             onClick={(e: React.MouseEvent) => { e.preventDefault(); setFilter('active'); }}
-            agentId="filter-active"
-            agentAction="click"
-            agentDescription="Show only active (uncompleted) todo items"
           >
             Active
           </AICButton>
         </li>
         <li>
           <AICButton
+            {...FILTER_COMPLETED_PROPS}
             as="a"
             href="#/completed"
             className={filter === 'completed' ? 'selected' : ''}
             onClick={(e: React.MouseEvent) => { e.preventDefault(); setFilter('completed'); }}
-            agentId="filter-completed"
-            agentAction="click"
-            agentDescription="Show only completed todo items"
           >
             Completed
           </AICButton>
@@ -67,11 +67,9 @@ export const Footer: React.FC<Props> = ({
       </ul>
       {completedCount > 0 && (
         <AICButton
+          {...createClearCompletedProps(completedCount)}
           className="clear-completed"
           onClick={clearCompleted}
-          agentId="clear-completed"
-          agentAction="click"
-          agentDescription="Clear all completed todo items"
         >
           Clear completed
         </AICButton>

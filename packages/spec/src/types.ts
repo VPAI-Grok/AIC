@@ -490,6 +490,11 @@ export interface AICDoctorFinding {
   file?: string;
   fix_hint?: string;
   manifest_kind?: AICManifestKind;
+  top_issue?: {
+    message: string;
+    path: string;
+    rule?: string;
+  };
   message: string;
   related_count?: number;
   severity: "warning" | "error";
@@ -525,6 +530,20 @@ export interface AICAuthoringProjectReport {
   diagnostics: AICAuthoringReportDiagnostic[];
   filesScanned: number;
   framework: string;
+  generated_manifests?: {
+    findings: Array<{
+      issue_count: number;
+      manifest_kind: AICManifestKind;
+      top_issue?: {
+        message: string;
+        path: string;
+        rule?: string;
+      };
+    }>;
+    summary: {
+      invalid: number;
+    };
+  };
   matches: AICAuthoringReportMatch[];
   source_inventory?: AICAuthoringSourceInventoryEntry[];
 }

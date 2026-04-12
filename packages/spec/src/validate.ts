@@ -465,6 +465,28 @@ function validateElement(
 
 export function validateDiscoveryManifest(value: unknown): ValidationResult<AICDiscoveryManifest> {
   const issues: AICValidationIssue[] = [];
+  const capabilityEndpointPairs = [
+    {
+      capability: "runtimeUiTree",
+      endpoint: "ui",
+      label: "runtime UI"
+    },
+    {
+      capability: "semanticActions",
+      endpoint: "actions",
+      label: "semantic actions"
+    },
+    {
+      capability: "permissions",
+      endpoint: "permissions",
+      label: "permissions"
+    },
+    {
+      capability: "workflows",
+      endpoint: "workflows",
+      label: "workflows"
+    }
+  ] as const;
 
   if (!isRecord(value)) {
     pushIssue(issues, "fatal", "$", "Expected an object", "discovery.object");
@@ -517,6 +539,54 @@ export function validateDiscoveryManifest(value: unknown): ValidationResult<AICD
 
   if (value.notes !== undefined && !isStringArray(value.notes)) {
     pushIssue(issues, "warning", "$.notes", "Expected an array of strings", "discovery.notes");
+  }
+
+  if (isRecord(value.capabilities) && isRecord(value.endpoints)) {
+    for (const { capability, endpoint, label } of capabilityEndpointPairs) {
+      const capabilityValue = value.capabilities[capability];
+      const endpointValue = value.endpoints[endpoint];
+
+      if (capabilityValue !== undefined && typeof capabilityValue !== "boolean") {
+        pushIssue(
+          issues,
+          "error",
+          `$.capabilities.${capability}`,
+          "Expected a boolean",
+          "discovery.capabilities"
+        );
+      }
+
+      if (endpointValue !== undefined && (typeof endpointValue !== "string" || endpointValue.length === 0)) {
+        pushIssue(
+          issues,
+          "error",
+          `$.endpoints.${endpoint}`,
+          "Expected a non-empty string",
+          "discovery.endpoints"
+        );
+        continue;
+      }
+
+      if (capabilityValue === true && typeof endpointValue !== "string") {
+        pushIssue(
+          issues,
+          "error",
+          `$.endpoints.${endpoint}`,
+          `Expected an endpoint for advertised ${label} capability`,
+          "discovery.endpoint_capability_mismatch"
+        );
+      }
+
+      if (capabilityValue === false && typeof endpointValue === "string") {
+        pushIssue(
+          issues,
+          "warning",
+          `$.endpoints.${endpoint}`,
+          `Endpoint is present but ${label} capability is disabled`,
+          "discovery.endpoint_capability_mismatch"
+        );
+      }
+    }
   }
 
   return createResult(value as unknown as AICDiscoveryManifest, issues);

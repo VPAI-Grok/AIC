@@ -1,0 +1,113 @@
+{
+  "spec": "aic/0.1",
+  "manifest_version": "0.1.0",
+  "updated_at": "2026-03-28T00:00:00.000Z",
+  "page": {
+    "url": "https://demo.example/customers"
+  },
+  "view": {
+    "view_id": "crm.customers"
+  },
+  "elements": [
+    {
+      "id": "customer.archive.dialog.open",
+      "label": "Opens the archive review dialog for the selected customer",
+      "description": "Opens the archive review dialog for the selected customer",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.archive.dialog.open",
+          "type": "element_action"
+        }
+      ],
+      "notes": [
+        "Extracted from src/contract-proof.tsx:6"
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      }
+    },
+    {
+      "id": "customer.archive",
+      "label": "Archives the selected customer after the archive impact review is accepted",
+      "description": "Archives the selected customer after the archive impact review is accepted",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "submit",
+          "target": "customer.archive",
+          "type": "element_action"
+        }
+      ],
+      "notes": [
+        "Extracted from src/contract-proof.tsx:14"
+      ],
+      "risk": "high",
+      "state": {
+        "visible": true
+      }
+    },
+    {
+      "id": "customer.send_renewal_email",
+      "label": "Sends a renewal reminder email to the current customer",
+      "description": "Sends a renewal reminder email to the current customer",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.send_renewal_email",
+          "type": "element_action"
+        }
+      ],
+      "notes": [
+        "Extracted from src/contract-proof.tsx:22"
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      }
+    },
+    {
+      "id": "customer.renewal_note",
+      "label": "Captures the next renewal follow-up note for the selected customer",
+      "description": "Captures the next renewal follow-up note for the selected customer",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "click",
+          "target": "customer.renewal_note",
+          "type": "element_action"
+        }
+      ],
+      "notes": [
+        "Extracted from src/contract-proof.tsx:30"
+      ],
+      "risk": "low",
+      "state": {
+        "visible": true
+      }
+    },
+    {
+      "id": "customer.renewal_note.save",
+      "label": "Stores the current renewal note on the customer record",
+      "description": "Stores the current renewal note on the customer record",
+      "role": "generic",
+      "actions": [
+        {
+          "name": "submit",
+          "target": "customer.renewal_note.save",
+          "type": "element_action"
+        }
+      ],
+      "notes": [
+        "Extracted from src/contract-proof.tsx:36"
+      ],
+      "risk": "medium",
+      "state": {
+        "visible": true
+      }
+    }
+  ]
+}

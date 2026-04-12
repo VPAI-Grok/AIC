@@ -292,8 +292,8 @@ export class AICRegistry {
       endpoints: {
         ui: "/.well-known/agent/ui",
         actions: "/.well-known/agent/actions",
-        permissions: "/.well-known/agent-permissions.json",
-        workflows: "/.well-known/agent-workflows.json",
+        permissions: "/agent-permissions.json",
+        workflows: "/agent-workflows.json",
         ...options.endpoints
       }
     };
@@ -316,8 +316,8 @@ export class AICRegistry {
       "Source of truth manifests:",
       `- UI: ${options.endpoints?.ui ?? "/.well-known/agent/ui"}`,
       `- Actions: ${options.endpoints?.actions ?? "/.well-known/agent/actions"}`,
-      `- Permissions: ${options.endpoints?.permissions ?? "/.well-known/agent-permissions.json"}`,
-      `- Workflows: ${options.endpoints?.workflows ?? "/.well-known/agent-workflows.json"}`
+      `- Permissions: ${options.endpoints?.permissions ?? "/agent-permissions.json"}`,
+      `- Workflows: ${options.endpoints?.workflows ?? "/agent-workflows.json"}`
     ];
 
     if (options.notes && options.notes.length > 0) {

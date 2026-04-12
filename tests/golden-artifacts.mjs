@@ -13,15 +13,29 @@ const pluginVite = await importWorkspaceModule("packages/plugin-vite/dist/plugin
 const fixtureRoot = resolveFromRepo("tests/fixtures/plugin-app");
 
 const PROJECT_FIXTURES = {
+  "example-nextjs-checkout-demo": {
+    configFile: resolveFromRepo("examples/nextjs-checkout-demo/aic.project.json"),
+    expectedDir: resolveFromRepo("examples/nextjs-checkout-demo/public"),
+    framework: "nextjs",
+    generator: "project"
+  },
+  "example-react-basic": {
+    configFile: resolveFromRepo("examples/react-basic/aic.project.json"),
+    expectedDir: resolveFromRepo("examples/react-basic/public"),
+    framework: "vite",
+    generator: "project"
+  },
   next: {
     configFile: resolveFromRepo("tests/fixtures/plugin-app/project.next.json"),
     expectedDir: resolveFromRepo("tests/fixtures/plugin-app/expected/next"),
-    framework: "nextjs"
+    framework: "nextjs",
+    generator: "plugin-next"
   },
   vite: {
     configFile: resolveFromRepo("tests/fixtures/plugin-app/project.vite.json"),
     expectedDir: resolveFromRepo("tests/fixtures/plugin-app/expected/vite"),
-    framework: "vite"
+    framework: "vite",
+    generator: "plugin-vite"
   }
 };
 
@@ -121,17 +135,34 @@ async function loadProjectFixtureConfig(name) {
   const config = await readJsonFile(fixture.configFile);
   return {
     ...config,
-    projectRoot: resolve(fixtureRoot, config.projectRoot ?? ".")
+    projectRoot:
+      fixture.generator === "project"
+        ? resolve(dirname(fixture.configFile), config.projectRoot ?? ".")
+        : resolve(fixtureRoot, config.projectRoot ?? ".")
   };
+}
+
+function getOperateNotes(config) {
+  return config.framework === "vite"
+    ? [
+        ...(config.notes ?? []),
+        config.hmr === false ? "HMR metadata refresh disabled." : "HMR metadata refresh enabled."
+      ]
+    : config.notes;
 }
 
 export async function generateGoldenProjectFixture(name) {
   const fixture = PROJECT_FIXTURES[name];
   const config = await loadProjectFixtureConfig(name);
   const artifacts =
-    name === "vite"
-      ? await pluginVite.generateViteArtifacts(config)
-      : await pluginNext.generateNextArtifacts(config);
+    fixture.generator === "project"
+      ? await automationCore.generateProjectArtifacts({
+          ...config,
+          operateNotes: getOperateNotes(config)
+        })
+      : fixture.generator === "plugin-vite"
+        ? await pluginVite.generateViteArtifacts(config)
+        : await pluginNext.generateNextArtifacts(config);
   const report = automationCore.createProjectArtifactReport(fixture.framework, artifacts, {
     projectRoot: config.projectRoot
   });

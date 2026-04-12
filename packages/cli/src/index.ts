@@ -491,6 +491,7 @@ async function generateProject(filePath: string, args: string[]): Promise<number
     discovery: artifacts.discovery,
     files: Object.keys(artifacts.files),
     framework,
+    generated_manifests: frameworkReport.generated_manifests,
     matches: artifacts.matches,
     operate: artifacts.operate,
     outDir: outDir ? resolve(process.cwd(), outDir) : undefined,
@@ -890,6 +891,198 @@ function isDoctorReport(value: unknown): value is AICDoctorReport {
   );
 }
 
+function summarizeCodeCounts(values: Array<{ code: string }>, limit = 3): string | undefined {
+  const counts = new Map<string, number>();
+
+  for (const value of values) {
+    counts.set(value.code, (counts.get(value.code) ?? 0) + 1);
+  }
+
+  const entries = Array.from(counts.entries())
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, limit);
+
+  if (entries.length === 0) {
+    return undefined;
+  }
+
+  return entries.map(([code, count]) => `${code} (${count})`).join(", ");
+}
+
+function summarizeManifestKindCounts(
+  findings: Array<{ code: string; manifest_kind?: string }>,
+  limit = 5
+): string | undefined {
+  const counts = new Map<string, number>();
+
+  for (const finding of findings) {
+    if (finding.code !== "invalid_generated_manifest" || typeof finding.manifest_kind !== "string") {
+      continue;
+    }
+
+    counts.set(finding.manifest_kind, (counts.get(finding.manifest_kind) ?? 0) + 1);
+  }
+
+  const entries = Array.from(counts.entries())
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, limit);
+
+  if (entries.length === 0) {
+    return undefined;
+  }
+
+  return entries.map(([kind, count]) => `${kind} (${count})`).join(", ");
+}
+
+function summarizeRiskMatches(
+  matches: Array<{ agentId: string; risk?: string }>,
+  risks: string[],
+  limit = 3
+): string | undefined {
+  const filtered = matches
+    .filter((match) => risks.includes(match.risk ?? ""))
+    .map((match) => match.agentId)
+    .slice(0, limit);
+
+  if (filtered.length === 0) {
+    return undefined;
+  }
+
+  return filtered.join(", ");
+}
+
+function summarizeGeneratedManifestIssueDetails(
+  findings: Array<{
+    issue_count: number;
+    manifest_kind: string;
+    top_issue?: {
+      message: string;
+      path: string;
+      rule?: string;
+    };
+  }>,
+  limit = 3
+): string | undefined {
+  const summaries = findings
+    .filter((finding) => finding.issue_count > 0 && finding.top_issue)
+    .slice(0, limit)
+    .map((finding) => `${finding.manifest_kind}: ${finding.top_issue?.path} ${finding.top_issue?.message}`);
+
+  if (summaries.length === 0) {
+    return undefined;
+  }
+
+  return summaries.join("; ");
+}
+
+function summarizeDoctorGeneratedManifestIssueDetails(
+  findings: Array<{
+    code: string;
+    manifest_kind?: string;
+    related_count?: number;
+    top_issue?: {
+      message: string;
+      path: string;
+      rule?: string;
+    };
+  }>,
+  limit = 3
+): string | undefined {
+  const summaries = findings
+    .filter((finding) => finding.code === "invalid_generated_manifest" && finding.manifest_kind && finding.top_issue)
+    .sort(
+      (left, right) =>
+        (right.related_count ?? 0) - (left.related_count ?? 0) ||
+        (left.manifest_kind ?? "").localeCompare(right.manifest_kind ?? "")
+    )
+    .slice(0, limit)
+    .map((finding) => `${finding.manifest_kind}: ${finding.top_issue?.path} ${finding.top_issue?.message}`);
+
+  if (summaries.length === 0) {
+    return undefined;
+  }
+
+  return summaries.join("; ");
+}
+
+function summarizeDoctorNextActions(
+  findings: AICDoctorReport["findings"],
+  limit = 3
+): string[] {
+  const uniqueActions = new Set<string>();
+  const orderedFindings = [...findings].sort((left, right) => {
+    const severityWeight = (value: AICDoctorReport["findings"][number]["severity"]): number =>
+      value === "error" ? 0 : 1;
+    const countWeight = (value: number | undefined): number => -(value ?? 0);
+
+    return (
+      severityWeight(left.severity) - severityWeight(right.severity) ||
+      countWeight(left.related_count) - countWeight(right.related_count) ||
+      left.code.localeCompare(right.code)
+    );
+  });
+
+  for (const finding of orderedFindings) {
+    let action = finding.fix_hint?.trim();
+    if (action && finding.code === "invalid_generated_manifest" && finding.manifest_kind && finding.top_issue) {
+      action = `${action} Top issue: ${finding.manifest_kind}: ${finding.top_issue.path} ${finding.top_issue.message}.`;
+    }
+    if (!action || uniqueActions.has(action)) {
+      continue;
+    }
+
+    uniqueActions.add(action);
+    if (uniqueActions.size >= limit) {
+      break;
+    }
+  }
+
+  return [...uniqueActions];
+}
+
+function summarizeProjectReportNextActions(
+  report: NonNullable<AICAuthoringInputs["project_report"]>,
+  limit = 3
+): string[] {
+  const actions: string[] = [];
+  const onboardingSummary = report.agent_onboarding?.summary;
+  const missingOrStaleOnboarding =
+    (onboardingSummary?.missing ?? 0) + (onboardingSummary?.stale ?? 0);
+
+  if (missingOrStaleOnboarding > 0) {
+    actions.push(
+      "Add or refresh the recommended agent onboarding files so repo instructions stay aligned for AI operators."
+    );
+  }
+
+  if (report.diagnostics.length > 0) {
+    actions.push(
+      "Replace unsupported dynamic AIC props with same-file deterministic values, then rerun `aic scan` or `aic generate project`."
+    );
+  }
+
+  const invalidGeneratedManifests = report.generated_manifests?.findings
+    ?.filter((finding) => finding.issue_count > 0)
+    .slice(0, 3);
+  if (invalidGeneratedManifests && invalidGeneratedManifests.length > 0) {
+    const detailedSummary = summarizeGeneratedManifestIssueDetails(invalidGeneratedManifests, 1);
+    actions.push(
+      detailedSummary
+        ? `Regenerate and inspect invalid generated manifests before review: ${detailedSummary}.`
+        : `Regenerate and inspect invalid generated manifests before review: ${invalidGeneratedManifests
+            .map((finding) => finding.manifest_kind)
+            .join(", ")}.`
+    );
+  }
+
+  const riskyIds = summarizeRiskMatches(report.matches, ["critical", "high"]);
+  if (riskyIds) {
+    actions.push(`Review confirmation and risk metadata for high-risk actions: ${riskyIds}.`);
+  }
+
+  return actions.slice(0, limit);
+}
+
 async function inspect(filePath: string): Promise<number> {
   const value = await readJson<unknown>(filePath);
   if (isInitResult(value)) {
@@ -917,6 +1110,25 @@ async function inspect(filePath: string): Promise<number> {
     console.log(
       `Agent onboarding: ${value.onboarding.summary.present}/${value.onboarding.summary.recommended} recommended present`
     );
+    const findingCodes = summarizeCodeCounts(value.findings);
+    if (findingCodes) {
+      console.log(`Top finding codes: ${findingCodes}`);
+    }
+    const invalidManifestKinds = summarizeManifestKindCounts(value.findings);
+    if (invalidManifestKinds) {
+      console.log(`Invalid generated manifests: ${invalidManifestKinds}`);
+    }
+    const generatedManifestIssueDetails = summarizeDoctorGeneratedManifestIssueDetails(value.findings);
+    if (generatedManifestIssueDetails) {
+      console.log(`Generated manifest issues: ${generatedManifestIssueDetails}`);
+    }
+    const nextActions = summarizeDoctorNextActions(value.findings);
+    if (nextActions.length > 0) {
+      console.log("Next actions:");
+      nextActions.forEach((action, index) => {
+        console.log(`${index + 1}. ${action}`);
+      });
+    }
     return 0;
   }
 
@@ -954,12 +1166,43 @@ async function inspect(filePath: string): Promise<number> {
     console.log(`Files scanned: ${report.filesScanned}`);
     console.log(`Matches: ${report.matches.length}`);
     console.log(`Diagnostics: ${report.diagnostics.length}`);
+    const highRiskMatches = report.matches.filter((match) => match.risk === "high" || match.risk === "critical");
+    console.log(`High-risk matches: ${highRiskMatches.length}`);
+    const riskyIds = summarizeRiskMatches(report.matches, ["critical", "high"]);
+    if (riskyIds) {
+      console.log(`High-risk IDs: ${riskyIds}`);
+    }
+    const diagnosticCodes = summarizeCodeCounts(report.diagnostics);
+    if (diagnosticCodes) {
+      console.log(`Top diagnostic codes: ${diagnosticCodes}`);
+    }
+    const invalidGeneratedManifestKinds = report.generated_manifests?.findings
+      ?.filter((finding) => finding.issue_count > 0)
+      .map((finding) => `${finding.manifest_kind} (${finding.issue_count})`)
+      .join(", ");
+    if (invalidGeneratedManifestKinds) {
+      console.log(`Invalid generated manifests: ${invalidGeneratedManifestKinds}`);
+    }
+    const generatedManifestIssueDetails = summarizeGeneratedManifestIssueDetails(
+      report.generated_manifests?.findings ?? []
+    );
+    if (generatedManifestIssueDetails) {
+      console.log(`Generated manifest issues: ${generatedManifestIssueDetails}`);
+    }
 
     if (report.agent_onboarding) {
       console.log(
         `Agent onboarding: ${report.agent_onboarding.summary.present}/${report.agent_onboarding.summary.recommended} recommended present`
       );
       console.log(`Onboarding warnings: ${report.agent_onboarding.summary.warnings}`);
+    }
+
+    const nextActions = summarizeProjectReportNextActions(report);
+    if (nextActions.length > 0) {
+      console.log("Next actions:");
+      nextActions.forEach((action, index) => {
+        console.log(`${index + 1}. ${action}`);
+      });
     }
 
     return 0;
@@ -999,9 +1242,23 @@ async function inspect(filePath: string): Promise<number> {
   switch (kind) {
     case "discovery": {
       const manifest = value as AICDiscoveryManifest;
+      const validation = validateDiscoveryManifest(manifest);
       console.log(`Discovery manifest for ${manifest.app.name}`);
       console.log(`Spec: ${manifest.spec}`);
-      console.log(`Endpoints: ${Object.keys(manifest.endpoints).join(", ")}`);
+      const enabledCapabilities = Object.entries(manifest.capabilities)
+        .filter(([, enabled]) => enabled)
+        .map(([name]) => name);
+      console.log(
+        `Capabilities: ${enabledCapabilities.length > 0 ? enabledCapabilities.join(", ") : "none"}`
+      );
+      console.log("Endpoints:");
+      (["ui", "actions", "permissions", "workflows"] as const).forEach((endpoint) => {
+        const target = manifest.endpoints?.[endpoint];
+        console.log(`- ${endpoint}: ${typeof target === "string" ? target : "(missing)"}`);
+      });
+      if (validation.issues.length > 0) {
+        console.log(`Validation issues: ${validation.issues.length}`);
+      }
       return 0;
     }
     case "ui": {

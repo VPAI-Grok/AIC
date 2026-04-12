@@ -97,6 +97,50 @@ test("validateRuntimeUiManifest warns when row-scoped actions omit entity identi
   );
 });
 
+test("validateDiscoveryManifest enforces endpoint and capability consistency", () => {
+  const manifest = {
+    spec: spec.SPEC_VERSION,
+    manifest_version: spec.MANIFEST_VERSION,
+    generated_at: "2026-04-11T00:00:00.000Z",
+    app: {
+      name: "Discovery Drift Demo"
+    },
+    capabilities: {
+      runtimeUiTree: true,
+      semanticActions: true,
+      permissions: false,
+      workflows: true
+    },
+    endpoints: {
+      ui: "/.well-known/agent/ui",
+      actions: "/.well-known/agent/actions",
+      permissions: "/agent-permissions.json"
+    }
+  };
+
+  const result = spec.validateDiscoveryManifest(manifest);
+
+  assert.equal(result.ok, false);
+  assert.ok(
+    result.issues.some(
+      (issue) =>
+        issue.rule === "discovery.endpoint_capability_mismatch" &&
+        issue.path === "$.endpoints.permissions" &&
+        issue.severity === "warning"
+    ),
+    "expected warning for disabled capability with endpoint"
+  );
+  assert.ok(
+    result.issues.some(
+      (issue) =>
+        issue.rule === "discovery.endpoint_capability_mismatch" &&
+        issue.path === "$.endpoints.workflows" &&
+        issue.severity === "error"
+    ),
+    "expected error for advertised capability without endpoint"
+  );
+});
+
 test("AICRegistry merges provenance, emits lifecycle events, and renders manifests", () => {
   const registry = new runtime.AICRegistry();
   const eventTypes = [];

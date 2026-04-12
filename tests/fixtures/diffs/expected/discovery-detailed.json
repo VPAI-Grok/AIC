@@ -13,15 +13,15 @@
     {
       "after": {
         "actions": "/.well-known/agent/actions/v2",
-        "permissions": "/.well-known/agent-permissions.json",
+        "permissions": "/agent-permissions.json",
         "ui": "/.well-known/agent/ui",
-        "workflows": "/.well-known/agent-workflows.json"
+        "workflows": "/agent-workflows.json"
       },
       "before": {
         "actions": "/.well-known/agent/actions",
-        "permissions": "/.well-known/agent-permissions.json",
+        "permissions": "/agent-permissions.json",
         "ui": "/.well-known/agent/ui",
-        "workflows": "/.well-known/agent-workflows.json"
+        "workflows": "/agent-workflows.json"
       },
       "field": "endpoints"
     },

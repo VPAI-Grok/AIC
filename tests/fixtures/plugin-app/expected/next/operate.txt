@@ -2,8 +2,8 @@ AIC is enabled for Demo Checkout.
 Source of truth manifests:
 - UI: /.well-known/agent/ui
 - Actions: /.well-known/agent/actions
-- Permissions: /.well-known/agent-permissions.json
-- Workflows: /.well-known/agent-workflows.json
+- Permissions: /agent-permissions.json
+- Workflows: /agent-workflows.json
 
 Notes:
 - fixture project

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AICInput } from '@aicorg/sdk-react';
+import { NEW_TODO_INPUT_PROPS } from '../todo-contract.js';
 
 interface Props {
   addTodo: (title: string) => void;
@@ -22,15 +23,13 @@ export const Header: React.FC<Props> = ({ addTodo }) => {
     <header className="header">
       <h1>todos</h1>
       <AICInput
+        {...NEW_TODO_INPUT_PROPS}
         className="new-todo"
         placeholder="What needs to be done?"
         autoFocus
         value={title}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
         onKeyDown={handleKeyDown}
-        agentId="new-todo-input"
-        agentAction="input"
-        agentDescription="Input field to add a new todo. Type your todo and hit enter."
       />
     </header>
   );

@@ -121,6 +121,47 @@ test("CLI validate surfaces manifest errors for invalid runtime UI", async (t) =
   assert.match(result.stderr, /Critical actions require structured confirmation details/);
 });
 
+test("CLI validate and inspect surface discovery endpoint capability drift", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const discoveryFile = `${tempDir}/invalid-discovery.json`;
+  await writeJsonFile(discoveryFile, {
+    spec: spec.SPEC_VERSION,
+    manifest_version: spec.MANIFEST_VERSION,
+    generated_at: "2026-04-11T00:00:00.000Z",
+    app: {
+      name: "Discovery Drift Demo"
+    },
+    capabilities: {
+      runtimeUiTree: true,
+      semanticActions: true,
+      permissions: false,
+      workflows: true
+    },
+    endpoints: {
+      ui: "/.well-known/agent/ui",
+      actions: "/.well-known/agent/actions",
+      permissions: "/agent-permissions.json"
+    }
+  });
+
+  const validateResult = await runCli(["validate", "discovery", discoveryFile]);
+  const inspectResult = await runCli(["inspect", discoveryFile]);
+
+  assert.equal(validateResult.code, 1);
+  assert.match(validateResult.stderr, /Expected an endpoint for advertised workflows capability/);
+  assert.match(validateResult.stderr, /Endpoint is present but permissions capability is disabled/);
+  assert.equal(inspectResult.code, 0);
+  assert.match(inspectResult.stdout, /Discovery manifest for Discovery Drift Demo/);
+  assert.match(inspectResult.stdout, /Capabilities: runtimeUiTree, semanticActions, workflows/);
+  assert.match(inspectResult.stdout, /- permissions: \/agent-permissions\.json/);
+  assert.match(inspectResult.stdout, /- workflows: \(missing\)/);
+  assert.match(inspectResult.stdout, /Validation issues: 2/);
+});
+
 test("CLI generate and diff commands produce stable machine-readable output", async (t) => {
   const tempDir = await createTempDir();
   t.after(async () => {
@@ -240,10 +281,12 @@ test("CLI generate project emits the full artifact set and writes generated file
 
   assert.equal(nextPayload.framework, "nextjs");
   assert.equal(nextPayload.diagnostics.length, 3);
+  assert.equal(nextPayload.generated_manifests.summary.invalid, 0);
   assert.equal(vitePayload.source_inventory.length, 9);
   assert.equal(vitePayload.agent_onboarding.summary.recommended, 5);
   assert.equal(vitePayload.agent_onboarding.summary.missing, 5);
   assert.equal(vitePayload.agent_onboarding.summary.warnings, 5);
+  assert.equal(vitePayload.generated_manifests.summary.invalid, 0);
   assert.ok(vitePayload.outDir.endsWith(viteOutDir));
   assert.ok(nextPayload.outDir.endsWith(nextOutDir));
   assert.deepEqual(viteFiles, expectedVite.files);
@@ -274,11 +317,131 @@ test("CLI project report and inspect summarize recommended onboarding files", as
   assert.equal(payload.agent_onboarding.summary.recommended, 5);
   assert.equal(payload.agent_onboarding.summary.present, 5);
   assert.equal(payload.agent_onboarding.summary.missing, 0);
+  assert.equal(report.generated_manifests.summary.invalid, 0);
   assert.equal(report.agent_onboarding.summary.warnings, 0);
   assert.equal(report.agent_onboarding.files[0].path, "AGENTS.md");
   assert.equal(inspectResult.code, 0);
   assert.match(inspectResult.stdout, /AIC project report for vite/);
+  assert.match(inspectResult.stdout, /High-risk matches: 1/);
+  assert.match(inspectResult.stdout, /High-risk IDs: customer.archive/);
   assert.match(inspectResult.stdout, /Agent onboarding: 5\/5 recommended present/);
+  assert.match(inspectResult.stdout, /Next actions:/);
+  assert.match(
+    inspectResult.stdout,
+    /1\. Review confirmation and risk metadata for high-risk actions: customer\.archive\./
+  );
+});
+
+test("CLI inspect project report surfaces onboarding and extraction next actions", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const reportFile = `${tempDir}/project-report.json`;
+  await writeJsonFile(reportFile, projectReportFixture);
+
+  const inspectResult = await runCli(["inspect", reportFile]);
+
+  assert.equal(inspectResult.code, 0);
+  assert.match(inspectResult.stdout, /AIC project report for vite/);
+  assert.match(inspectResult.stdout, /Top diagnostic codes: unsupported_/);
+  assert.match(inspectResult.stdout, /Agent onboarding: 0\/5 recommended present/);
+  assert.match(inspectResult.stdout, /Onboarding warnings: 5/);
+  assert.match(inspectResult.stdout, /Next actions:/);
+  assert.match(
+    inspectResult.stdout,
+    /1\. Add or refresh the recommended agent onboarding files so repo instructions stay aligned for AI operators\./
+  );
+  assert.match(
+    inspectResult.stdout,
+    /2\. Replace unsupported dynamic AIC props with same-file deterministic values, then rerun `aic scan` or `aic generate project`\./
+  );
+  assert.match(
+    inspectResult.stdout,
+    /3\. Review confirmation and risk metadata for high-risk actions: customer\.archive\./
+  );
+});
+
+test("CLI inspect project report surfaces invalid generated manifest summaries", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  await writeJsonFile(`${tempDir}/package.json`, {
+    dependencies: {
+      react: "^19.0.0",
+      vite: "^6.4.1"
+    },
+    name: "invalid-project-report-demo"
+  });
+
+  await writeJsonFile(`${tempDir}/aic.project.json`, {
+    appName: "Invalid Project Report Demo",
+    framework: "vite",
+    projectRoot: ".",
+    viewId: "customers.list",
+    viewUrl: "https://demo.example/customers"
+  });
+
+  await writeTextFile(
+    `${tempDir}/src/App.tsx`,
+    `export function App() {
+  return (
+    <main>
+      <button
+        agentId="duplicate.action"
+        agentDescription="Duplicate action one"
+        agentAction="click"
+        agentRisk="medium"
+      >
+        First duplicate
+      </button>
+      <button
+        agentId="duplicate.action"
+        agentDescription="Duplicate action two"
+        agentAction="click"
+        agentRisk="medium"
+      >
+        Second duplicate
+      </button>
+    </main>
+  );
+}
+`
+  );
+
+  const outDir = `${tempDir}/generated`;
+  const result = await runCli([
+    "generate",
+    "project",
+    `${tempDir}/aic.project.json`,
+    "--out-dir",
+    outDir
+  ]);
+
+  assert.equal(result.code, 0);
+
+  const payload = JSON.parse(result.stdout);
+  const report = await readJsonFile(`${outDir}/report.json`);
+  const inspectResult = await runCli(["inspect", `${outDir}/report.json`]);
+
+  assert.ok(payload.generated_manifests.summary.invalid >= 1);
+  const uiFinding = report.generated_manifests.findings.find(
+    (finding) => finding.manifest_kind === "ui" && finding.issue_count >= 1
+  );
+  assert.ok(uiFinding);
+  assert.equal(typeof uiFinding.top_issue?.path, "string");
+  assert.equal(typeof uiFinding.top_issue?.message, "string");
+  assert.equal(inspectResult.code, 0);
+  assert.match(inspectResult.stdout, /Invalid generated manifests: .*ui \([1-9]\d*\)/);
+  assert.match(inspectResult.stdout, /Generated manifest issues: ui: \$\./);
+  assert.match(inspectResult.stdout, /Next actions:/);
+  assert.match(
+    inspectResult.stdout,
+    /Regenerate and inspect invalid generated manifests before review: ui: \$\./
+  );
 });
 
 test("CLI init scaffolds onboarding files and config with dry-run, write, skip, and force modes", async (t) => {
@@ -387,6 +550,23 @@ test("CLI doctor reports missing config, warning-only repos, and inspect summari
   assert.match(inspectResult.stdout, /AIC doctor report/);
   assert.match(inspectResult.stdout, /Framework: nextjs/);
   assert.match(inspectResult.stdout, /Errors: 0/);
+  assert.match(
+    inspectResult.stdout,
+    /Top finding codes: no_aic_annotations_found \(1\), no_permission_policies_configured \(1\), no_workflows_configured \(1\)/
+  );
+  assert.match(inspectResult.stdout, /Next actions:/);
+  assert.match(
+    inspectResult.stdout,
+    /1\. Add explicit agent\* props to critical controls before generating production artifacts\./
+  );
+  assert.match(
+    inspectResult.stdout,
+    /2\. Add actionPolicies for risky or role-restricted actions\./
+  );
+  assert.match(
+    inspectResult.stdout,
+    /3\. Add at least one workflow definition for meaningful multi-step flows\./
+  );
 });
 
 test("CLI doctor fails for invalid config JSON and invalid generated manifest output", async (t) => {
@@ -449,11 +629,24 @@ test("CLI doctor fails for invalid config JSON and invalid generated manifest ou
   const invalidManifestResult = await runCli(["doctor", tempDir]);
   assert.equal(invalidManifestResult.code, 1);
   const invalidManifestPayload = JSON.parse(invalidManifestResult.stdout);
-  assert.ok(
-    invalidManifestPayload.findings.some(
-      (finding) =>
-        finding.code === "invalid_generated_manifest" && finding.manifest_kind === "ui"
-    )
+  const invalidManifestFinding = invalidManifestPayload.findings.find(
+    (finding) =>
+      finding.code === "invalid_generated_manifest" && finding.manifest_kind === "ui"
+  );
+  assert.ok(invalidManifestFinding);
+  assert.equal(typeof invalidManifestFinding.top_issue?.path, "string");
+  assert.equal(typeof invalidManifestFinding.top_issue?.message, "string");
+
+  const invalidManifestReportFile = `${tempDir}/invalid-manifest-report.json`;
+  await writeJsonFile(invalidManifestReportFile, invalidManifestPayload);
+  const inspectInvalidManifestResult = await runCli(["inspect", invalidManifestReportFile]);
+  assert.equal(inspectInvalidManifestResult.code, 0);
+  assert.match(inspectInvalidManifestResult.stdout, /Invalid generated manifests: ui \(1\)/);
+  assert.match(inspectInvalidManifestResult.stdout, /Generated manifest issues: ui: \$\./);
+  assert.match(inspectInvalidManifestResult.stdout, /Next actions:/);
+  assert.match(
+    inspectInvalidManifestResult.stdout,
+    /1\. Run `aic generate project aic\.project\.json --out-dir \.aic` and inspect the ui manifest issues\. Top issue: ui: \$\./
   );
 });
 

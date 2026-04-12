@@ -28,6 +28,7 @@ import {
   type AICManifestKind,
   AICPermissionsManifest,
   type AICRole,
+  type AICValidationIssue,
   AICRuntimeUiManifest,
   AICSemanticActionsManifest,
   AICWorkflowManifest,
@@ -826,6 +827,7 @@ export async function createAICDoctorReport(
 
   for (const [kind, result] of manifestValidationResults) {
     if (!result.ok) {
+      const topIssue = result.issues[0];
       findings.push(
         createDoctorFinding({
           code: "invalid_generated_manifest",
@@ -834,6 +836,13 @@ export async function createAICDoctorReport(
           manifest_kind: kind,
           message: `${kind} manifest validation failed for generated artifacts.`,
           related_count: result.issues.length,
+          top_issue: topIssue
+            ? {
+                message: topIssue.message,
+                path: topIssue.path,
+                rule: topIssue.rule
+              }
+            : undefined,
           severity: "error"
         })
       );
@@ -2738,16 +2747,63 @@ export async function writeArtifactFiles(
 
 export function createProjectArtifactReport(
   framework: string,
-  artifacts: Pick<AICProjectArtifacts, "diagnostics" | "matches" | "scan" | "source_inventory">,
+  artifacts: Pick<
+    AICProjectArtifacts,
+    "actions" | "diagnostics" | "discovery" | "matches" | "permissions" | "scan" | "source_inventory" | "ui" | "workflows"
+  >,
   options: {
     projectRoot?: string;
   } = {}
 ): AICProjectArtifactReport {
+  type GeneratedManifestFinding = NonNullable<AICProjectArtifactReport["generated_manifests"]>["findings"][number];
+
+  const generatedManifestFindings: GeneratedManifestFinding[] = [];
+  const manifestValidationResults: Array<{
+    manifest_kind: GeneratedManifestFinding["manifest_kind"];
+    result: {
+      issues: AICValidationIssue[];
+      ok: boolean;
+    };
+  }> = [
+    { manifest_kind: "discovery", result: validateDiscoveryManifest(artifacts.discovery) },
+    { manifest_kind: "ui", result: validateRuntimeUiManifest(artifacts.ui) },
+    { manifest_kind: "actions", result: validateSemanticActionsManifest(artifacts.actions) },
+    { manifest_kind: "permissions", result: validatePermissionsManifest(artifacts.permissions) },
+    { manifest_kind: "workflows", result: validateWorkflowManifest(artifacts.workflows) }
+  ];
+
+  for (const { manifest_kind, result } of manifestValidationResults) {
+    if (!result.ok) {
+      const topIssue = result.issues[0];
+      generatedManifestFindings.push({
+        issue_count: result.issues.length,
+        manifest_kind,
+        top_issue: topIssue
+          ? {
+              message: topIssue.message,
+              path: topIssue.path,
+              rule: topIssue.rule
+            }
+          : undefined
+      });
+    }
+  }
+
+  generatedManifestFindings.sort(
+    (left, right) => right.issue_count - left.issue_count || left.manifest_kind.localeCompare(right.manifest_kind)
+  );
+
   return {
     agent_onboarding: getAICAgentOnboardingReport(options.projectRoot ?? process.cwd()),
     diagnostics: artifacts.diagnostics,
     filesScanned: artifacts.scan.filesScanned,
     framework,
+    generated_manifests: {
+      findings: generatedManifestFindings,
+      summary: {
+        invalid: generatedManifestFindings.length
+      }
+    },
     matches: artifacts.matches,
     source_inventory: artifacts.source_inventory
   };

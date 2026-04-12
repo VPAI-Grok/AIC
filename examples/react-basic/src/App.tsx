@@ -25,6 +25,7 @@ import {
   ACCOUNT_STATUS_TRIGGER_PROPS,
   ACCOUNT_STATUS_TRIAL_PROPS,
   ARCHIVE_CUSTOMER_PROPS,
+  ARCHIVE_CONFIRM_PROPS,
   ARCHIVE_DIALOG_CLOSE_PROPS,
   ARCHIVE_DIALOG_PROPS,
   BILLING_TAB_PROPS,
@@ -155,6 +156,19 @@ export function App() {
                     <ShadcnAICDialogClose {...ARCHIVE_DIALOG_CLOSE_PROPS} type="button">
                       Cancel archive
                     </ShadcnAICDialogClose>
+                    <ShadcnAICButton
+                      {...ARCHIVE_CONFIRM_PROPS}
+                      style={{
+                        background: "#b91c1c",
+                        border: 0,
+                        color: "white",
+                        cursor: "pointer",
+                        fontSize: 15
+                      }}
+                      type="button"
+                    >
+                      Confirm archive
+                    </ShadcnAICButton>
                   </div>
                 </div>
               </ShadcnAICDialogContent>

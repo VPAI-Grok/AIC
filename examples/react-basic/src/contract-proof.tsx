@@ -5,11 +5,19 @@ export function ContractProof() {
     <>
       <AICButton
         agentAction="click"
-        agentDescription="Opens the archive confirmation dialog for the selected customer"
+        agentDescription="Opens the archive review dialog for the selected customer"
+        agentId="customer.archive.dialog.open"
+        agentRisk="medium"
+      >
+        Archive customer
+      </AICButton>
+      <AICButton
+        agentAction="submit"
+        agentDescription="Archives the selected customer after the archive impact review is accepted"
         agentId="customer.archive"
         agentRisk="high"
       >
-        Archive customer
+        Confirm archive
       </AICButton>
       <AICButton
         agentAction="click"

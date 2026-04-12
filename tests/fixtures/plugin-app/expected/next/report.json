@@ -110,6 +110,12 @@
   ],
   "filesScanned": 1,
   "framework": "nextjs",
+  "generated_manifests": {
+    "findings": [],
+    "summary": {
+      "invalid": 0
+    }
+  },
   "matches": [
     {
       "action": "click",

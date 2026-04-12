@@ -2,13 +2,13 @@
   "spec": "aic/0.1",
   "manifest_version": "0.1.0",
   "generated_at": "2026-03-28T00:00:00.000Z",
-  "framework": "nextjs",
+  "framework": "vite",
   "notes": [
     "example project",
-    "checkout proof harness"
+    "crm proof harness"
   ],
   "app": {
-    "name": "AIC Checkout Demo"
+    "name": "AIC CRM Demo"
   },
   "capabilities": {
     "runtimeUiTree": true,
@@ -24,7 +24,7 @@
   "endpoints": {
     "ui": "/.well-known/agent/ui",
     "actions": "/.well-known/agent/actions",
-    "permissions": "/.well-known/agent-permissions.json",
-    "workflows": "/.well-known/agent-workflows.json"
+    "permissions": "/agent-permissions.json",
+    "workflows": "/agent-workflows.json"
   }
 }

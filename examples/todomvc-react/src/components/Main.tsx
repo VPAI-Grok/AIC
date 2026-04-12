@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { AICInput, AICButton } from '@aicorg/sdk-react';
 import type { Todo } from '../types';
+import {
+  createTodoDeleteProps,
+  createTodoEditInputProps,
+  createTodoToggleProps,
+  TOGGLE_ALL_PROPS,
+} from '../todo-contract.js';
 
 interface Props {
   todos: Todo[];
@@ -48,14 +54,12 @@ export const Main: React.FC<Props> = ({ todos, toggleAll, toggle, destroy, updat
   return (
     <section className="main">
       <AICInput
+        {...TOGGLE_ALL_PROPS}
         id="toggle-all"
         className="toggle-all"
         type="checkbox"
         checked={activeTodoCount === 0}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => toggleAll(e.target.checked)}
-        agentId="toggle-all"
-        agentAction="click"
-        agentDescription="Toggle all items as completed or active"
       />
       <label htmlFor="toggle-all">Mark all as complete</label>
       <ul className="todo-list">
@@ -69,43 +73,28 @@ export const Main: React.FC<Props> = ({ todos, toggleAll, toggle, destroy, updat
             <li key={todo.id} className={classes.join(' ')}>
               <div className="view">
                 <AICInput
+                  {...createTodoToggleProps(todo)}
                   className="toggle"
                   type="checkbox"
                   checked={todo.completed}
                   onChange={() => toggle(todo.id)}
-                  agentId={`todo-toggle-${todo.id}`}
-                  agentAction="click"
-                  agentDescription={`Toggle completion status of "${todo.title}"`}
-                  agentEntityId={todo.id}
-                  agentEntityType="todo"
-                  agentEntityLabel={todo.title}
                 />
                 <label onDoubleClick={() => handleEdit(todo)}>{todo.title}</label>
                 <AICButton
+                  {...createTodoDeleteProps(todo)}
                   className="destroy"
                   onClick={() => destroy(todo.id)}
-                  agentId={`todo-destroy-${todo.id}`}
-                  agentAction="click"
-                  agentDescription={`Delete todo "${todo.title}"`}
-                  agentEntityId={todo.id}
-                  agentEntityType="todo"
-                  agentEntityLabel={todo.title}
                 />
               </div>
               {isEditing && (
                 <AICInput
+                  {...createTodoEditInputProps(todo)}
                   className="edit"
                   value={editText}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditText(e.target.value)}
                   onBlur={handleSubmit}
                   onKeyDown={handleEditKeyDown}
                   autoFocus
-                  agentId={`todo-edit-${todo.id}`}
-                  agentAction="input"
-                  agentDescription={`Edit title for todo "${todo.title}"`}
-                  agentEntityId={todo.id}
-                  agentEntityType="todo"
-                  agentEntityLabel={todo.title}
                 />
               )}
             </li>
