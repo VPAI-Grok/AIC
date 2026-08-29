@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/assurance-policy.schema.json",
+  "title": "AIC Assurance Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "spec", "id", "unmatched", "rules"],
+  "properties": {
+    "artifact_type": { "const": "aic_assurance_policy" },
+    "spec": { "const": "aic.policy/0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "unmatched": { "enum": ["allow", "fail"] },
+    "rules": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/rule" } }
+  },
+  "$defs": {
+    "nonEmptyStrings": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "positiveInteger": { "type": "integer", "minimum": 1 },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "match", "require"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "match": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "risks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["low", "medium", "high", "critical"] } },
+            "operation_ids": { "$ref": "#/$defs/nonEmptyStrings" },
+            "environments": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["production", "staging", "test", "development"] } }
+          }
+        },
+        "require": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "proof_status": { "const": "passed" },
+            "allowed_evidence_levels": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["executed", "imported", "mixed", "none"] } },
+            "observations_required": { "type": "boolean" },
+            "maximum_observation_age_seconds": { "$ref": "#/$defs/positiveInteger" },
+            "maximum_proof_age_seconds": { "$ref": "#/$defs/positiveInteger" },
+            "required_scenario_ids": { "$ref": "#/$defs/nonEmptyStrings" },
+            "parity": { "const": "all_required" },
+            "required_surface_kinds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["human_ui", "webmcp", "mcp", "openapi", "custom"] } },
+            "attestation": { "$ref": "#/$defs/attestation" }
+          }
+        }
+      }
+    },
+    "attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "require_expiry": { "type": "boolean" },
+        "maximum_age_seconds": { "$ref": "#/$defs/positiveInteger" },
+        "maximum_validity_seconds": { "$ref": "#/$defs/positiveInteger" },
+        "allowed_issuer_ids": { "$ref": "#/$defs/nonEmptyStrings" },
+        "allowed_key_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" } },
+        "allowed_runner_ids": { "$ref": "#/$defs/nonEmptyStrings" },
+        "allowed_runner_kinds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["github_actions", "ci", "local", "remote"] } },
+        "require_expected_origin": { "type": "boolean" },
+        "require_expected_revision": { "type": "boolean" },
+        "observations_not_before_deployment": { "type": "boolean" }
+      }
+    }
+  }
+}

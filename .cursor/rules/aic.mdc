@@ -8,7 +8,7 @@ globs:
   - "lib/**"
 alwaysApply: false
 ---
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 5 -->
 
 # AIC Cursor Rule
 

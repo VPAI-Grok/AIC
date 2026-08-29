@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 5 -->
 # AIC Agent Onboarding
 
 This example demonstrates the recommended AIC coding-agent onboarding file set.
@@ -12,3 +12,4 @@ This example demonstrates the recommended AIC coding-agent onboarding file set.
 5. If WebMCP is added, use native task-level tools backed by authored `execution_ready` AIC contracts and preserve the human path.
 6. Add a protocol-neutral behavior contract before claiming parity for consequential multi-surface actions.
 7. Use rendered/native evidence and verify deployment-bound claims against a separately pinned issuer key before external reliance.
+8. For a covered consequential action, use a reviewed conformance-pack mapping and fail-closed assurance policy.

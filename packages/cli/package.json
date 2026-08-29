@@ -41,8 +41,13 @@
     "@aicorg/ai-bootstrap-http": "workspace:*",
     "@aicorg/ai-bootstrap-openai": "workspace:*",
     "@aicorg/automation-core": "workspace:*",
+    "@aicorg/conformance-packs": "workspace:*",
+    "@aicorg/evidence-core": "workspace:*",
+    "@aicorg/evidence-http": "workspace:*",
+    "@aicorg/evidence-mcp": "workspace:*",
     "@aicorg/plugin-vite": "workspace:*",
     "@aicorg/runtime": "workspace:*",
+    "@aicorg/runner-remote": "workspace:*",
     "@aicorg/spec": "workspace:*"
   }
 }

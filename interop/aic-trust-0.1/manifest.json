@@ -1,0 +1,103 @@
+{
+  "artifact_type": "aic_interop_suite",
+  "spec": "aic.interop/0.1",
+  "id": "aic.trust/0.1",
+  "canonicalization": "aic-canonical-json/0.1",
+  "cases": [
+    {
+      "id": "canonical-nested-unicode-negative-zero",
+      "operation": "canonicalize",
+      "input": {
+        "value": {
+          "z": 1,
+          "a": {
+            "beta": "β",
+            "alpha": [true, null, "line\nfeed"]
+          },
+          "n": -0.0
+        }
+      },
+      "expected": {
+        "canonical_json": "{\"a\":{\"alpha\":[true,null,\"line\\nfeed\"],\"beta\":\"β\"},\"n\":0,\"z\":1}"
+      }
+    },
+    {
+      "id": "digest-escaped-unicode",
+      "operation": "digest",
+      "input": {
+        "value": {
+          "emoji": "😀",
+          "escaped": "\b\f\n\r\t\"\\"
+        }
+      },
+      "expected": {
+        "digest": "sha256:2c51275cf668ed5191dc003d45290f11f7a63b231419991d50bfdb63686ec95f"
+      }
+    },
+    {
+      "id": "valid-origin-revision-contract-proof-binding",
+      "operation": "verify_attestation",
+      "input": {
+        "attestation": { "$ref": "valid/bundle.json#/attestation" },
+        "trust_store": { "$ref": "valid/bundle.json#/trust_store" },
+        "contract": { "$ref": "valid/bundle.json#/contract" },
+        "proof": { "$ref": "valid/bundle.json#/proof" },
+        "expected_origin": "https://interop.example",
+        "expected_revision": "0123456789abcdef0123456789abcdef01234567",
+        "verified_at": "2026-08-29T12:00:02.000Z"
+      },
+      "expected": {
+        "assurance_class": "remote_signed_claim",
+        "checks": {
+          "attestation_schema": "passed",
+          "contract_binding": "passed",
+          "deployment_binding": "passed",
+          "issuer_trust": "passed",
+          "proof_binding": "passed",
+          "signature": "passed",
+          "trust_store_schema": "passed"
+        },
+        "finding_codes": [],
+        "key_id": "sha256:fb7d32adb67c1dbd91ec7d6ed7d64dd133158add1d4f4611f62cfe2ba12e3fbb",
+        "status": "trusted"
+      }
+    },
+    {
+      "id": "valid-registry-derived-fields",
+      "operation": "verify_registry",
+      "input": {
+        "registry": {
+          "artifact_type": "aic_trust_registry",
+          "entries": [
+            {
+              "attestation": { "$ref": "valid/bundle.json#/attestation" },
+              "attestation_digest": "sha256:7921bdcee4176c6099c06b211c85a7f086476e61ddc1650f585b672764f075ab",
+              "deployment_id": "interop-1",
+              "environment": "test",
+              "id": "urn:aic:attestation:7921bdcee4176c6099c06b211c85a7f086476e61ddc1650f585b672764f075ab",
+              "operation_id": "record.read.domain",
+              "origin": "https://interop.example"
+            }
+          ],
+          "id": "interop.registry",
+          "spec": "aic.trust/0.1",
+          "updated_at": "2026-08-29T12:00:02.000Z"
+        },
+        "trust_store": { "$ref": "valid/bundle.json#/trust_store" },
+        "verified_at": "2026-08-29T12:00:02.000Z"
+      },
+      "expected": {
+        "entries": [
+          {
+            "assurance_class": "remote_signed_claim",
+            "finding_codes": [],
+            "id": "urn:aic:attestation:7921bdcee4176c6099c06b211c85a7f086476e61ddc1650f585b672764f075ab",
+            "status": "trusted"
+          }
+        ],
+        "finding_codes": [],
+        "status": "trusted"
+      }
+    }
+  ]
+}

@@ -39,6 +39,8 @@ interface CheckoutToolResult {
   status: "submitted";
 }
 
+type CheckoutFixtureExecution = "fail" | "recover" | "succeed";
+
 interface CheckoutSummary {
   currency: "USD";
   item_count: 3;
@@ -54,6 +56,9 @@ export function CheckoutDemoContent() {
   const orderStatusRef = useRef<"draft" | "processing" | "submitted">("draft");
   const [paymentStatus, setPaymentStatus] = useState<"charged" | "unpaid">("unpaid");
   const [chargeCount, setChargeCount] = useState(0);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [auditCount, setAuditCount] = useState(0);
+  const [recovered, setRecovered] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<
     "accepted" | "declined" | "not_reached"
   >("not_reached");
@@ -132,17 +137,52 @@ export function CheckoutDemoContent() {
     return accepted;
   }, []);
 
-  const completeOrder = useCallback(async (input: CheckoutToolInput): Promise<CheckoutToolResult> => {
-    return executeCheckoutDomainOperation(input, (status) => {
-      orderStatusRef.current = status;
-      setOrderStatus(status);
-      if (status === "submitted") {
-        setChargeCount((count) => count + 1);
-        setPaymentStatus("charged");
-        setLastErrorCode("");
-      }
-    });
+  const fixtureExecution = useCallback((): CheckoutFixtureExecution => {
+    const value = new URLSearchParams(window.location.search).get("aic_fixture_execution");
+    return value === "fail" || value === "recover" ? value : "succeed";
   }, []);
+
+  const completeOrder = useCallback(async (input: CheckoutToolInput): Promise<CheckoutToolResult> => {
+    const executeAttempt = async (failBeforeCommit: boolean) => {
+      setAttemptCount((count) => count + 1);
+      return executeCheckoutDomainOperation(
+        input,
+        (status) => {
+          orderStatusRef.current = status;
+          setOrderStatus(status);
+          if (status === "submitted") {
+            setChargeCount((count) => count + 1);
+            setAuditCount((count) => count + 1);
+            setPaymentStatus("charged");
+            setLastErrorCode("");
+          }
+        },
+        { fail_before_commit: failBeforeCommit }
+      );
+    };
+
+    const mode = fixtureExecution();
+    if (mode === "recover") {
+      try {
+        await executeAttempt(true);
+      } catch {
+        setLastErrorCode("payment_provider_unavailable");
+        setRecovered(true);
+      }
+      return executeAttempt(false);
+    }
+
+    try {
+      return await executeAttempt(mode === "fail");
+    } catch (error) {
+      setLastErrorCode(
+        error instanceof Error && "code" in error
+          ? String(error.code)
+          : "checkout_execution_failed"
+      );
+      throw error;
+    }
+  }, [fixtureExecution]);
 
   const checkoutWebMCP = useAICWebMCPTool<CheckoutToolInput, CheckoutToolResult>(
     () => ({
@@ -205,7 +245,11 @@ export function CheckoutDemoContent() {
       return;
     }
 
-    await completeOrder(CHECKOUT_REQUEST);
+    try {
+      await completeOrder(CHECKOUT_REQUEST);
+    } catch {
+      // The fixture exposes the fail-closed state through the evidence element.
+    }
   }, [authorizeCheckout, completeOrder, confirmCheckout]);
 
   return (
@@ -360,16 +404,22 @@ export function CheckoutDemoContent() {
           {...checkoutSummaryAttributes}
           aria-live="polite"
           data-aic-evidence="checkout-state"
+          data-attempt-count={String(attemptCount)}
+          data-audit-count={String(auditCount)}
           data-charge-count={String(chargeCount)}
           data-confirmation={confirmationResult}
           data-error-code={lastErrorCode}
           data-order-id="ord_100245"
           data-order-status={orderStatus}
+          data-order-total="$177.00"
+          data-payment-method="Visa ending 4242"
           data-payment-status={paymentStatus}
+          data-recovered={String(recovered)}
           style={{ color: "#57534e", display: "flex", flexWrap: "wrap", gap: 16, fontSize: 14 }}
         >
           <span>Order: {orderStatus}</span>
           <span>Payment: {paymentStatus}; charges: {chargeCount}</span>
+          <span>Attempts: {attemptCount}; audit events: {auditCount}</span>
           <span>
             WebMCP: summary {summaryWebMCP.status}; checkout {checkoutWebMCP.status}
           </span>
@@ -391,11 +441,15 @@ export function CheckoutDemoContent() {
         </span>
         <h2 style={{ fontSize: 24, margin: 0 }}>Native browser parity: passed</h2>
         <p style={{ color: "#d6d3d1", margin: 0 }}>
-          Real human controls and native document.modelContext tools produced six executed
-          observations with zero findings across success, authorization denial, and confirmation
-          decline. The deterministic domain harness remains a faster lower-level check.
+          Real human controls and native document.modelContext tools produced ten executed
+          observations with zero findings across success, authorization denial, confirmation
+          decline, isolated business failure, and exactly-once recovery. The deterministic domain
+          harness remains a faster lower-level check.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+          <a href="/aic-browser-conformance-result" style={{ color: "#ddd6fe", fontWeight: 700 }}>
+            Inspect checkout conformance
+          </a>
           <a href="/aic-browser-proof" style={{ color: "#ddd6fe", fontWeight: 700 }}>
             Inspect browser proof
           </a>

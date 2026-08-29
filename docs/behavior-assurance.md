@@ -108,7 +108,7 @@ export async function collectAICBehaviorObservations({ contract }) {
 
 Harnesses are trusted local code. Importing one can execute arbitrary code with the CLI process's filesystem, environment, and network access. Review third-party harnesses and run them in isolated CI with least-privilege credentials.
 
-The verifier does not require a particular runner. A harness can call pure domain functions, a browser test, an API client, an MCP client, or a remote test environment as long as it returns valid observations. Evidence quality should be stated honestly.
+The verifier does not require a particular runner. A harness can call pure domain functions or a browser test. Authored data-only plans can use `@aicorg/evidence-http` or `@aicorg/evidence-mcp`, and `@aicorg/runner-remote` can collect them after exact deployment and network preflight. Every path returns the same observation contract. Evidence quality and operator independence must still be stated honestly.
 
 ## What causes failure
 
@@ -145,7 +145,7 @@ The [Next.js checkout example](../examples/nextjs-checkout-demo/README.md) conta
 - [`aic-verification-harness.mjs`](../examples/nextjs-checkout-demo/aic-verification-harness.mjs);
 - [`aic-browser-verification-harness.mjs`](../examples/nextjs-checkout-demo/aic-browser-verification-harness.mjs), which uses real rendered controls and native WebMCP;
 - a shared checkout domain operation;
-- six executed observations across three scenarios and two surfaces; and
+- ten executed observations across five scenarios and two surfaces; and
 - checked-in deterministic and [`native browser`](../examples/nextjs-checkout-demo/aic-browser-proof.json) proofs plus digest-addressed screenshots.
 
 The deterministic fixture is useful for fast domain review. The browser fixture was executed in Chrome `152.0.7977.65` against `document.modelContext`; it demonstrates the local rendered app and browser implementation, not a remote production deployment.
@@ -175,7 +175,7 @@ A passed proof means the supplied observations conformed to the supplied contrac
 
 The repository now provides Ed25519 signed claims, explicit deployment/source bindings, trust stores, registries, and GitHub CI provenance. Those mechanisms prove the integrity and issuer of an exact claim; they do not independently prove that its origin was reachable or that the claimed revision was actually deployed.
 
-Independent remote production runners, general transparency-log operation, policy thresholds, and certification remain ecosystem work. See [AIC Verified Trust Layer](./trust-layer.md) for commands and precise semantics.
+The repository now includes the independently operable remote runner kit, configurable policy, conformance packs, compatibility vectors, and signed reference transparency primitives. Real independent operation, external adoption, globally witnessed transparency, hosted history, and certification remain ecosystem outcomes outside the codebase. See [Protocol Evidence and Remote Observation](./evidence-adapters.md), [Conformance Packs](./conformance-packs.md), [Assurance Policy](./assurance-policy.md), and [AIC Verified Trust Layer](./trust-layer.md).
 
 ## Schemas
 

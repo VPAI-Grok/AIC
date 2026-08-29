@@ -12,18 +12,23 @@ That means teams can adopt it freely, including in commercial products and inter
 - custom MCP integrations for Claude, Cursor, Codex, and internal agent stacks
 - behavior-assurance sprints that define contracts for consequential operations and execute success, denial, confirmation, failure, and recovery scenarios
 - cross-surface parity work for human UI, WebMCP, MCP, and API entrypoints
-- CI proof gates, evidence adapters, regression suites, and proof-retention policy
-- issuer-key setup, deployment-bound signed claims, trust-store policy, and registry integration
+- conformance-pack selection, reviewed application bindings, custom pack authoring, and regression profiles
+- CI proof gates, protocol evidence plans and adapters, cumulative assurance policy, and proof-retention policy
+- deployment of the self-hostable remote runner with public-network controls, minimal secret references, and exact canary grants
+- issuer-key setup, deployment-bound signed claims, scheduled dual-signed rotation, trust-store policy, and registry integration
+- compatibility-vector integration for third-party verifier implementations
+- signed reference transparency-index integration and external receipt metadata binding
 - WebMCP implementation and compatibility work that remains native-first and routes to shared domain operations
 - private support retainers and faster response channels
 - training, architecture reviews, and integration workshops
 
 ## Later Monetization Paths
 
-- hosted evidence collection, proof history, and contract review workflows
+- hosted evidence collection, policy evaluation, proof history, and contract review workflows
 - managed bootstrap and review pipelines
-- managed remote evidence runners, policy gates, and transparency services
-- reusable conformance packs and independent certification support
+- independently operated managed evidence runners and reachability checks
+- standardized/provider-verified transparency receipt integrations and globally witnessed history
+- independent conformance certification support
 - enterprise support, SLAs, and compliance packaging
 - premium integrations or managed cloud features
 
@@ -49,7 +54,9 @@ The recommended strategy for AIC at this stage is:
 - maximize adoption with Apache-2.0
 - monetize implementation, support, and hosted value
 - keep contracts, schemas, the verifier, and local evidence collection open
-- keep signing, verification, trust-store, registry, and local/browser evidence formats open
-- build the official ecosystem around independently operated runners, reusable conformance packs, and portable proof
+- keep conformance packs, evidence plans/adapters, policy, compatibility vectors, signing, verification, trust stores, registries, and reference transparency formats open
+- build the official ecosystem around independently operated runners, portable proof, reusable packs, and independently verifiable consumer policy
 - use WebMCP as a native execution layer while AIC remains the protocol-neutral assurance layer
 - never imply that an issuer-signed claim independently proves production reachability or compliance certification
+
+The repository currently has no verified external adopter, no independently operated AIC-hosted runner, no globally witnessed transparency service, no provider verifier for external receipt metadata, and no certification program. Those are future operational and ecosystem opportunities, not shipped-service claims.

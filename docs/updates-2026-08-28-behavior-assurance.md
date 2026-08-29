@@ -12,7 +12,7 @@ The first reference proof covers a critical checkout:
 - authorization denial before confirmation; and
 - confirmation decline without a charge.
 
-Each scenario runs through human UI and WebMCP surface adapters. The proof contains six executed observations, passed parity, canonical SHA-256 digests, and no findings.
+Five scenarios run through human UI and WebMCP surface adapters. The proof contains ten executed observations, passed parity, canonical SHA-256 digests, and no findings.
 
 The important boundary: this is a deterministic local proof, not a signed production attestation. The open contract and verifier come first. Trusted runners, deployment binding, signatures, transparency logs, reusable conformance packs, and hosted policy can build on that foundation.
 

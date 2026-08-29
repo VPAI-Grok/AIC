@@ -11,14 +11,19 @@ const requiredFiles = [
   "SECURITY.md",
   "CODE_OF_CONDUCT.md",
   "CHANGELOG.md",
+  "ADOPTERS.md",
   "AGENTS.md",
   "CLAUDE.md",
   "GEMINI.md",
   "docs/release-checklist.md",
   "docs/behavior-assurance.md",
+  "docs/conformance-packs.md",
   "docs/coding-agents.md",
+  "docs/evidence-adapters.md",
   "docs/npm-packages.md",
+  "docs/assurance-policy.md",
   "docs/supported-today.md",
+  "docs/transparency-and-key-rotation.md",
   "docs/trust-layer.md",
   ".github/copilot-instructions.md",
   ".github/skills/aic-onboarding/SKILL.md",
@@ -31,13 +36,34 @@ const requiredFiles = [
   "schemas/behavior-contract.schema.json",
   "schemas/behavior-observation-set.schema.json",
   "schemas/behavior-proof.schema.json",
+  "schemas/assurance-policy.schema.json",
+  "schemas/conformance-binding.schema.json",
+  "schemas/conformance-pack.schema.json",
+  "schemas/conformance-result.schema.json",
+  "schemas/deployment-identity.schema.json",
+  "schemas/evidence-bundle.schema.json",
+  "schemas/evidence-plan.schema.json",
+  "schemas/key-transition.schema.json",
+  "schemas/policy-evaluation.schema.json",
+  "schemas/remote-observation-job.schema.json",
   "schemas/signed-attestation.schema.json",
+  "schemas/transparency-checkpoint.schema.json",
+  "schemas/transparency-index.schema.json",
   "schemas/trust-registry.schema.json",
   "schemas/trust-statement.schema.json",
   "schemas/trust-store.schema.json",
   "registry/index.json",
   "registry/README.md",
+  "registry/submissions/README.md",
+  "interop/aic-trust-0.1/manifest.json",
+  "policies/critical-assurance.json",
+  "transparency/README.md",
+  "packages/conformance-packs/package.json",
+  "packages/evidence-core/package.json",
+  "packages/evidence-http/package.json",
+  "packages/evidence-mcp/package.json",
   "packages/evidence-playwright/package.json",
+  "packages/runner-remote/package.json",
   "templates/agent-onboarding/AGENTS.md",
   "templates/agent-onboarding/CLAUDE.md",
   "templates/agent-onboarding/GEMINI.md",
@@ -45,6 +71,8 @@ const requiredFiles = [
   "templates/agent-onboarding/.cursor/rules/aic.mdc",
   "templates/agent-onboarding/.github/skills/aic-onboarding/SKILL.md"
 ];
+
+const publicSchemaFiles = requiredFiles.filter((file) => file.startsWith("schemas/"));
 
 function normalizeLineEndings(value) {
   return value.replaceAll("\r\n", "\n");
@@ -83,6 +111,17 @@ test("agent onboarding wrappers point back to the canonical AGENTS file", async 
   assert.match(copilot, /AGENTS\.md/);
   assert.match(cursorRule, /AGENTS\.md/);
   assert.match(skill, /AGENTS\.md/);
+});
+
+test("public JSON Schema artifacts parse and declare stable canonical ids", async () => {
+  await Promise.all(
+    publicSchemaFiles.map(async (relativePath) => {
+      const schema = JSON.parse(await readFile(resolveFromRepo(relativePath), "utf8"));
+      assert.equal(schema.$schema, "https://json-schema.org/draft/2020-12/schema");
+      assert.equal(schema.$id, `https://aic.dev/${relativePath.replaceAll("\\", "/")}`);
+      assert.equal(schema.type, "object");
+    })
+  );
 });
 
 test("automation-core onboarding templates stay in sync with checked-in template files", async () => {

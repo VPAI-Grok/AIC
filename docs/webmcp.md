@@ -157,7 +157,7 @@ For a consequential mutation, cover at least:
 - unsupported-browser behavior; and
 - parity with the human path.
 
-The [checkout reference](../examples/nextjs-checkout-demo/README.md) implements the first success/denial/decline parity slice. See [Behavior Assurance](./behavior-assurance.md) for proof semantics and limitations.
+The [checkout reference](../examples/nextjs-checkout-demo/README.md) implements success, authorization-denial, confirmation-decline, business-failure, and recovery parity. See [Behavior Assurance](./behavior-assurance.md) for proof semantics and limitations.
 
 ## Native browser evidence
 
@@ -179,13 +179,12 @@ The current Chrome `152.0.7977.65` fixture records `json_string_compat`, matchin
 
 ## What remains
 
-The durable roadmap is still not a larger WebMCP wrapper. The browser adapter, signed deployment claims, CI provenance, well-known discovery, and open registry format now exist. The next ecosystem work is:
+The durable roadmap is still not a larger WebMCP wrapper. The browser adapter, signed deployment claims, CI provenance, well-known discovery, multi-protocol evidence, conformance packs, policy, remote runner kit, compatibility vectors, key rotation, and signed reference transparency now exist. The remaining ecosystem work is operational and external:
 
-- independent external adopters and issuer keys;
-- remote production runners that verify deployed origin/revision binding;
-- MCP and HTTP/OpenAPI evidence adapters;
-- reusable behavior-contract packs;
-- policy thresholds and verifier compatibility suites; and
-- public transparency and hosted evidence history compatible with the open verifier.
+- genuine external applications publishing reproducible claims;
+- remote runners actually operated independently from application owners and the AIC project;
+- external verifier implementations passing the compatibility vectors;
+- standardized or independently operated transparency receipts; and
+- hosted evidence history compatible with the open verifier.
 
 This keeps AIC useful even if WebMCP absorbs richer schemas, confirmation, validation, lifecycle, or skill composition.

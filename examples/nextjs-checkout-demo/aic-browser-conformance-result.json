@@ -1,0 +1,19 @@
+{
+  "artifact_type": "aic_conformance_result",
+  "binding_digest": "sha256:81d937b236dfb5f649b5ea4bcc34bfebf9edfa7c8203c732dbec81398533d9df",
+  "contract_digest": "sha256:6f809e4782bf1f1cffcfc8815ec649fa562fc875cc032b8f9145b6b7539cbd4f",
+  "findings": [],
+  "generated_at": "2026-08-29T00:00:00.000Z",
+  "level": "proof",
+  "pack_digest": "sha256:04f067dcb144623f1500936ac93fe5dbd3c0ba4004958cbe34d8ccc8f72b9757",
+  "profile_id": "complete",
+  "proof_digest": "sha256:7165c8d9c13648d9bf2b61c68bd18084972bc681578a3763d469d88d9f622e9d",
+  "spec": "aic.conformance/0.1",
+  "status": "passed",
+  "summary": {
+    "errors": 0,
+    "requirement_obligations": 11,
+    "scenario_obligations": 5,
+    "warnings": 0
+  }
+}

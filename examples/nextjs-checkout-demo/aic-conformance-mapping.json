@@ -1,0 +1,26 @@
+{
+  "requirement_map": {
+    "exact_scope": ["checkout.exact_scope"],
+    "authorization_allowed": ["authorization.allowed"],
+    "authorization_denied": ["authorization.denied"],
+    "confirmation_accepted": ["confirmation.accepted"],
+    "confirmation_declined": ["confirmation.declined"],
+    "idempotency": ["payment.idempotent"],
+    "failure_isolation": ["execution.failure_isolated"],
+    "mutation_committed": ["payment.charge"],
+    "audit_evidence": ["checkout.audit_recorded"],
+    "unchanged_when_stopped": ["order.unchanged"],
+    "safe_recovery": ["checkout.safe_recovery"]
+  },
+  "scenario_map": {
+    "success": ["success"],
+    "authorization_denial": ["authorization-denied"],
+    "confirmation_decline": ["confirmation-declined"],
+    "business_failure": ["business-failure"],
+    "recovery": ["recovery"]
+  },
+  "surface_roles": {
+    "human": ["human-ui"],
+    "agent": ["webmcp"]
+  }
+}

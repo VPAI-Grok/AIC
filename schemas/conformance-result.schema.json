@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/conformance-result.schema.json",
+  "title": "AIC Conformance Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "spec",
+    "generated_at",
+    "level",
+    "status",
+    "pack_digest",
+    "binding_digest",
+    "contract_digest",
+    "profile_id",
+    "findings",
+    "summary"
+  ],
+  "properties": {
+    "artifact_type": { "const": "aic_conformance_result" },
+    "spec": { "const": "aic.conformance/0.1" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "level": { "enum": ["contract", "proof"] },
+    "status": { "enum": ["passed", "failed"] },
+    "pack_digest": { "$ref": "#/$defs/digest" },
+    "binding_digest": { "$ref": "#/$defs/digest" },
+    "contract_digest": { "$ref": "#/$defs/digest" },
+    "profile_id": { "$ref": "#/$defs/stableId" },
+    "proof_digest": { "$ref": "#/$defs/digest" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "message"],
+        "properties": {
+          "code": {
+            "enum": [
+              "authored_binding_required",
+              "binding_invalid",
+              "contract_binding_mismatch",
+              "contract_invalid",
+              "mapping_reused",
+              "mapping_unknown",
+              "pack_binding_mismatch",
+              "pack_invalid",
+              "proof_contract_mismatch",
+              "proof_invalid",
+              "proof_parity_failed",
+              "proof_scenario_failed",
+              "proof_scenario_missing",
+              "proof_status_failed",
+              "requirement_binding_count",
+              "requirement_obligation_missing",
+              "requirement_phase_mismatch",
+              "scenario_confirmation_mismatch",
+              "scenario_forbidden_requirement_mismatch",
+              "scenario_obligation_missing",
+              "scenario_parity_mismatch",
+              "scenario_requirement_mismatch",
+              "scenario_status_mismatch",
+              "scenario_surface_role_mismatch",
+              "surface_role_invalid",
+              "unknown_profile"
+            ]
+          },
+          "severity": { "enum": ["error", "warning"] },
+          "message": { "type": "string", "minLength": 1 },
+          "obligation_id": { "$ref": "#/$defs/stableId" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["errors", "warnings", "requirement_obligations", "scenario_obligations"],
+      "properties": {
+        "errors": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 },
+        "requirement_obligations": { "type": "integer", "minimum": 0 },
+        "scenario_obligations": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "level": { "const": "proof" } }, "required": ["level"] },
+      "then": { "required": ["proof_digest"] },
+      "else": { "not": { "required": ["proof_digest"] } }
+    }
+  ],
+  "$defs": {
+    "stableId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/deployment-identity.schema.json",
+  "title": "AIC Deployment Identity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "deployed_at",
+    "deployment_id",
+    "environment",
+    "origin",
+    "source_revision",
+    "spec"
+  ],
+  "properties": {
+    "artifact_type": { "const": "aic_deployment_identity" },
+    "spec": { "const": "aic.deployment/0.1" },
+    "deployed_at": { "type": "string", "format": "date-time" },
+    "deployment_id": { "type": "string", "minLength": 1 },
+    "environment": { "enum": ["development", "production", "staging", "test"] },
+    "origin": { "type": "string", "format": "uri", "pattern": "^https?://[^/]+$" },
+    "source_revision": { "$ref": "#/$defs/sourceRevision" },
+    "source_repository": { "type": "string", "minLength": 1 },
+    "artifact_digest": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "sourceRevision": { "type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$" }
+  }
+}

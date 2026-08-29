@@ -5,6 +5,7 @@ import { chmod, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promis
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { format } from "node:util";
+import { runAICEcosystemCommand } from "./ecosystem.js";
 import {
   analyzeProjectForAICAnnotations,
   analyzeProjectForWebMCPReadiness,
@@ -151,6 +152,7 @@ Usage:
   aic init [project-root] [--framework <nextjs|vite|react>] [--app-name <name>] [--view-id <id>] [--view-url <url>] [--dry-run] [--force]
   aic doctor [project-root] [--config <file>] [--report-file <file>] [--webmcp]
   aic validate <discovery|ui|permissions|workflows|actions|behavior|behavior-proof|trust-statement|attestation|trust-store|registry> <file>
+  aic validate <conformance-pack|conformance-binding|conformance-result|assurance-policy|policy-evaluation|evidence-plan|evidence-bundle|deployment-identity|remote-job|transparency-checkpoint|transparency-index|key-transition> <file>
   aic verify <behavior-contract-file> (--harness <module> | --observations <file>) [--observations-out-file <file>] [--out-file <file>] [--generated-at <iso>]
   aic trust keygen --issuer-id <id> --private-key <file> --public-key <file> --trust-store <file> [--origin <origin>] [--generated-at <iso>] [--force]
   aic trust attest <contract> <proof> --private-key <file> --origin <origin> --environment <environment> --deployment-id <id> --source-revision <sha> --issuer-id <id> --runner-id <id> --out-file <file> [binding options]
@@ -158,6 +160,21 @@ Usage:
   aic registry build <attestations-dir> --trust-store <file> --registry-id <id> --out-file <file> [--updated-at <iso>]
   aic registry verify <registry> --trust-store <file> [--verified-at <iso>]
   aic registry query <registry-file-or-url> [--origin <origin>] [--operation-id <id>] [--environment <environment>]
+  aic conformance list
+  aic conformance show <pack-id-or-file>
+  aic conformance bind <pack-id-or-file> <profile-id> <contract> <mapping> --out-file <file>
+  aic conformance verify <pack-id-or-file> <binding> <contract> [--proof <file>] [--out-file <file>]
+  aic policy evaluate <policy> <contract> <proof> --observations <file> [trust and binding options] [--out-file <file>]
+  aic interop verify <suite> [--out-file <file>]
+  aic evidence verify <bundle> [--runner-public-key <file> --runner-key-id <sha256:id>] [--out-file <file>]
+  aic evidence run-remote <job> --runner-id <id> --runner-revision <sha> --out-file <file> [--secret <ref=ENV>] [--receipt-private-key <file>] [--allow-mutation <operation=canary-scope>] [--allow-destructive-operation <operation>]
+  aic transparency init --log-id <id> --private-key <file> --out-file <file>
+  aic transparency append <index> <entry-kind> <artifact> --expect-size <n> --expect-head <digest|null> --trust-store <file> --private-key <file> --out-file <file> [--external-receipts <file>]
+  aic transparency verify <index> --trust-store <file>
+  aic transparency consistency <from-index> <to-index> --trust-store <file>
+  aic trust rotate prepare --prior-trust-store <file> --retiring-private-key <file> --successor-private-key <file> --issuer-id <id> --transition-id <id> --effective-at <iso> --retire-at <iso> --next-trust-store <file> --transition-out <file>
+  aic trust transition verify --prior-trust-store <file> --next-trust-store <file> --transition <file> [--out-file <file>]
+  aic trust transition apply --prior-trust-store <file> --next-trust-store <file> --transition <file> --out-file <file>
   aic bootstrap <url> [routes-csv] [--app-name <name>] [--captures-file <file>] [--suggestions-file <file>] [--provider-kind <http|openai>] [--provider-endpoint <url>] [--provider-model <name>] [--provider-header <k=v>] [--provider-selector <path>] [--provider-bearer-env <env>] [--provider-timeout-ms <ms>] [--provider-retries <n>] [--openai-api-key-env <env>] [--openai-base-url <url>] [--draft-file <file>] [--review-file <file>] [--report-file <file>] [--prompt-file <file>] [--min-confidence <0-1>] [--max-suggestions <n>] [--print-prompt]
   aic generate discovery <config-file>
   aic generate ui <elements-file> <url> <view-id>
@@ -1921,6 +1938,12 @@ async function main(): Promise<void> {
   if (command === "help" || command === "--help" || command === "-h") {
     printUsage();
     process.exitCode = 0;
+    return;
+  }
+
+  const ecosystemExitCode = await runAICEcosystemCommand(process.argv.slice(2));
+  if (ecosystemExitCode !== undefined) {
+    process.exitCode = ecosystemExitCode;
     return;
   }
 

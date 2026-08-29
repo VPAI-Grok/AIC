@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/transparency-checkpoint.schema.json",
+  "title": "AIC Signed Transparency Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "spec", "statement", "signature"],
+  "properties": {
+    "artifact_type": { "const": "aic_signed_transparency_checkpoint" },
+    "spec": { "const": "aic.transparency/0.1" },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_type", "spec", "log_id", "size", "head_entry_digest", "issued_at"],
+      "properties": {
+        "artifact_type": { "const": "aic_transparency_checkpoint_statement" },
+        "spec": { "const": "aic.transparency/0.1" },
+        "log_id": { "type": "string", "minLength": 1 },
+        "size": { "type": "integer", "minimum": 0 },
+        "head_entry_digest": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/digest" }] },
+        "previous_checkpoint_digest": { "$ref": "#/$defs/digest" },
+        "issued_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "signature": { "$ref": "#/$defs/signature" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "signature": { "type": "object", "additionalProperties": false, "required": ["algorithm", "key_id", "value"], "properties": { "algorithm": { "const": "ed25519" }, "key_id": { "$ref": "#/$defs/digest" }, "value": { "type": "string", "pattern": "^[A-Za-z0-9+/]+={0,2}$" } } }
+  }
+}

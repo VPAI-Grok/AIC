@@ -7,15 +7,19 @@ on:
       - "examples/nextjs-checkout-demo/**"
       - "packages/automation-core/**"
       - "packages/cli/**"
+      - "packages/conformance-packs/**"
+      - "packages/evidence-core/**"
+      - "packages/evidence-http/**"
+      - "packages/evidence-mcp/**"
       - "packages/evidence-playwright/**"
+      - "packages/runner-remote/**"
       - "packages/spec/**"
+      - "interop/**"
+      - "policies/**"
       - "registry/**"
-      - "schemas/behavior-*.schema.json"
-      - "schemas/signed-attestation.schema.json"
-      - "schemas/trust-*.schema.json"
-      - "tests/behavior-assurance.test.mjs"
-      - "tests/browser-evidence.test.mjs"
-      - "tests/trust-layer.test.mjs"
+      - "schemas/**"
+      - "tests/**"
+      - "transparency/**"
   push:
     branches:
       - main
@@ -24,15 +28,19 @@ on:
       - "examples/nextjs-checkout-demo/**"
       - "packages/automation-core/**"
       - "packages/cli/**"
+      - "packages/conformance-packs/**"
+      - "packages/evidence-core/**"
+      - "packages/evidence-http/**"
+      - "packages/evidence-mcp/**"
       - "packages/evidence-playwright/**"
+      - "packages/runner-remote/**"
       - "packages/spec/**"
+      - "interop/**"
+      - "policies/**"
       - "registry/**"
-      - "schemas/behavior-*.schema.json"
-      - "schemas/signed-attestation.schema.json"
-      - "schemas/trust-*.schema.json"
-      - "tests/behavior-assurance.test.mjs"
-      - "tests/browser-evidence.test.mjs"
-      - "tests/trust-layer.test.mjs"
+      - "schemas/**"
+      - "tests/**"
+      - "transparency/**"
   workflow_dispatch:
 
 jobs:
@@ -62,10 +70,40 @@ jobs:
         run: pnpm --filter @aicorg/cli... --filter @aicorg/example-nextjs-checkout-demo... build
 
       - name: Run behavior assurance tests
-        run: node --test tests/behavior-assurance.test.mjs tests/browser-evidence.test.mjs tests/trust-layer.test.mjs
+        run: node --test tests/behavior-assurance.test.mjs tests/browser-evidence.test.mjs tests/checkout-conformance.test.mjs tests/conformance-packs.test.mjs tests/ecosystem-cli.test.mjs tests/evidence-cli.test.mjs tests/evidence-protocols.test.mjs tests/interop.test.mjs tests/key-rotation.test.mjs tests/policy.test.mjs tests/remote-runner.test.mjs tests/transparency.test.mjs tests/trust-layer.test.mjs
+
+      - name: Establish deployment and attestation window
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const { appendFileSync } = require("node:fs");
+          const deployedAt = new Date();
+          const expiresAt = new Date(deployedAt.getTime() + 60 * 60 * 1000);
+          appendFileSync(process.env.GITHUB_ENV, `AIC_DEPLOYED_AT=${deployedAt.toISOString()}\n`);
+          appendFileSync(process.env.GITHUB_ENV, `AIC_ATTESTATION_EXPIRES_AT=${expiresAt.toISOString()}\n`);
+          NODE
 
       - name: Generate checkout behavior proof
         run: pnpm --dir examples/nextjs-checkout-demo run aic:verify
+
+      - name: Verify checkout conformance and trust interoperability
+        shell: bash
+        run: |
+          node packages/cli/dist/cli/src/index.js conformance bind \
+            aic.pack.checkout \
+            complete \
+            examples/nextjs-checkout-demo/aic-behavior-contract.json \
+            examples/nextjs-checkout-demo/aic-conformance-mapping.json \
+            --out-file examples/nextjs-checkout-demo/aic-ci-conformance-binding.json
+          node packages/cli/dist/cli/src/index.js conformance verify \
+            aic.pack.checkout \
+            examples/nextjs-checkout-demo/aic-ci-conformance-binding.json \
+            examples/nextjs-checkout-demo/aic-behavior-contract.json \
+            --proof examples/nextjs-checkout-demo/aic-proof.json \
+            --out-file examples/nextjs-checkout-demo/aic-ci-conformance-result.json
+          node packages/cli/dist/cli/src/index.js interop verify \
+            interop/aic-trust-0.1/manifest.json \
+            --out-file examples/nextjs-checkout-demo/aic-ci-interop-result.json
 
       - name: Locate installed Chrome
         shell: bash
@@ -80,6 +118,15 @@ jobs:
 
       - name: Generate native WebMCP browser proof
         run: pnpm --dir examples/nextjs-checkout-demo run aic:verify:browser
+
+      - name: Verify native browser checkout conformance
+        run: |
+          node packages/cli/dist/cli/src/index.js conformance verify \
+            aic.pack.checkout \
+            examples/nextjs-checkout-demo/aic-ci-conformance-binding.json \
+            examples/nextjs-checkout-demo/aic-behavior-contract.json \
+            --proof examples/nextjs-checkout-demo/aic-browser-proof.json \
+            --out-file examples/nextjs-checkout-demo/aic-ci-browser-conformance-result.json
 
       - name: Create deployment-bound signed claim and registry
         shell: bash
@@ -100,6 +147,8 @@ jobs:
             --origin http://127.0.0.1:3100 \
             --environment test \
             --deployment-id "github-actions-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --deployed-at "$AIC_DEPLOYED_AT" \
+            --expires-at "$AIC_ATTESTATION_EXPIRES_AT" \
             --source-revision "$GITHUB_SHA" \
             --source-repository "https://github.com/${GITHUB_REPOSITORY}" \
             --issuer-id "github:${GITHUB_REPOSITORY}:behavior-assurance" \
@@ -130,6 +179,17 @@ jobs:
           node packages/cli/dist/cli/src/index.js registry verify \
             examples/nextjs-checkout-demo/aic-ci-registry.json \
             --trust-store examples/nextjs-checkout-demo/aic-ci-trust-store.json
+          node packages/cli/dist/cli/src/index.js policy evaluate \
+            policies/critical-assurance.json \
+            examples/nextjs-checkout-demo/aic-behavior-contract.json \
+            examples/nextjs-checkout-demo/aic-browser-proof.json \
+            --observations examples/nextjs-checkout-demo/aic-browser-observations.json \
+            --attestation examples/nextjs-checkout-demo/aic-ci-attestation.json \
+            --trust-store examples/nextjs-checkout-demo/aic-ci-trust-store.json \
+            --environment test \
+            --expect-origin http://127.0.0.1:3100 \
+            --expect-revision "$GITHUB_SHA" \
+            --out-file examples/nextjs-checkout-demo/aic-ci-policy-evaluation.json
 
       - name: Package AIC Verified evidence
         shell: bash
@@ -139,7 +199,12 @@ jobs:
             examples/nextjs-checkout-demo/aic-browser-observations.json \
             examples/nextjs-checkout-demo/aic-browser-proof.json \
             examples/nextjs-checkout-demo/aic-browser-evidence \
+            examples/nextjs-checkout-demo/aic-ci-browser-conformance-result.json \
+            examples/nextjs-checkout-demo/aic-ci-conformance-binding.json \
+            examples/nextjs-checkout-demo/aic-ci-conformance-result.json \
             examples/nextjs-checkout-demo/aic-ci-attestation.json \
+            examples/nextjs-checkout-demo/aic-ci-interop-result.json \
+            examples/nextjs-checkout-demo/aic-ci-policy-evaluation.json \
             examples/nextjs-checkout-demo/aic-ci-public.pem \
             examples/nextjs-checkout-demo/aic-ci-registry.json \
             examples/nextjs-checkout-demo/aic-ci-trust-store.json
@@ -160,7 +225,12 @@ jobs:
             examples/nextjs-checkout-demo/aic-browser-observations.json
             examples/nextjs-checkout-demo/aic-browser-proof.json
             examples/nextjs-checkout-demo/aic-browser-evidence
+            examples/nextjs-checkout-demo/aic-ci-browser-conformance-result.json
+            examples/nextjs-checkout-demo/aic-ci-conformance-binding.json
+            examples/nextjs-checkout-demo/aic-ci-conformance-result.json
             examples/nextjs-checkout-demo/aic-ci-attestation.json
+            examples/nextjs-checkout-demo/aic-ci-interop-result.json
+            examples/nextjs-checkout-demo/aic-ci-policy-evaluation.json
             examples/nextjs-checkout-demo/aic-ci-public.pem
             examples/nextjs-checkout-demo/aic-ci-registry.json
             examples/nextjs-checkout-demo/aic-ci-trust-store.json

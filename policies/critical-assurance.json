@@ -1,0 +1,49 @@
+{
+  "artifact_type": "aic_assurance_policy",
+  "spec": "aic.policy/0.1",
+  "id": "aic.reference.critical-assurance",
+  "unmatched": "fail",
+  "rules": [
+    {
+      "id": "critical-executed-parity",
+      "match": {
+        "risks": ["critical"]
+      },
+      "require": {
+        "proof_status": "passed",
+        "allowed_evidence_levels": ["executed"],
+        "observations_required": true,
+        "maximum_observation_age_seconds": 3600,
+        "maximum_proof_age_seconds": 3600,
+        "parity": "all_required",
+        "required_surface_kinds": ["human_ui", "webmcp"],
+        "attestation": {
+          "required": true,
+          "require_expiry": true,
+          "maximum_age_seconds": 3600,
+          "maximum_validity_seconds": 86400,
+          "allowed_issuer_ids": ["github:VPAI-Grok/AIC:behavior-assurance"],
+          "allowed_runner_kinds": ["github_actions"],
+          "require_expected_origin": true,
+          "require_expected_revision": true,
+          "observations_not_before_deployment": true
+        }
+      }
+    },
+    {
+      "id": "checkout-required-scenarios",
+      "match": {
+        "operation_ids": ["checkout.complete.domain"]
+      },
+      "require": {
+        "required_scenario_ids": [
+          "success",
+          "authorization-denied",
+          "confirmation-declined",
+          "business-failure",
+          "recovery"
+        ]
+      }
+    }
+  ]
+}

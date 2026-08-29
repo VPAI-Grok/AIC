@@ -38,9 +38,9 @@ test("checkout behavior contract is valid and produces executed parity proof", a
 
   assert.equal(proof.status, "passed");
   assert.equal(proof.evidence_level, "executed");
-  assert.equal(proof.summary.scenarios, 3);
-  assert.equal(proof.summary.observations, 6);
-  assert.equal(proof.summary.required_observations, 6);
+  assert.equal(proof.summary.scenarios, 5);
+  assert.equal(proof.summary.observations, 10);
+  assert.equal(proof.summary.required_observations, 10);
   assert.deepEqual(proof.findings, []);
   assert.ok(proof.scenarios.every((scenario) => scenario.parity === "passed"));
 });
@@ -108,7 +108,7 @@ test("aic verify runs a trusted local harness and writes an inspectable proof", 
   const inspection = await runCli(["inspect", proofPath]);
   assert.equal(inspection.code, 0, inspection.stderr);
   assert.match(inspection.stdout, /Status: passed/);
-  assert.match(inspection.stdout, /Observations: 6\/6/);
+  assert.match(inspection.stdout, /Observations: 10\/10/);
 });
 
 test("CLI validates behavior contracts and verifies imported observation files", async () => {

@@ -346,16 +346,6 @@ function validateTrustStatementValue(
     }
   }
 
-  if (
-    isRecord(value.runner) &&
-    isRecord(value.deployment) &&
-    isSourceRevision(value.runner.commit_sha) &&
-    isSourceRevision(value.deployment.source_revision) &&
-    value.runner.commit_sha !== value.deployment.source_revision
-  ) {
-    pushIssue(issues, "error", `${path}.runner.commit_sha`, "Runner commit must match the deployment source revision", "trust_statement.revision_consistency");
-  }
-
   if (value.references !== undefined) {
     if (!isRecord(value.references)) {
       pushIssue(issues, "error", `${path}.references`, "Expected an object", "trust_statement.references");

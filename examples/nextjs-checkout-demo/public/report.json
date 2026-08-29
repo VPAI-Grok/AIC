@@ -6,35 +6,35 @@
         "path": "AGENTS.md",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "wrapper",
         "path": "CLAUDE.md",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "wrapper",
         "path": "GEMINI.md",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "copilot_instructions",
         "path": ".github/copilot-instructions.md",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "cursor_rule",
         "path": ".cursor/rules/aic.mdc",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "wrapper",
@@ -50,11 +50,11 @@
       "stale": 0,
       "warnings": 0
     },
-    "template_version": "4",
+    "template_version": "5",
     "warnings": []
   },
   "diagnostics": [],
-  "filesScanned": 9,
+  "filesScanned": 11,
   "framework": "nextjs",
   "generated_manifests": {
     "findings": [],
@@ -68,10 +68,10 @@
       "agentId": "checkout.discount_form",
       "column": 9,
       "file": "app/CheckoutDemoContent.tsx",
-      "line": 284,
+      "line": 328,
       "risk": "low",
       "role": "generic",
-      "source_key": "app/CheckoutDemoContent.tsx:284:9:AICForm",
+      "source_key": "app/CheckoutDemoContent.tsx:328:9:AICForm",
       "tagName": "AICForm"
     },
     {
@@ -141,52 +141,65 @@
       "column": 9,
       "file": "app/CheckoutDemoContent.tsx",
       "label": "Discounts form",
-      "line": 284,
+      "line": 328,
       "opening_tag_signature": "<AICForm agentDescription=\"Reviews and applies coupon codes before the order is submitted\" agentId=\"checkout.discount_form\" agentLabel=\"Discounts form\" agentRisk=\"low\" agentWorkflowStep=\"checkout.review.discount\" style={{ display: \"grid\", gap: 12 }} >",
       "role": "generic",
       "selectors": {
         "text": "Discounts form"
       },
-      "source_key": "app/CheckoutDemoContent.tsx:284:9:AICForm",
+      "source_key": "app/CheckoutDemoContent.tsx:328:9:AICForm",
       "tagName": "AICForm"
     },
     {
       "column": 11,
       "file": "app/CheckoutDemoContent.tsx",
+      "label": "Inspect checkout conformance",
+      "line": 450,
+      "opening_tag_signature": "<a href=\"/aic-browser-conformance-result\" style={{ color: \"#ddd6fe\", fontWeight: 700 }}>",
+      "role": "link",
+      "selectors": {
+        "text": "Inspect checkout conformance"
+      },
+      "source_key": "app/CheckoutDemoContent.tsx:450:11:a",
+      "tagName": "a"
+    },
+    {
+      "column": 11,
+      "file": "app/CheckoutDemoContent.tsx",
       "label": "Inspect browser proof",
-      "line": 399,
+      "line": 453,
       "opening_tag_signature": "<a href=\"/aic-browser-proof\" style={{ color: \"#ddd6fe\", fontWeight: 700 }}>",
       "role": "link",
       "selectors": {
         "text": "Inspect browser proof"
       },
-      "source_key": "app/CheckoutDemoContent.tsx:399:11:a",
+      "source_key": "app/CheckoutDemoContent.tsx:453:11:a",
       "tagName": "a"
     },
     {
       "column": 11,
       "file": "app/CheckoutDemoContent.tsx",
       "label": "Inspect raw observations",
-      "line": 402,
+      "line": 456,
       "opening_tag_signature": "<a href=\"/aic-browser-observations\" style={{ color: \"#ddd6fe\", fontWeight: 700 }}>",
       "role": "link",
       "selectors": {
         "text": "Inspect raw observations"
       },
-      "source_key": "app/CheckoutDemoContent.tsx:402:11:a",
+      "source_key": "app/CheckoutDemoContent.tsx:456:11:a",
       "tagName": "a"
     },
     {
       "column": 11,
       "file": "app/CheckoutDemoContent.tsx",
       "label": "Inspect deterministic proof",
-      "line": 405,
+      "line": 459,
       "opening_tag_signature": "<a href=\"/aic-proof\" style={{ color: \"#ddd6fe\", fontWeight: 700 }}>",
       "role": "link",
       "selectors": {
         "text": "Inspect deterministic proof"
       },
-      "source_key": "app/CheckoutDemoContent.tsx:405:11:a",
+      "source_key": "app/CheckoutDemoContent.tsx:459:11:a",
       "tagName": "a"
     },
     {

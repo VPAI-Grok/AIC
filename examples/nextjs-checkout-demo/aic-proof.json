@@ -1,14 +1,14 @@
 {
   "artifact_type": "aic_behavior_proof",
   "contract": {
-    "digest": "sha256:f3b3d9376ac56dce975e862bf2450e606f1868e0a76dffcc230e498bb2d96799",
+    "digest": "sha256:6f809e4782bf1f1cffcfc8815ec649fa562fc875cc032b8f9145b6b7539cbd4f",
     "id": "checkout.complete.behavior",
     "spec": "aic.behavior/0.1"
   },
   "evidence_level": "executed",
   "findings": [],
   "generated_at": "2026-08-28T00:00:00.000Z",
-  "observations_digest": "sha256:e5316845436e02dd3623e3ded9277fcad236c959877c2b14d33cc92670c7891e",
+  "observations_digest": "sha256:1099052e6be3e6b9c298638cf4c43fca93a30b2a86bb3203fc5b24ff3edad838",
   "proof_version": "0.1",
   "scenarios": [
     {
@@ -70,14 +70,54 @@
           "surface_id": "webmcp"
         }
       ]
+    },
+    {
+      "finding_count": 0,
+      "parity": "passed",
+      "scenario_id": "business-failure",
+      "status": "passed",
+      "surfaces": [
+        {
+          "finding_count": 0,
+          "observation_mode": "executed",
+          "status": "passed",
+          "surface_id": "human-ui"
+        },
+        {
+          "finding_count": 0,
+          "observation_mode": "executed",
+          "status": "passed",
+          "surface_id": "webmcp"
+        }
+      ]
+    },
+    {
+      "finding_count": 0,
+      "parity": "passed",
+      "scenario_id": "recovery",
+      "status": "passed",
+      "surfaces": [
+        {
+          "finding_count": 0,
+          "observation_mode": "executed",
+          "status": "passed",
+          "surface_id": "human-ui"
+        },
+        {
+          "finding_count": 0,
+          "observation_mode": "executed",
+          "status": "passed",
+          "surface_id": "webmcp"
+        }
+      ]
     }
   ],
   "status": "passed",
   "summary": {
     "failed_scenarios": 0,
-    "observations": 6,
-    "passed_scenarios": 3,
-    "required_observations": 6,
-    "scenarios": 3
+    "observations": 10,
+    "passed_scenarios": 5,
+    "required_observations": 10,
+    "scenarios": 5
   }
 }

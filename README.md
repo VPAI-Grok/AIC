@@ -10,6 +10,7 @@
 [![WebMCP](https://img.shields.io/badge/WebMCP-native--first-0f766e.svg)](./docs/webmcp.md)
 [![Behavior Proof](https://img.shields.io/badge/AIC%20Proof-executed-7c3aed.svg)](./docs/behavior-assurance.md)
 [![AIC Verified](https://img.shields.io/badge/AIC%20Verified-signed%20claims-2563eb.svg)](./docs/trust-layer.md)
+[![Conformance](https://img.shields.io/badge/conformance-open%20ecosystem-9333ea.svg)](./docs/implementation-phases.md)
 
 **Standards describe. AIC proves.**
 
@@ -24,24 +25,27 @@ AIC is an open-source assurance layer for that gap. It helps teams:
 - define protocol-neutral behavioral contracts;
 - execute the same scenarios across multiple surfaces;
 - fail CI when those surfaces diverge; and
-- emit portable behavior proofs and deployment-bound, signed trust claims.
+- emit portable behavior proofs and deployment-bound, signed trust claims;
+- collect the same observation model through browser, MCP, and HTTP/OpenAPI adapters; and
+- apply reusable conformance packs and fail-closed assurance policy.
 
 AIC does not compete with WebMCP, MCP, OpenAPI, or future browser standards. Those are execution and description surfaces. AIC verifies the behavior behind them.
 
-## What is new: AIC Verified
+## What is new: Open Ecosystem Conformance
 
-The repository now implements the first open AIC Verified milestone:
+The repository now implements the technical foundation for a neutral conformance ecosystem:
 
 - `aic.behavior/0.1` contracts, observations, parity verification, and digest-addressed proofs;
 - `@aicorg/evidence-playwright`, which executes real human controls and native `document.modelContext` tools in Chrome;
-- checked-in screenshot evidence with SHA-256 digests for success, authorization denial, and confirmation decline;
+- HTTP/OpenAPI and MCP evidence adapters that project protocol results into the same strict observation model;
+- a data-only remote runner that verifies an exact production origin, deployment identity, and source revision before collection;
+- five authored conformance packs for checkout, billing mutation, account deletion, admin mutation, and record CRUD;
+- cumulative policy gates for risk, evidence level, scenario and surface coverage, parity, freshness, bindings, and trust;
 - `aic.trust/0.1` deployment-bound trust statements and Ed25519 signed claims;
-- issuer trust stores with origin policy, validity windows, and revocation state;
-- independently verifiable registries plus `/.well-known/aic-trust` discovery;
-- CLI commands for key generation, attestation, verification, registry build, and registry query; and
-- CI evidence packaging with GitHub OIDC/Sigstore artifact provenance on trusted runs.
+- portable verifier compatibility vectors, scheduled dual-signed key transitions, and signed tamper-evident checkpoints; and
+- independently verifiable registries plus `/.well-known/aic-trust` discovery.
 
-The reference native-browser run produced six executed observations, passed parity, and zero findings. A signature verifies an issuer's exact claim; it does not by itself prove that a production origin is live or independently certified. Read [AIC Verified Trust Layer](./docs/trust-layer.md) for the boundary.
+The verifier regenerates proof from raw observations before policy evaluation. A signature verifies an issuer's exact claim; a `remote` label does not make its operator independent. The [external adopter list](./ADOPTERS.md) remains empty until genuine maintainers submit reproducible public evidence. Read [Open Ecosystem Conformance](./docs/updates-2026-08-29-open-ecosystem-conformance.md) for the milestone boundary.
 
 ## Quick start
 
@@ -210,6 +214,11 @@ See [MCP Server Setup](./docs/mcp-server.md).
 | `@aicorg/spec` | Interaction manifests, behavior contracts, proof types, and validators |
 | `@aicorg/automation-core` | Deterministic scanning, generation, readiness analysis, and behavior verification |
 | `@aicorg/evidence-playwright` | Native browser and WebMCP evidence collection primitives |
+| `@aicorg/evidence-core` | Strict evidence plans, projections, canonical artifacts, and observation assembly |
+| `@aicorg/evidence-http` | HTTP and OpenAPI operation evidence adapter |
+| `@aicorg/evidence-mcp` | MCP tool evidence adapter with current stateless transport support |
+| `@aicorg/runner-remote` | Data-only, deployment-bound remote observation runner kit |
+| `@aicorg/conformance-packs` | Versioned checkout, billing, deletion, admin, and CRUD assurance profiles |
 | `@aicorg/cli` | Onboarding, behavior verification, trust signing/verification, registry, inspection, diff, and guarded apply commands |
 | `@aicorg/runtime` | Browser registry and live UI manifest serialization |
 | `@aicorg/sdk-react` | React hooks and components for explicit `agent*` semantics |
@@ -232,7 +241,7 @@ Start with the [Next.js checkout demo](./examples/nextjs-checkout-demo). It cont
 - a behavior contract and deterministic harness;
 - a strict native browser/WebMCP harness;
 - a checked-in [browser proof](./examples/nextjs-checkout-demo/aic-browser-proof.json) and [raw observations](./examples/nextjs-checkout-demo/aic-browser-observations.json); and
-- six screenshot evidence files with verified digests.
+- ten screenshot evidence files with verified digests.
 
 The broader benchmark corpus includes real browser-agent experiments on TailAdmin and a measured adoption slice on Twenty CRM. Those benchmarks measure agent task performance; the new behavior proof measures contract conformance and cross-surface parity. They answer different questions.
 
@@ -251,9 +260,10 @@ Current limitations:
 - dynamic JSX extraction produces diagnostics instead of guesses;
 - bootstrap suggestions require review;
 - WebMCP tracks an experimental browser API;
-- the included signed-claim primitives verify issuer intent, not current production reachability;
+- signed-claim primitives verify issuer intent, not current production reachability or runner independence;
 - the public registry interface has no fabricated external-adopter entries;
-- independent remote production runners, a general transparency log, hosted policy enforcement, and certification are not implemented yet.
+- the remote runner is open software and must be operated by a genuinely independent party before its evidence can support an independence claim; and
+- a hosted evidence history/dashboard, globally operated transparency service, external certification, and three verified external adopters remain market and operations gates.
 
 Read [Supported Today](./docs/supported-today.md) and [Threat Model](./docs/threat-model.md) before making assurance claims.
 
@@ -277,6 +287,8 @@ Generated AIC JSON should be regenerated and reviewed, not hand-edited.
 |---|---|
 | [Behavior Assurance](./docs/behavior-assurance.md) | Contracts, observations, proof semantics, harnesses, and CI |
 | [AIC Verified Trust Layer](./docs/trust-layer.md) | Native browser evidence, signed claims, trust stores, registries, and trust boundaries |
+| [Open Ecosystem Conformance](./docs/updates-2026-08-29-open-ecosystem-conformance.md) | Multi-protocol evidence, packs, policy, interoperability, rotation, and honest external gates |
+| [Submit an Adopter Claim](./docs/adopter-submission.md) | Evidence requirements for a public external adopter listing |
 | [WebMCP with AIC](./docs/webmcp.md) | Native-first integration and compatibility boundary |
 | [Architecture](./docs/architecture.md) | Packages, data flow, and trust boundaries |
 | [Manifest Spec](./docs/manifest-spec.md) | Discovery and interaction artifacts |

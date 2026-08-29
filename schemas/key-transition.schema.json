@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/key-transition.schema.json",
+  "title": "AIC Signed Scheduled Key Transition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "spec", "statement", "signatures"],
+  "properties": {
+    "artifact_type": { "const": "aic_signed_key_transition" },
+    "spec": { "const": "aic.key-transition/0.1" },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_type", "spec", "transition_id", "issuer_id", "reason", "issued_at", "effective_at", "prior_trust_store_digest", "next_trust_store_digest", "retiring_key_id", "successor_key_id"],
+      "properties": {
+        "artifact_type": { "const": "aic_key_transition_statement" },
+        "spec": { "const": "aic.key-transition/0.1" },
+        "transition_id": { "type": "string", "minLength": 1 },
+        "issuer_id": { "type": "string", "minLength": 1 },
+        "reason": { "const": "scheduled_rotation" },
+        "issued_at": { "type": "string", "format": "date-time" },
+        "effective_at": { "type": "string", "format": "date-time" },
+        "prior_trust_store_digest": { "$ref": "#/$defs/digest" },
+        "next_trust_store_digest": { "$ref": "#/$defs/digest" },
+        "retiring_key_id": { "$ref": "#/$defs/digest" },
+        "successor_key_id": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "signatures": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "signature"],
+        "properties": {
+          "role": { "enum": ["authorizing", "proof_of_possession"] },
+          "signature": { "$ref": "#/$defs/signature" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "signature": { "type": "object", "additionalProperties": false, "required": ["algorithm", "key_id", "value"], "properties": { "algorithm": { "const": "ed25519" }, "key_id": { "$ref": "#/$defs/digest" }, "value": { "type": "string", "pattern": "^[A-Za-z0-9+/]+={0,2}$" } } }
+  }
+}

@@ -121,12 +121,17 @@ async function readState(page) {
   return locator.evaluate((element) => {
     const html = /** @type {HTMLElement} */ (element);
     return {
+      attemptCount: Number(html.dataset.attemptCount ?? "0"),
+      auditCount: Number(html.dataset.auditCount ?? "0"),
       chargeCount: Number(html.dataset.chargeCount ?? "0"),
       confirmation: html.dataset.confirmation ?? "not_reached",
       errorCode: html.dataset.errorCode ?? "",
       orderId: html.dataset.orderId ?? "",
       orderStatus: html.dataset.orderStatus ?? "unknown",
-      paymentStatus: html.dataset.paymentStatus ?? "unknown"
+      orderTotal: html.dataset.orderTotal ?? "",
+      paymentMethod: html.dataset.paymentMethod ?? "",
+      paymentStatus: html.dataset.paymentStatus ?? "unknown",
+      recovered: html.dataset.recovered === "true"
     };
   });
 }
@@ -137,9 +142,31 @@ async function waitForFinalState(page, scenarioId) {
       document.querySelector('[data-aic-evidence="checkout-state"]')
     );
     if (!element) return false;
-    if (scenario === "success") return element.dataset.orderStatus === "submitted";
+    if (scenario === "success") {
+      return (
+        element.dataset.orderStatus === "submitted" &&
+        element.dataset.attemptCount === "1" &&
+        element.dataset.chargeCount === "1" &&
+        element.dataset.auditCount === "1"
+      );
+    }
     if (scenario === "authorization-denied") return element.dataset.errorCode === "authorization_denied";
-    return element.dataset.confirmation === "declined";
+    if (scenario === "confirmation-declined") return element.dataset.confirmation === "declined";
+    if (scenario === "business-failure") {
+      return (
+        element.dataset.errorCode === "payment_provider_unavailable" &&
+        element.dataset.orderStatus === "draft" &&
+        element.dataset.attemptCount === "1"
+      );
+    }
+    return (
+      scenario === "recovery" &&
+      element.dataset.recovered === "true" &&
+      element.dataset.orderStatus === "submitted" &&
+      element.dataset.attemptCount === "2" &&
+      element.dataset.chargeCount === "1" &&
+      element.dataset.auditCount === "1"
+    );
   }, scenarioId);
   return readState(page);
 }
@@ -207,7 +234,25 @@ function observationFromState({
   const unchanged =
     state.orderStatus === "draft" &&
     state.paymentStatus === "unpaid" &&
-    state.chargeCount === 0;
+    state.chargeCount === 0 &&
+    state.auditCount === 0;
+  const committedExactlyOnce =
+    state.orderStatus === "submitted" &&
+    state.paymentStatus === "charged" &&
+    state.chargeCount === 1 &&
+    state.auditCount === 1;
+  const exactScope =
+    state.orderId === CHECKOUT_REQUEST.order_id &&
+    state.orderTotal === CHECKOUT_REQUEST.order_total &&
+    state.paymentMethod === CHECKOUT_REQUEST.payment_method;
+  const initialChecks = [
+    passed("order.is_draft", initialState.orderStatus === "draft", initialState.orderStatus),
+    passed("checkout.exact_scope", exactScope, {
+      order_id: state.orderId,
+      order_total: state.orderTotal,
+      payment_method: state.paymentMethod
+    })
+  ];
   const outcome = {
     order_id: state.orderId,
     order_status: state.orderStatus,
@@ -218,14 +263,19 @@ function observationFromState({
     return {
       ...common,
       checks: [
-        passed("order.is_draft", initialState.orderStatus === "draft", initialState.orderStatus),
+        ...initialChecks,
         passed("authorization.denied", state.errorCode === "authorization_denied", state.errorCode),
         passed("order.unchanged", unchanged, outcome),
+        notObserved("authorization.allowed", true, false),
         notObserved("confirmation.accepted", state.confirmation !== "accepted", state.confirmation),
         notObserved("confirmation.declined", state.confirmation !== "declined", state.confirmation),
+        notObserved("payment.idempotent", state.attemptCount === 0, state.attemptCount),
+        notObserved("execution.failure_isolated", state.errorCode !== "payment_provider_unavailable", state.errorCode),
         notObserved("payment.charge", state.chargeCount === 0, state.chargeCount),
         notObserved("order.submitted", state.orderStatus !== "submitted", state.orderStatus),
-        notObserved("payment.charged", state.paymentStatus !== "charged", state.paymentStatus)
+        notObserved("payment.charged", state.paymentStatus !== "charged", state.paymentStatus),
+        notObserved("checkout.audit_recorded", state.auditCount === 0, state.auditCount),
+        notObserved("checkout.safe_recovery", !state.recovered, state.recovered)
       ],
       confirmation: "not_reached",
       error_code: state.errorCode || "browser_outcome_mismatch",
@@ -239,15 +289,19 @@ function observationFromState({
     return {
       ...common,
       checks: [
-        passed("order.is_draft", initialState.orderStatus === "draft", initialState.orderStatus),
+        ...initialChecks,
         passed("authorization.allowed", state.confirmation === "declined", state.confirmation),
         passed("confirmation.declined", state.confirmation === "declined", state.confirmation),
         passed("order.unchanged", unchanged, outcome),
         notObserved("authorization.denied", state.errorCode !== "authorization_denied", state.errorCode),
         notObserved("confirmation.accepted", state.confirmation !== "accepted", state.confirmation),
+        notObserved("payment.idempotent", state.attemptCount === 0, state.attemptCount),
+        notObserved("execution.failure_isolated", state.errorCode !== "payment_provider_unavailable", state.errorCode),
         notObserved("payment.charge", state.chargeCount === 0, state.chargeCount),
         notObserved("order.submitted", state.orderStatus !== "submitted", state.orderStatus),
-        notObserved("payment.charged", state.paymentStatus !== "charged", state.paymentStatus)
+        notObserved("payment.charged", state.paymentStatus !== "charged", state.paymentStatus),
+        notObserved("checkout.audit_recorded", state.auditCount === 0, state.auditCount),
+        notObserved("checkout.safe_recovery", !state.recovered, state.recovered)
       ],
       confirmation: state.confirmation,
       error_code: state.errorCode || "browser_outcome_mismatch",
@@ -257,24 +311,104 @@ function observationFromState({
     };
   }
 
+  if (scenarioId === "business-failure") {
+    const isolated =
+      unchanged &&
+      state.attemptCount === 1 &&
+      state.errorCode === "payment_provider_unavailable";
+    return {
+      ...common,
+      checks: [
+        ...initialChecks,
+        passed("authorization.allowed", state.confirmation === "accepted", state.confirmation),
+        passed("confirmation.accepted", state.confirmation === "accepted", state.confirmation),
+        passed("execution.failure_isolated", isolated, {
+          attempt_count: state.attemptCount,
+          audit_count: state.auditCount,
+          charge_count: state.chargeCount,
+          error_code: state.errorCode
+        }),
+        passed("order.unchanged", unchanged, outcome),
+        notObserved("authorization.denied", state.errorCode !== "authorization_denied", state.errorCode),
+        notObserved("confirmation.declined", state.confirmation !== "declined", state.confirmation),
+        notObserved("payment.idempotent", state.chargeCount === 0, state.chargeCount),
+        notObserved("payment.charge", state.chargeCount === 0, state.chargeCount),
+        notObserved("order.submitted", state.orderStatus !== "submitted", state.orderStatus),
+        notObserved("payment.charged", state.paymentStatus !== "charged", state.paymentStatus),
+        notObserved("checkout.audit_recorded", state.auditCount === 0, state.auditCount),
+        notObserved("checkout.safe_recovery", !state.recovered, state.recovered)
+      ],
+      confirmation: state.confirmation,
+      error_code: state.errorCode || "browser_outcome_mismatch",
+      outcome,
+      scenario_id: scenarioId,
+      status: isolated ? "failed" : "succeeded"
+    };
+  }
+
+  if (scenarioId === "recovery") {
+    const recoveredExactlyOnce =
+      committedExactlyOnce && state.attemptCount === 2 && state.recovered;
+    return {
+      ...common,
+      checks: [
+        ...initialChecks,
+        passed("authorization.allowed", state.confirmation === "accepted", state.confirmation),
+        passed("confirmation.accepted", state.confirmation === "accepted", state.confirmation),
+        passed("execution.failure_isolated", state.recovered && state.attemptCount === 2, {
+          attempt_count: state.attemptCount,
+          recovered: state.recovered
+        }),
+        passed("payment.idempotent", recoveredExactlyOnce, {
+          attempt_count: state.attemptCount,
+          audit_count: state.auditCount,
+          charge_count: state.chargeCount
+        }),
+        passed("payment.charge", state.chargeCount === 1, state.chargeCount),
+        passed("order.submitted", state.orderStatus === "submitted", state.orderStatus),
+        passed("payment.charged", state.paymentStatus === "charged", state.paymentStatus),
+        passed("checkout.audit_recorded", state.auditCount === 1, state.auditCount),
+        passed("checkout.safe_recovery", recoveredExactlyOnce, {
+          attempt_count: state.attemptCount,
+          recovered: state.recovered
+        }),
+        notObserved("authorization.denied", state.errorCode !== "authorization_denied", state.errorCode),
+        notObserved("confirmation.declined", state.confirmation !== "declined", state.confirmation),
+        notObserved("order.unchanged", !unchanged, outcome)
+      ],
+      confirmation: state.confirmation,
+      outcome,
+      scenario_id: scenarioId,
+      status: recoveredExactlyOnce ? "recovered" : "failed"
+    };
+  }
+
   return {
     ...common,
     checks: [
-      passed("order.is_draft", initialState.orderStatus === "draft", initialState.orderStatus),
+      ...initialChecks,
       passed("authorization.allowed", state.confirmation === "accepted", state.confirmation),
       passed("confirmation.accepted", state.confirmation === "accepted", state.confirmation),
+      passed("payment.idempotent", committedExactlyOnce && state.attemptCount === 1, {
+        attempt_count: state.attemptCount,
+        audit_count: state.auditCount,
+        charge_count: state.chargeCount
+      }),
       passed("payment.charge", state.chargeCount === 1, state.chargeCount),
       passed("order.submitted", state.orderStatus === "submitted", state.orderStatus),
       passed("payment.charged", state.paymentStatus === "charged", state.paymentStatus),
+      passed("checkout.audit_recorded", state.auditCount === 1, state.auditCount),
       notObserved("authorization.denied", state.errorCode !== "authorization_denied", state.errorCode),
       notObserved("confirmation.declined", state.confirmation !== "declined", state.confirmation),
-      notObserved("order.unchanged", !unchanged, outcome)
+      notObserved("execution.failure_isolated", state.errorCode !== "payment_provider_unavailable", state.errorCode),
+      notObserved("order.unchanged", !unchanged, outcome),
+      notObserved("checkout.safe_recovery", !state.recovered, state.recovered)
     ],
     confirmation: state.confirmation,
     outcome,
     scenario_id: scenarioId,
     status:
-      state.orderStatus === "submitted" && state.paymentStatus === "charged" && state.chargeCount === 1
+      committedExactlyOnce && state.attemptCount === 1
         ? "succeeded"
         : "failed"
   };
@@ -294,6 +428,11 @@ async function runBrowserScenario({
   const url = new URL(baseUrl);
   if (scenarioId === "authorization-denied") {
     url.searchParams.set("aic_fixture_permission", "denied");
+  }
+  if (scenarioId === "business-failure") {
+    url.searchParams.set("aic_fixture_execution", "fail");
+  } else if (scenarioId === "recovery") {
+    url.searchParams.set("aic_fixture_execution", "recover");
   }
   const startedAt = Date.now();
   let nativeInspection;

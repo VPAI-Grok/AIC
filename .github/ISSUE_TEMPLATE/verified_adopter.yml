@@ -1,0 +1,77 @@
+name: Verified adopter submission
+description: Submit public evidence for an external AIC adopter listing
+title: "[Adopter] "
+labels:
+  - adopter-submission
+body:
+  - type: markdown
+    attributes:
+      value: |
+        AIC lists external adopters only from public, independently verifiable evidence. Never paste secrets, cookies, private keys, personal data, or payment details.
+  - type: input
+    id: app_name
+    attributes:
+      label: Application name
+      description: Public name of the application or service.
+    validations:
+      required: true
+  - type: input
+    id: repository
+    attributes:
+      label: Repository or implementation documentation
+      description: Public URL that explains the implementation and identifies its maintainer.
+      placeholder: https://github.com/example/application
+    validations:
+      required: true
+  - type: input
+    id: origin
+    attributes:
+      label: Production origin
+      description: Exact HTTPS origin bound by the signed claim.
+      placeholder: https://app.example.com
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Application source revision
+      description: Immutable full source revision deployed at the submitted origin.
+    validations:
+      required: true
+  - type: input
+    id: pack
+    attributes:
+      label: Conformance pack
+      description: Pack ID and version, or a link to the reviewed custom contract.
+      placeholder: aic.checkout/0.1
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Public verification artifacts
+      description: Direct immutable links to the contract, pack binding, observations, proof, signed attestation, trust information, and policy result.
+    validations:
+      required: true
+  - type: input
+    id: workflow
+    attributes:
+      label: Reproducible workflow
+      description: Link to the public workflow run or documented commands that reproduce verification.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Maintainer confirmations
+      options:
+        - label: I maintain or am authorized to represent this application.
+          required: true
+        - label: The submitted action contract is authored and represents a real application operation.
+          required: true
+        - label: The artifacts contain no secrets, private keys, session data, personal data, or payment details.
+          required: true
+        - label: I consent to the application and evidence links being listed publicly.
+          required: true
+        - label: I understand that listing is not certification, warranty, or endorsement.
+          required: true

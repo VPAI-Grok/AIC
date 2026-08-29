@@ -26,7 +26,7 @@ The protocol-neutral vertical slice is implemented:
 - deterministic contract, evidence, and parity verification;
 - CLI validation, verification, and proof inspection;
 - a shared-domain checkout example across human UI and WebMCP;
-- success, authorization-denial, and confirmation-decline scenarios; and
+- success, authorization-denial, confirmation-decline, business-failure, and safe-recovery scenarios; and
 - a CI proof artifact.
 
 ## Completed: AIC Verified technical milestone
@@ -44,20 +44,33 @@ The repository now includes:
 
 This completes the in-repository technical milestone. It does not manufacture independent adoption or turn an issuer's signed claim into independent production certification.
 
-## Next milestone: ecosystem proof and adoption
+## Completed: Open Ecosystem Conformance technical milestone
 
-Priorities:
+The repository now includes:
+
+1. MCP and HTTP/OpenAPI evidence adapters using the same observation contract as browser evidence.
+2. A data-only remote production runner kit with exact origin, deployment, and revision preflight, public-network restrictions, bounded response/runtime limits, and mutations disabled unless explicitly canary-scoped.
+3. Reusable conformance packs for checkout, billing mutation, account deletion, admin mutation, and record CRUD.
+4. Authored, digest-bound mappings from application contracts to pack obligations.
+5. Cumulative configurable policy by risk, evidence level, scenario and surface coverage, freshness, parity, deployment binding, and pinned trust.
+6. Portable compatibility vectors for canonical JSON, digests, verification decisions, and finding codes.
+7. A signed tamper-evident reference index with checkpoint consistency and portable external receipt references.
+8. Dual-signed scheduled key transitions that keep historical claims verifiable while distinguishing compromise revocation.
+9. An evidence-first external adopter submission kit and ecosystem-conformance gates in the existing Behavior Assurance CI workflow.
+
+This completes every repository-achievable technical prerequisite from the milestone. The contracts, schemas, verifier, signing format, adapters, packs, policy, runner kit, and compatibility vectors remain open. Hosted capabilities should add convenience and independently operated trust, not lock users out of their evidence.
+
+## Next market and operations gate
+
+The following outcomes require real external actors or operated infrastructure and are not manufactured by repository fixtures:
 
 1. Three real external applications publishing independently verifiable claims.
-2. Remote production observation runners that verify origin, deployment, and revision from outside the app owner's CI.
-3. MCP and HTTP/OpenAPI evidence adapters using the same observation contract.
-4. Reusable conformance packs for checkout, billing, account deletion, admin mutations, and record CRUD.
-5. Configurable CI policies by risk, evidence level, scenario class, freshness, and parity requirement.
-6. Verifier compatibility fixtures for independent implementations.
-7. Tamper-evident public provenance/transparency indexing and key-rotation operations.
-8. Hosted evidence history and policy dashboards that remain compatible with the open verifier.
+2. At least one remote runner operated independently from both the application owner and the AIC project.
+3. A hosted evidence-history and policy-dashboard service compatible with the open verifier.
+4. External verifier implementations passing the compatibility vectors.
+5. Standardized or independently operated public transparency receipts for production claims.
 
-The contracts, schemas, verifier, signing format, local/browser runner, and registry format remain open. Hosted capabilities should add convenience and independently operated trust, not lock users out of their evidence.
+The canonical adopter list and registry stay empty until genuine submissions pass review.
 
 ## Ongoing stabilization
 

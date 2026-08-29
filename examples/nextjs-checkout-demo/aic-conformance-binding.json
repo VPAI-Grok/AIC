@@ -1,0 +1,75 @@
+{
+  "artifact_type": "aic_conformance_binding",
+  "authored": true,
+  "contract": {
+    "digest": "sha256:6f809e4782bf1f1cffcfc8815ec649fa562fc875cc032b8f9145b6b7539cbd4f",
+    "id": "checkout.complete.behavior"
+  },
+  "pack": {
+    "digest": "sha256:04f067dcb144623f1500936ac93fe5dbd3c0ba4004958cbe34d8ccc8f72b9757",
+    "id": "aic.pack.checkout",
+    "profile": "complete",
+    "version": "0.1.0"
+  },
+  "requirement_map": {
+    "exact_scope": [
+      "checkout.exact_scope"
+    ],
+    "authorization_allowed": [
+      "authorization.allowed"
+    ],
+    "authorization_denied": [
+      "authorization.denied"
+    ],
+    "confirmation_accepted": [
+      "confirmation.accepted"
+    ],
+    "confirmation_declined": [
+      "confirmation.declined"
+    ],
+    "idempotency": [
+      "payment.idempotent"
+    ],
+    "failure_isolation": [
+      "execution.failure_isolated"
+    ],
+    "mutation_committed": [
+      "payment.charge"
+    ],
+    "audit_evidence": [
+      "checkout.audit_recorded"
+    ],
+    "unchanged_when_stopped": [
+      "order.unchanged"
+    ],
+    "safe_recovery": [
+      "checkout.safe_recovery"
+    ]
+  },
+  "scenario_map": {
+    "success": [
+      "success"
+    ],
+    "authorization_denial": [
+      "authorization-denied"
+    ],
+    "confirmation_decline": [
+      "confirmation-declined"
+    ],
+    "business_failure": [
+      "business-failure"
+    ],
+    "recovery": [
+      "recovery"
+    ]
+  },
+  "spec": "aic.conformance/0.1",
+  "surface_roles": {
+    "human": [
+      "human-ui"
+    ],
+    "agent": [
+      "webmcp"
+    ]
+  }
+}

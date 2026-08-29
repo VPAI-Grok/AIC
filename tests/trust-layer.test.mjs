@@ -75,6 +75,48 @@ test("AIC signs a passed proof and verifies every supplied binding", () => {
   assert.ok(Object.values(result.checks).every((check) => check === "passed"));
 });
 
+test("independent runner revision is bound separately from the deployed app revision", () => {
+  const keys = automation.generateAICTrustKeyPair({
+    allowedOrigins: [ORIGIN],
+    generatedAt: ISSUED_AT,
+    issuerId: "aic.remote-observer"
+  });
+  const runnerRevision = "b".repeat(40);
+  const attestation = automation.createAICSignedAttestation({
+    contract,
+    deployment: {
+      deployment_id: "checkout-demo-remote",
+      environment: "development",
+      origin: ORIGIN,
+      source_revision: SOURCE_REVISION
+    },
+    issuedAt: ISSUED_AT,
+    issuer: { id: "aic.remote-observer", kind: "organization" },
+    privateKeyPem: keys.private_key_pem,
+    proof,
+    runner: {
+      commit_sha: runnerRevision,
+      id: "independent-runner",
+      kind: "remote",
+      repository: "independent/example-runner"
+    }
+  });
+
+  assert.equal(spec.validateAICSignedAttestation(attestation).ok, true);
+  assert.equal(attestation.statement.deployment.source_revision, SOURCE_REVISION);
+  assert.equal(attestation.statement.runner.commit_sha, runnerRevision);
+  assert.equal(
+    automation.verifyAICSignedAttestation({
+      attestation,
+      expectedOrigin: ORIGIN,
+      expectedRevision: SOURCE_REVISION,
+      trustStore: keys.trust_store,
+      verifiedAt: ISSUED_AT
+    }).status,
+    "trusted"
+  );
+});
+
 test("public registry starts as valid, honest empty discovery data", () => {
   const validation = spec.validateAICTrustRegistry(publicRegistry);
   assert.equal(validation.ok, true);

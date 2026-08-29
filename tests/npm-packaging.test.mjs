@@ -40,6 +40,42 @@ const publishablePackages = [
   },
   {
     hasBin: false,
+    hasClientExport: false,
+    name: "@aicorg/conformance-packs",
+    path: "packages/conformance-packs"
+  },
+  {
+    hasBin: false,
+    hasClientExport: false,
+    name: "@aicorg/evidence-core",
+    path: "packages/evidence-core"
+  },
+  {
+    hasBin: false,
+    hasClientExport: false,
+    name: "@aicorg/evidence-http",
+    path: "packages/evidence-http"
+  },
+  {
+    hasBin: false,
+    hasClientExport: false,
+    name: "@aicorg/evidence-mcp",
+    path: "packages/evidence-mcp"
+  },
+  {
+    hasBin: false,
+    hasClientExport: false,
+    name: "@aicorg/evidence-playwright",
+    path: "packages/evidence-playwright"
+  },
+  {
+    hasBin: false,
+    hasClientExport: false,
+    name: "@aicorg/runner-remote",
+    path: "packages/runner-remote"
+  },
+  {
+    hasBin: false,
     hasClientExport: true,
     hasExtensionAssets: true,
     name: "@aicorg/devtools",

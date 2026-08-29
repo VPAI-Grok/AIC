@@ -36,6 +36,11 @@
       "description": "The order is still in draft state before execution."
     },
     {
+      "id": "checkout.exact_scope",
+      "phase": "precondition",
+      "description": "The request is bound to the displayed order, amount, currency, and payment method."
+    },
+    {
       "id": "authorization.allowed",
       "phase": "invariant",
       "description": "The caller is authorized for the displayed order."
@@ -56,6 +61,16 @@
       "description": "A declined confirmation cancels execution."
     },
     {
+      "id": "payment.idempotent",
+      "phase": "invariant",
+      "description": "Repeated or recovered execution cannot charge or submit the order more than once."
+    },
+    {
+      "id": "execution.failure_isolated",
+      "phase": "invariant",
+      "description": "A provider failure before commit leaves no charge, submission, or ambiguous payment state."
+    },
+    {
       "id": "payment.charge",
       "phase": "side_effect",
       "description": "Exactly one payment charge is performed."
@@ -71,9 +86,19 @@
       "description": "The payment ends in charged state."
     },
     {
+      "id": "checkout.audit_recorded",
+      "phase": "postcondition",
+      "description": "A successful commit produces exactly one checkout audit record."
+    },
+    {
       "id": "order.unchanged",
       "phase": "postcondition",
       "description": "A stopped operation leaves the draft order and payment unchanged."
+    },
+    {
+      "id": "checkout.safe_recovery",
+      "phase": "recovery",
+      "description": "A pre-commit provider failure can be reconciled and retried without a duplicate charge."
     }
   ],
   "scenarios": [
@@ -92,16 +117,21 @@
         },
         "required_requirements": [
           "order.is_draft",
+          "checkout.exact_scope",
           "authorization.allowed",
           "confirmation.accepted",
+          "payment.idempotent",
           "payment.charge",
           "order.submitted",
-          "payment.charged"
+          "payment.charged",
+          "checkout.audit_recorded"
         ],
         "forbidden_requirements": [
           "authorization.denied",
           "confirmation.declined",
-          "order.unchanged"
+          "execution.failure_isolated",
+          "order.unchanged",
+          "checkout.safe_recovery"
         ]
       }
     },
@@ -121,15 +151,21 @@
         },
         "required_requirements": [
           "order.is_draft",
+          "checkout.exact_scope",
           "authorization.denied",
           "order.unchanged"
         ],
         "forbidden_requirements": [
+          "authorization.allowed",
           "confirmation.accepted",
           "confirmation.declined",
+          "payment.idempotent",
+          "execution.failure_isolated",
           "payment.charge",
           "order.submitted",
-          "payment.charged"
+          "payment.charged",
+          "checkout.audit_recorded",
+          "checkout.safe_recovery"
         ]
       }
     },
@@ -149,6 +185,7 @@
         },
         "required_requirements": [
           "order.is_draft",
+          "checkout.exact_scope",
           "authorization.allowed",
           "confirmation.declined",
           "order.unchanged"
@@ -156,9 +193,80 @@
         "forbidden_requirements": [
           "authorization.denied",
           "confirmation.accepted",
+          "payment.idempotent",
+          "execution.failure_isolated",
           "payment.charge",
           "order.submitted",
-          "payment.charged"
+          "payment.charged",
+          "checkout.audit_recorded",
+          "checkout.safe_recovery"
+        ]
+      }
+    },
+    {
+      "id": "business-failure",
+      "title": "Provider failure stops before payment commit",
+      "surfaces": ["human-ui", "webmcp"],
+      "parity": "required",
+      "expected": {
+        "status": "failed",
+        "confirmation": "accepted",
+        "error_code": "payment_provider_unavailable",
+        "outcome": {
+          "order_id": "ord_100245",
+          "order_status": "draft",
+          "payment_status": "unpaid"
+        },
+        "required_requirements": [
+          "order.is_draft",
+          "checkout.exact_scope",
+          "authorization.allowed",
+          "confirmation.accepted",
+          "execution.failure_isolated",
+          "order.unchanged"
+        ],
+        "forbidden_requirements": [
+          "authorization.denied",
+          "confirmation.declined",
+          "payment.idempotent",
+          "payment.charge",
+          "order.submitted",
+          "payment.charged",
+          "checkout.audit_recorded",
+          "checkout.safe_recovery"
+        ]
+      }
+    },
+    {
+      "id": "recovery",
+      "title": "A pre-commit failure recovers without a duplicate charge",
+      "surfaces": ["human-ui", "webmcp"],
+      "parity": "required",
+      "expected": {
+        "status": "recovered",
+        "confirmation": "accepted",
+        "outcome": {
+          "order_id": "ord_100245",
+          "order_status": "submitted",
+          "payment_status": "charged"
+        },
+        "required_requirements": [
+          "order.is_draft",
+          "checkout.exact_scope",
+          "authorization.allowed",
+          "confirmation.accepted",
+          "execution.failure_isolated",
+          "payment.idempotent",
+          "payment.charge",
+          "order.submitted",
+          "payment.charged",
+          "checkout.audit_recorded",
+          "checkout.safe_recovery"
+        ],
+        "forbidden_requirements": [
+          "authorization.denied",
+          "confirmation.declined",
+          "order.unchanged"
         ]
       }
     }

@@ -37,13 +37,13 @@ test("checked-in checkout evidence proves browser-native human/WebMCP parity", a
   });
   assert.equal(proof.status, "passed");
   assert.equal(proof.evidence_level, "executed");
-  assert.equal(proof.summary.observations, 6);
+  assert.equal(proof.summary.observations, 10);
   assert.deepEqual(proof.findings, []);
 
   const webmcp = observations.observations.filter(
     (observation) => observation.surface_id === "webmcp"
   );
-  assert.equal(webmcp.length, 3);
+  assert.equal(webmcp.length, 5);
   for (const observation of webmcp) {
     assert.equal(observation.environment.native_webmcp, "true");
     assert.equal(observation.environment.webmcp_api, "document.modelContext");

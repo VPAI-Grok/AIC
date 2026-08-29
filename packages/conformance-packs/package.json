@@ -1,0 +1,44 @@
+{
+  "name": "@aicorg/conformance-packs",
+  "version": "0.1.0-alpha.1",
+  "type": "module",
+  "description": "Open, digest-bound conformance profiles for consequential AIC operations.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/AIC.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/AIC",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/AIC/issues"
+  },
+  "keywords": [
+    "aic",
+    "agents",
+    "assurance",
+    "conformance",
+    "testing"
+  ],
+  "main": "./dist/conformance-packs/src/index.js",
+  "types": "./dist/conformance-packs/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/conformance-packs/src/index.d.ts",
+      "import": "./dist/conformance-packs/src/index.js",
+      "default": "./dist/conformance-packs/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@aicorg/spec": "workspace:*"
+  }
+}

@@ -101,7 +101,7 @@ Verification checks:
 - verifier-supplied origin and revision expectations; and
 - optional byte-for-byte canonical contract and proof bindings.
 
-Results distinguish `local_signed_claim`, `ci_signed_claim`, and `remote_signed_claim`. These labels describe the claimed runner class; they do not elevate a claim into independent certification.
+Results distinguish `local_signed_claim`, `ci_signed_claim`, and `remote_signed_claim`. These labels describe the signed runner class; they do not elevate a claim into independent certification. Production policy can additionally pin exact issuer IDs, key IDs, runner IDs, origin, and revision.
 
 ## Build and query a registry
 
@@ -168,7 +168,9 @@ A valid AIC signature proves that the holder of a trusted private key signed the
 - the issuer key was uncompromised; or
 - a regulator or independent auditor endorsed the result.
 
-GitHub artifact provenance proves where the CI evidence bundle was built; it still does not prove current production reachability. A production-grade claim should combine a protected issuer key, a trusted or independently operated remote runner, origin/deployment verification, short validity windows, revocation, retained raw evidence, and public provenance or transparency records.
+GitHub artifact provenance proves where the CI evidence bundle was built; it still does not prove current production reachability. The open remote runner kit now verifies exact origin/deployment/revision bindings and emits digest-bound receipts, but an independence claim is valid only when a genuinely separate operator controls that run and its key. A production-grade claim should combine a protected issuer key, a trusted or independently operated remote runner, origin/deployment verification, short validity windows, revocation, retained raw evidence, consumer policy, and public provenance or transparency receipts.
+
+See [Protocol Evidence and Remote Observation](./evidence-adapters.md), [Assurance Policy](./assurance-policy.md), and [Transparency and Key Rotation](./transparency-and-key-rotation.md) for the next-layer controls.
 
 See [Threat Model](./threat-model.md) before presenting AIC Verified evidence externally.
 

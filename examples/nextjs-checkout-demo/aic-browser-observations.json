@@ -1,13 +1,13 @@
 {
   "artifact_type": "aic_behavior_observation_set",
   "contract_id": "checkout.complete.behavior",
-  "generated_at": "2026-08-29T16:38:41.096Z",
+  "generated_at": "2026-08-29T00:00:00.000Z",
   "observations": [
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-08-29T16:38:41.096Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1027,
+      "duration_ms": 1229,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "not_applicable",
@@ -21,7 +21,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:3850b04158a06acdecc198bf6027f6305178d4f54c57a82a056e77320c8c3585",
+          "digest": "sha256:013fc6b55db7296a385c1e8ed19133c43e5e0b5a283c699c0755d1e89d0ae82d",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/success--human-ui.png"
         }
@@ -36,6 +36,15 @@
           "requirement_id": "order.is_draft"
         },
         {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
+          },
+          "passed": true,
+          "requirement_id": "checkout.exact_scope"
+        },
+        {
           "actual": "accepted",
           "passed": true,
           "requirement_id": "authorization.allowed"
@@ -44,6 +53,15 @@
           "actual": "accepted",
           "passed": true,
           "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": {
+            "attempt_count": 1,
+            "audit_count": 1,
+            "charge_count": 1
+          },
+          "passed": true,
+          "requirement_id": "payment.idempotent"
         },
         {
           "actual": 1,
@@ -61,6 +79,11 @@
           "requirement_id": "payment.charged"
         },
         {
+          "actual": 1,
+          "passed": true,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
           "actual": "",
           "passed": false,
           "requirement_id": "authorization.denied"
@@ -71,6 +94,11 @@
           "requirement_id": "confirmation.declined"
         },
         {
+          "actual": "",
+          "passed": false,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
           "actual": {
             "order_id": "ord_100245",
             "order_status": "submitted",
@@ -78,6 +106,11 @@
           },
           "passed": false,
           "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "checkout.safe_recovery"
         }
       ],
       "confirmation": "accepted",
@@ -91,9 +124,9 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-08-29T16:38:41.096Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 929,
+      "duration_ms": 1081,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "json_string_compat",
@@ -107,7 +140,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:84c8426f024740586dfef30db96802a5e0f46f3de6735dc813a88f539eb2c9ee",
+          "digest": "sha256:f9f79616073975299a2227f868ed62ef8f1e2cbc95cdcc6ae3b9c071052f29ea",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/success--webmcp.png"
         }
@@ -122,6 +155,15 @@
           "requirement_id": "order.is_draft"
         },
         {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
+          },
+          "passed": true,
+          "requirement_id": "checkout.exact_scope"
+        },
+        {
           "actual": "accepted",
           "passed": true,
           "requirement_id": "authorization.allowed"
@@ -130,6 +172,15 @@
           "actual": "accepted",
           "passed": true,
           "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": {
+            "attempt_count": 1,
+            "audit_count": 1,
+            "charge_count": 1
+          },
+          "passed": true,
+          "requirement_id": "payment.idempotent"
         },
         {
           "actual": 1,
@@ -145,6 +196,852 @@
           "actual": "charged",
           "passed": true,
           "requirement_id": "payment.charged"
+        },
+        {
+          "actual": 1,
+          "passed": true,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
+          "actual": "",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "accepted",
+          "passed": false,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": "",
+          "passed": false,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "submitted",
+            "payment_status": "charged"
+          },
+          "passed": false,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "checkout.safe_recovery"
+        }
+      ],
+      "confirmation": "accepted",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "submitted",
+        "payment_status": "charged"
+      },
+      "scenario_id": "success",
+      "status": "succeeded"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T00:00:00.000Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 1162,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "not_applicable",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "false",
+        "surface": "human-ui",
+        "tool_result_type": "none",
+        "webmcp_api": "not_applicable"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:85ba40bae4ddca0b37f00f064a9bc502085774f93acf30c11aff94c207d7cf62",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/authorization-denied--human-ui.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "human-ui",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
+          },
+          "passed": true,
+          "requirement_id": "checkout.exact_scope"
+        },
+        {
+          "actual": "authorization_denied",
+          "passed": true,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "not_reached",
+          "passed": false,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": "not_reached",
+          "passed": false,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.idempotent"
+        },
+        {
+          "actual": "authorization_denied",
+          "passed": false,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "checkout.safe_recovery"
+        }
+      ],
+      "confirmation": "not_reached",
+      "error_code": "authorization_denied",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "authorization-denied",
+      "status": "denied"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T00:00:00.000Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 1017,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "json_string_compat",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "true",
+        "surface": "webmcp",
+        "tool_result_type": "object",
+        "webmcp_api": "document.modelContext"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:39d9ffc4ad6186d21dff2effcf3fda8f0856a3a0dd6afb8ada421ead22c98601",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/authorization-denied--webmcp.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "webmcp",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
+          },
+          "passed": true,
+          "requirement_id": "checkout.exact_scope"
+        },
+        {
+          "actual": "authorization_denied",
+          "passed": true,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "not_reached",
+          "passed": false,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": "not_reached",
+          "passed": false,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.idempotent"
+        },
+        {
+          "actual": "authorization_denied",
+          "passed": false,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "checkout.safe_recovery"
+        }
+      ],
+      "confirmation": "not_reached",
+      "error_code": "authorization_denied",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "authorization-denied",
+      "status": "denied"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T00:00:00.000Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 982,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "not_applicable",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "false",
+        "surface": "human-ui",
+        "tool_result_type": "none",
+        "webmcp_api": "not_applicable"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:85ba40bae4ddca0b37f00f064a9bc502085774f93acf30c11aff94c207d7cf62",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/confirmation-declined--human-ui.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "human-ui",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
+          },
+          "passed": true,
+          "requirement_id": "checkout.exact_scope"
+        },
+        {
+          "actual": "declined",
+          "passed": true,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "declined",
+          "passed": true,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": "confirmation_declined",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "declined",
+          "passed": false,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.idempotent"
+        },
+        {
+          "actual": "confirmation_declined",
+          "passed": false,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "checkout.safe_recovery"
+        }
+      ],
+      "confirmation": "declined",
+      "error_code": "confirmation_declined",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "confirmation-declined",
+      "status": "cancelled"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T00:00:00.000Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 972,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "json_string_compat",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "true",
+        "surface": "webmcp",
+        "tool_result_type": "object",
+        "webmcp_api": "document.modelContext"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:39d9ffc4ad6186d21dff2effcf3fda8f0856a3a0dd6afb8ada421ead22c98601",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/confirmation-declined--webmcp.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "webmcp",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
+          },
+          "passed": true,
+          "requirement_id": "checkout.exact_scope"
+        },
+        {
+          "actual": "declined",
+          "passed": true,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "declined",
+          "passed": true,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": "confirmation_declined",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "declined",
+          "passed": false,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.idempotent"
+        },
+        {
+          "actual": "confirmation_declined",
+          "passed": false,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "checkout.safe_recovery"
+        }
+      ],
+      "confirmation": "declined",
+      "error_code": "confirmation_declined",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "confirmation-declined",
+      "status": "cancelled"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T00:00:00.000Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 1090,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "not_applicable",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "false",
+        "surface": "human-ui",
+        "tool_result_type": "none",
+        "webmcp_api": "not_applicable"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:83452ed6c3c79db94063a2465baa83a74d4908124b96bd810d21fc573e957baf",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/business-failure--human-ui.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "human-ui",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
+          },
+          "passed": true,
+          "requirement_id": "checkout.exact_scope"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": {
+            "attempt_count": 1,
+            "audit_count": 0,
+            "charge_count": 0,
+            "error_code": "payment_provider_unavailable"
+          },
+          "passed": true,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": "payment_provider_unavailable",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "accepted",
+          "passed": false,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.idempotent"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "checkout.safe_recovery"
+        }
+      ],
+      "confirmation": "accepted",
+      "error_code": "payment_provider_unavailable",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "business-failure",
+      "status": "failed"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T00:00:00.000Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 1067,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "json_string_compat",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "true",
+        "surface": "webmcp",
+        "tool_result_type": "object",
+        "webmcp_api": "document.modelContext"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:fffc01f3772db7abdad72842fa60af204752161c9fc57bdce33f1b5f01f52d61",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/business-failure--webmcp.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "webmcp",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
+          },
+          "passed": true,
+          "requirement_id": "checkout.exact_scope"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": {
+            "attempt_count": 1,
+            "audit_count": 0,
+            "charge_count": 0,
+            "error_code": "payment_provider_unavailable"
+          },
+          "passed": true,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": "payment_provider_unavailable",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "accepted",
+          "passed": false,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.idempotent"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
+          "actual": false,
+          "passed": false,
+          "requirement_id": "checkout.safe_recovery"
+        }
+      ],
+      "confirmation": "accepted",
+      "error_code": "payment_provider_unavailable",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "business-failure",
+      "status": "failed"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T00:00:00.000Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 1028,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "not_applicable",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "false",
+        "surface": "human-ui",
+        "tool_result_type": "none",
+        "webmcp_api": "not_applicable"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:10e033b401aabe9c447e8aef8a6af9f861637bfaa5d2da7f5bc34916bb9f0638",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/recovery--human-ui.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "human-ui",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
+          },
+          "passed": true,
+          "requirement_id": "checkout.exact_scope"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": {
+            "attempt_count": 2,
+            "recovered": true
+          },
+          "passed": true,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
+          "actual": {
+            "attempt_count": 2,
+            "audit_count": 1,
+            "charge_count": 1
+          },
+          "passed": true,
+          "requirement_id": "payment.idempotent"
+        },
+        {
+          "actual": 1,
+          "passed": true,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "submitted",
+          "passed": true,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "charged",
+          "passed": true,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": 1,
+          "passed": true,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
+          "actual": {
+            "attempt_count": 2,
+            "recovered": true
+          },
+          "passed": true,
+          "requirement_id": "checkout.safe_recovery"
         },
         {
           "actual": "",
@@ -172,96 +1069,14 @@
         "order_status": "submitted",
         "payment_status": "charged"
       },
-      "scenario_id": "success",
-      "status": "succeeded"
+      "scenario_id": "recovery",
+      "status": "recovered"
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-08-29T16:38:41.096Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 907,
-      "environment": {
-        "adapter": "@aicorg/evidence-playwright",
-        "argument_encoding": "not_applicable",
-        "browser": "Google Chrome",
-        "browser_version": "152.0.7977.65",
-        "feature_mode": "testing_flag",
-        "native_webmcp": "false",
-        "surface": "human-ui",
-        "tool_result_type": "none",
-        "webmcp_api": "not_applicable"
-      },
-      "evidence": [
-        {
-          "digest": "sha256:201be7fed0e5c68abab98ea3c3f0dbef3a55eeb0aa534b1b070aebf8e3b3f95a",
-          "kind": "screenshot",
-          "ref": "aic-browser-evidence/authorization-denied--human-ui.png"
-        }
-      ],
-      "mode": "executed",
-      "operation_id": "checkout.complete.domain",
-      "surface_id": "human-ui",
-      "checks": [
-        {
-          "actual": "draft",
-          "passed": true,
-          "requirement_id": "order.is_draft"
-        },
-        {
-          "actual": "authorization_denied",
-          "passed": true,
-          "requirement_id": "authorization.denied"
-        },
-        {
-          "actual": {
-            "order_id": "ord_100245",
-            "order_status": "draft",
-            "payment_status": "unpaid"
-          },
-          "passed": true,
-          "requirement_id": "order.unchanged"
-        },
-        {
-          "actual": "not_reached",
-          "passed": false,
-          "requirement_id": "confirmation.accepted"
-        },
-        {
-          "actual": "not_reached",
-          "passed": false,
-          "requirement_id": "confirmation.declined"
-        },
-        {
-          "actual": 0,
-          "passed": false,
-          "requirement_id": "payment.charge"
-        },
-        {
-          "actual": "draft",
-          "passed": false,
-          "requirement_id": "order.submitted"
-        },
-        {
-          "actual": "unpaid",
-          "passed": false,
-          "requirement_id": "payment.charged"
-        }
-      ],
-      "confirmation": "not_reached",
-      "error_code": "authorization_denied",
-      "outcome": {
-        "order_id": "ord_100245",
-        "order_status": "draft",
-        "payment_status": "unpaid"
-      },
-      "scenario_id": "authorization-denied",
-      "status": "denied"
-    },
-    {
-      "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-08-29T16:38:41.096Z",
-      "contract_id": "checkout.complete.behavior",
-      "duration_ms": 911,
+      "duration_ms": 982,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "json_string_compat",
@@ -275,9 +1090,9 @@
       },
       "evidence": [
         {
-          "digest": "sha256:6fd7cde8d50d85196c675c3d73a7d224885dabf9e0cbc749f1d51f8a7c06c35b",
+          "digest": "sha256:9b422ed060d9dbd7171690452f880d44188857965a31423ad9045e89b6f51cc9",
           "kind": "screenshot",
-          "ref": "aic-browser-evidence/authorization-denied--webmcp.png"
+          "ref": "aic-browser-evidence/recovery--webmcp.png"
         }
       ],
       "mode": "executed",
@@ -290,228 +1105,97 @@
           "requirement_id": "order.is_draft"
         },
         {
-          "actual": "authorization_denied",
-          "passed": true,
-          "requirement_id": "authorization.denied"
-        },
-        {
           "actual": {
             "order_id": "ord_100245",
-            "order_status": "draft",
-            "payment_status": "unpaid"
+            "order_total": "$177.00",
+            "payment_method": "Visa ending 4242"
           },
           "passed": true,
-          "requirement_id": "order.unchanged"
+          "requirement_id": "checkout.exact_scope"
         },
         {
-          "actual": "not_reached",
-          "passed": false,
-          "requirement_id": "confirmation.accepted"
-        },
-        {
-          "actual": "not_reached",
-          "passed": false,
-          "requirement_id": "confirmation.declined"
-        },
-        {
-          "actual": 0,
-          "passed": false,
-          "requirement_id": "payment.charge"
-        },
-        {
-          "actual": "draft",
-          "passed": false,
-          "requirement_id": "order.submitted"
-        },
-        {
-          "actual": "unpaid",
-          "passed": false,
-          "requirement_id": "payment.charged"
-        }
-      ],
-      "confirmation": "not_reached",
-      "error_code": "authorization_denied",
-      "outcome": {
-        "order_id": "ord_100245",
-        "order_status": "draft",
-        "payment_status": "unpaid"
-      },
-      "scenario_id": "authorization-denied",
-      "status": "denied"
-    },
-    {
-      "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-08-29T16:38:41.096Z",
-      "contract_id": "checkout.complete.behavior",
-      "duration_ms": 948,
-      "environment": {
-        "adapter": "@aicorg/evidence-playwright",
-        "argument_encoding": "not_applicable",
-        "browser": "Google Chrome",
-        "browser_version": "152.0.7977.65",
-        "feature_mode": "testing_flag",
-        "native_webmcp": "false",
-        "surface": "human-ui",
-        "tool_result_type": "none",
-        "webmcp_api": "not_applicable"
-      },
-      "evidence": [
-        {
-          "digest": "sha256:201be7fed0e5c68abab98ea3c3f0dbef3a55eeb0aa534b1b070aebf8e3b3f95a",
-          "kind": "screenshot",
-          "ref": "aic-browser-evidence/confirmation-declined--human-ui.png"
-        }
-      ],
-      "mode": "executed",
-      "operation_id": "checkout.complete.domain",
-      "surface_id": "human-ui",
-      "checks": [
-        {
-          "actual": "draft",
-          "passed": true,
-          "requirement_id": "order.is_draft"
-        },
-        {
-          "actual": "declined",
+          "actual": "accepted",
           "passed": true,
           "requirement_id": "authorization.allowed"
         },
         {
-          "actual": "declined",
+          "actual": "accepted",
           "passed": true,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": {
+            "attempt_count": 2,
+            "recovered": true
+          },
+          "passed": true,
+          "requirement_id": "execution.failure_isolated"
+        },
+        {
+          "actual": {
+            "attempt_count": 2,
+            "audit_count": 1,
+            "charge_count": 1
+          },
+          "passed": true,
+          "requirement_id": "payment.idempotent"
+        },
+        {
+          "actual": 1,
+          "passed": true,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "submitted",
+          "passed": true,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "charged",
+          "passed": true,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": 1,
+          "passed": true,
+          "requirement_id": "checkout.audit_recorded"
+        },
+        {
+          "actual": {
+            "attempt_count": 2,
+            "recovered": true
+          },
+          "passed": true,
+          "requirement_id": "checkout.safe_recovery"
+        },
+        {
+          "actual": "",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "accepted",
+          "passed": false,
           "requirement_id": "confirmation.declined"
         },
         {
           "actual": {
             "order_id": "ord_100245",
-            "order_status": "draft",
-            "payment_status": "unpaid"
+            "order_status": "submitted",
+            "payment_status": "charged"
           },
-          "passed": true,
+          "passed": false,
           "requirement_id": "order.unchanged"
-        },
-        {
-          "actual": "confirmation_declined",
-          "passed": false,
-          "requirement_id": "authorization.denied"
-        },
-        {
-          "actual": "declined",
-          "passed": false,
-          "requirement_id": "confirmation.accepted"
-        },
-        {
-          "actual": 0,
-          "passed": false,
-          "requirement_id": "payment.charge"
-        },
-        {
-          "actual": "draft",
-          "passed": false,
-          "requirement_id": "order.submitted"
-        },
-        {
-          "actual": "unpaid",
-          "passed": false,
-          "requirement_id": "payment.charged"
         }
       ],
-      "confirmation": "declined",
-      "error_code": "confirmation_declined",
+      "confirmation": "accepted",
       "outcome": {
         "order_id": "ord_100245",
-        "order_status": "draft",
-        "payment_status": "unpaid"
+        "order_status": "submitted",
+        "payment_status": "charged"
       },
-      "scenario_id": "confirmation-declined",
-      "status": "cancelled"
-    },
-    {
-      "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-08-29T16:38:41.096Z",
-      "contract_id": "checkout.complete.behavior",
-      "duration_ms": 910,
-      "environment": {
-        "adapter": "@aicorg/evidence-playwright",
-        "argument_encoding": "json_string_compat",
-        "browser": "Google Chrome",
-        "browser_version": "152.0.7977.65",
-        "feature_mode": "testing_flag",
-        "native_webmcp": "true",
-        "surface": "webmcp",
-        "tool_result_type": "object",
-        "webmcp_api": "document.modelContext"
-      },
-      "evidence": [
-        {
-          "digest": "sha256:6fd7cde8d50d85196c675c3d73a7d224885dabf9e0cbc749f1d51f8a7c06c35b",
-          "kind": "screenshot",
-          "ref": "aic-browser-evidence/confirmation-declined--webmcp.png"
-        }
-      ],
-      "mode": "executed",
-      "operation_id": "checkout.complete.domain",
-      "surface_id": "webmcp",
-      "checks": [
-        {
-          "actual": "draft",
-          "passed": true,
-          "requirement_id": "order.is_draft"
-        },
-        {
-          "actual": "declined",
-          "passed": true,
-          "requirement_id": "authorization.allowed"
-        },
-        {
-          "actual": "declined",
-          "passed": true,
-          "requirement_id": "confirmation.declined"
-        },
-        {
-          "actual": {
-            "order_id": "ord_100245",
-            "order_status": "draft",
-            "payment_status": "unpaid"
-          },
-          "passed": true,
-          "requirement_id": "order.unchanged"
-        },
-        {
-          "actual": "confirmation_declined",
-          "passed": false,
-          "requirement_id": "authorization.denied"
-        },
-        {
-          "actual": "declined",
-          "passed": false,
-          "requirement_id": "confirmation.accepted"
-        },
-        {
-          "actual": 0,
-          "passed": false,
-          "requirement_id": "payment.charge"
-        },
-        {
-          "actual": "draft",
-          "passed": false,
-          "requirement_id": "order.submitted"
-        },
-        {
-          "actual": "unpaid",
-          "passed": false,
-          "requirement_id": "payment.charged"
-        }
-      ],
-      "confirmation": "declined",
-      "error_code": "confirmation_declined",
-      "outcome": {
-        "order_id": "ord_100245",
-        "order_status": "draft",
-        "payment_status": "unpaid"
-      },
-      "scenario_id": "confirmation-declined",
-      "status": "cancelled"
+      "scenario_id": "recovery",
+      "status": "recovered"
     }
   ]
 }

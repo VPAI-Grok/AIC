@@ -9,6 +9,7 @@ Short, shareable writeups for launch, adoption, and proof.
 - [📊 What The Benchmarks Actually Prove](./updates-2026-04-09-proof.md)
 - [Standards Describe; AIC Proves](./updates-2026-08-28-behavior-assurance.md)
 - [AIC Verified: Native WebMCP Evidence You Can Verify](./updates-2026-08-29-aic-verified.md)
+- [Open Ecosystem Conformance: Assurance Across Browser, MCP, and HTTP](./updates-2026-08-29-open-ecosystem-conformance.md)
 
 ## How To Use These
 
@@ -17,3 +18,4 @@ Short, shareable writeups for launch, adoption, and proof.
 - Use the **proof post** when someone asks, “Does this actually work?”
 - Use the **behavior assurance post** to explain why AIC remains useful as WebMCP expands.
 - Use the **AIC Verified post** to introduce native browser evidence, signed deployment claims, and the open trust registry.
+- Use the **Open Ecosystem Conformance post** to introduce cross-protocol evidence, reusable packs, policy, remote runners, and the honest external-adoption boundary.

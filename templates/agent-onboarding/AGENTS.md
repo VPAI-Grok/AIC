@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 5 -->
 # AIC Agent Onboarding
 
 Use AIC when this repo needs reliable interaction semantics and behavioral assurance for AI agents.
@@ -13,6 +13,7 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 6. Add behavior contracts and executable scenarios for consequential multi-surface actions.
 7. Run `aic verify` before claiming behavioral parity.
 8. Use rendered/native evidence and a deployment-bound signed claim before asking other systems to rely on the proof.
+9. Bind consequential operations to an open conformance pack and enforce the applicable assurance policy in CI.
 
 ## Rules
 
@@ -26,6 +27,9 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 - readiness and executed proof are separate claims
 - a signed issuer claim is not independent production certification
 - registries are untrusted discovery and require a separately pinned trust store
+- remote mutation evidence requires separate operator capability and exact canary scope
+- transparency indexes are locally signed append-only evidence, not automatic global transparency
+- key transitions must be verified against the pinned prior trust store before application
 - generated JSON stays generated
 
 ## WebMCP Rules
@@ -48,3 +52,7 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 - `aic verify <behavior-contract-file> --harness <module> --out-file <proof-file>`
 - `aic trust verify <attestation-file> --trust-store <file> --contract <contract-file> --proof <proof-file> --expect-origin <origin> --expect-revision <revision>`
 - `aic registry verify <registry-file> --trust-store <file>`
+- `aic conformance verify <pack-id-or-file> <binding> <contract> --proof <proof-file>`
+- `aic policy evaluate <policy> <contract> <proof> --observations <file>`
+- `aic interop verify <suite>`
+- `aic evidence verify <bundle> --runner-public-key <file> --runner-key-id <id>`

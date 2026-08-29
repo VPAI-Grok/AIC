@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/conformance-binding.schema.json",
+  "title": "AIC Conformance Binding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "spec",
+    "authored",
+    "pack",
+    "contract",
+    "requirement_map",
+    "scenario_map",
+    "surface_roles"
+  ],
+  "properties": {
+    "artifact_type": { "const": "aic_conformance_binding" },
+    "spec": { "const": "aic.conformance/0.1" },
+    "authored": { "const": true },
+    "pack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "digest", "profile"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "version": { "type": "string", "minLength": 1 },
+        "digest": { "$ref": "#/$defs/digest" },
+        "profile": { "$ref": "#/$defs/stableId" }
+      }
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "digest"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "digest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "requirement_map": { "$ref": "#/$defs/mapping" },
+    "scenario_map": { "$ref": "#/$defs/mapping" },
+    "surface_roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["human", "agent"],
+      "anyOf": [
+        { "properties": { "human": { "minItems": 1 } } },
+        { "properties": { "agent": { "minItems": 1 } } }
+      ],
+      "properties": {
+        "human": { "$ref": "#/$defs/idArrayAllowEmpty" },
+        "agent": { "$ref": "#/$defs/idArrayAllowEmpty" }
+      }
+    }
+  },
+  "$defs": {
+    "stableId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "idArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "idArrayAllowEmpty": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "mapping": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/stableId" },
+      "additionalProperties": { "$ref": "#/$defs/idArray" }
+    }
+  }
+}

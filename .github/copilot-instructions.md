@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 5 -->
 # GitHub Copilot AIC Instructions
 
 Use [AGENTS.md](../AGENTS.md) as the canonical AIC instruction set for this repo.

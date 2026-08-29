@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/evidence-plan.schema.json",
+  "title": "AIC Evidence Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "contract", "id", "spec", "surfaces"],
+  "properties": {
+    "artifact_type": { "const": "aic_evidence_plan" },
+    "spec": { "const": "aic.evidence/0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "contract": { "$ref": "#/$defs/contractReference" },
+    "surfaces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/httpSurface" },
+          { "$ref": "#/$defs/mcpSurface" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "contractReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest", "id"],
+      "properties": {
+        "digest": { "$ref": "#/$defs/digest" },
+        "id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "expression": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "literal": {},
+        "source": { "type": "string", "minLength": 1 },
+        "pointer": { "type": "string", "pattern": "^$|^/" }
+      },
+      "oneOf": [
+        { "required": ["literal"], "not": { "required": ["source"] } },
+        { "required": ["source"], "not": { "required": ["literal"] } }
+      ],
+      "dependentRequired": { "pointer": ["source"] }
+    },
+    "predicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operator"],
+      "properties": {
+        "literal": {},
+        "source": { "type": "string", "minLength": 1 },
+        "pointer": { "type": "string", "pattern": "^$|^/" },
+        "operator": {
+          "enum": ["absent", "equals", "exists", "falsy", "greater_than", "less_than", "not_equals", "truthy"]
+        },
+        "value": {}
+      },
+      "oneOf": [
+        { "required": ["literal"], "not": { "required": ["source"] } },
+        { "required": ["source"], "not": { "required": ["literal"] } }
+      ],
+      "dependentRequired": { "pointer": ["source"] },
+      "allOf": [
+        {
+          "if": { "properties": { "operator": { "enum": ["equals", "greater_than", "less_than", "not_equals"] } } },
+          "then": { "required": ["value"] },
+          "else": { "not": { "required": ["value"] } }
+        }
+      ]
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checks", "status"],
+      "properties": {
+        "status": { "$ref": "#/$defs/expression" },
+        "confirmation": { "$ref": "#/$defs/expression" },
+        "error_code": { "$ref": "#/$defs/expression" },
+        "outcome": { "$ref": "#/$defs/expression" },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["observed_when", "requirement_id"],
+            "properties": {
+              "requirement_id": { "type": "string", "minLength": 1 },
+              "observed_when": { "$ref": "#/$defs/predicate" },
+              "actual": { "$ref": "#/$defs/expression" }
+            }
+          }
+        }
+      }
+    },
+    "headerValue": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["secret_ref"],
+          "properties": { "secret_ref": { "type": "string", "minLength": 1 } }
+        }
+      ]
+    },
+    "headers": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/headerValue" }
+    },
+    "httpRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": { "enum": ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"] },
+        "path": { "type": "string", "pattern": "^/" },
+        "headers": { "$ref": "#/$defs/headers" },
+        "body": {},
+        "query": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          }
+        }
+      }
+    },
+    "httpProbe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "phase", "request"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "phase": { "enum": ["after", "before"] },
+        "request": { "$ref": "#/$defs/httpRequest" }
+      }
+    },
+    "httpScenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mutates", "projection", "request", "scenario_id"],
+      "properties": {
+        "scenario_id": { "type": "string", "minLength": 1 },
+        "mutates": { "type": "boolean" },
+        "request": { "$ref": "#/$defs/httpRequest" },
+        "probes": { "type": "array", "items": { "$ref": "#/$defs/httpProbe" } },
+        "projection": { "$ref": "#/$defs/projection" }
+      }
+    },
+    "httpSurface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter", "scenarios", "surface_id"],
+      "properties": {
+        "adapter": { "const": "@aicorg/evidence-http" },
+        "surface_id": { "type": "string", "minLength": 1 },
+        "timeout_ms": { "type": "integer", "minimum": 1 },
+        "max_response_bytes": { "type": "integer", "minimum": 1 },
+        "capture_response_body": { "type": "boolean" },
+        "openapi": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["document", "operation_id"],
+          "properties": {
+            "document": {},
+            "operation_id": { "type": "string", "minLength": 1 }
+          }
+        },
+        "scenarios": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/httpScenario" } }
+      }
+    },
+    "mcpCall": {
+      "type": "object",
+      "properties": {
+        "tool_name": { "type": "string", "minLength": 1 },
+        "arguments": { "type": "object" }
+      },
+      "required": ["arguments", "tool_name"]
+    },
+    "mcpProbe": {
+      "allOf": [
+        { "$ref": "#/$defs/mcpCall" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "phase"],
+          "properties": {
+            "arguments": { "type": "object" },
+            "tool_name": { "type": "string", "minLength": 1 },
+            "id": { "type": "string", "minLength": 1 },
+            "phase": { "enum": ["after", "before"] }
+          }
+        }
+      ]
+    },
+    "mcpScenario": {
+      "allOf": [
+        { "$ref": "#/$defs/mcpCall" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mutates", "projection", "scenario_id"],
+          "properties": {
+            "arguments": { "type": "object" },
+            "tool_name": { "type": "string", "minLength": 1 },
+            "scenario_id": { "type": "string", "minLength": 1 },
+            "mutates": { "type": "boolean" },
+            "probes": { "type": "array", "items": { "$ref": "#/$defs/mcpProbe" } },
+            "projection": { "$ref": "#/$defs/projection" }
+          }
+        }
+      ]
+    },
+    "mcpSurface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter", "endpoint", "scenarios", "surface_id"],
+      "properties": {
+        "adapter": { "const": "@aicorg/evidence-mcp" },
+        "surface_id": { "type": "string", "minLength": 1 },
+        "endpoint": { "type": "string", "minLength": 1 },
+        "headers": { "$ref": "#/$defs/headers" },
+        "timeout_ms": { "type": "integer", "minimum": 1 },
+        "max_response_bytes": { "type": "integer", "minimum": 1 },
+        "scenarios": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/mcpScenario" } }
+      }
+    }
+  }
+}

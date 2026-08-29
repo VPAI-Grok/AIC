@@ -1,0 +1,158 @@
+{
+  "contract": {
+    "artifact_type": "aic_behavior_contract",
+    "spec": "aic.behavior/0.1",
+    "id": "interop.read.behavior",
+    "title": "Interop read",
+    "description": "Stable verifier fixture",
+    "action": {
+      "id": "record.read",
+      "operation_id": "record.read.domain",
+      "risk": "low"
+    },
+    "surfaces": [
+      {
+        "id": "http",
+        "kind": "openapi",
+        "label": "HTTP",
+        "entrypoint": "GET /records/1"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "record.returned",
+        "phase": "postcondition",
+        "description": "Record returned"
+      }
+    ],
+    "scenarios": [
+      {
+        "id": "success",
+        "title": "Read succeeds",
+        "surfaces": ["http"],
+        "parity": "independent",
+        "expected": {
+          "status": "succeeded",
+          "required_requirements": ["record.returned"],
+          "outcome": { "id": "1" }
+        }
+      }
+    ]
+  },
+  "observations": {
+    "artifact_type": "aic_behavior_observation_set",
+    "contract_id": "interop.read.behavior",
+    "generated_at": "2026-08-29T12:00:00.000Z",
+    "observations": [
+      {
+        "artifact_type": "aic_behavior_observation",
+        "captured_at": "2026-08-29T12:00:00.000Z",
+        "checks": [
+          {
+            "actual": true,
+            "passed": true,
+            "requirement_id": "record.returned"
+          }
+        ],
+        "contract_id": "interop.read.behavior",
+        "mode": "executed",
+        "operation_id": "record.read.domain",
+        "outcome": { "id": "1" },
+        "scenario_id": "success",
+        "status": "succeeded",
+        "surface_id": "http"
+      }
+    ]
+  },
+  "proof": {
+    "artifact_type": "aic_behavior_proof",
+    "contract": {
+      "digest": "sha256:e2a8b1bc652765c7d38f678aebc813a87fd4a4d1c3c0d16356aa0859fb923bd7",
+      "id": "interop.read.behavior",
+      "spec": "aic.behavior/0.1"
+    },
+    "evidence_level": "executed",
+    "findings": [],
+    "generated_at": "2026-08-29T12:00:01.000Z",
+    "observations_digest": "sha256:da83a09a8faed13006b63fee7ab880762090b36bf1e3f53cc715d85dfaf69231",
+    "proof_version": "0.1",
+    "scenarios": [
+      {
+        "finding_count": 0,
+        "parity": "not_required",
+        "scenario_id": "success",
+        "status": "passed",
+        "surfaces": [
+          {
+            "finding_count": 0,
+            "observation_mode": "executed",
+            "status": "passed",
+            "surface_id": "http"
+          }
+        ]
+      }
+    ],
+    "status": "passed",
+    "summary": {
+      "failed_scenarios": 0,
+      "observations": 1,
+      "passed_scenarios": 1,
+      "required_observations": 1,
+      "scenarios": 1
+    }
+  },
+  "trust_store": {
+    "artifact_type": "aic_trust_store",
+    "keys": [
+      {
+        "allowed_origins": ["https://interop.example"],
+        "issuer_id": "interop.fixture",
+        "key_id": "sha256:fb7d32adb67c1dbd91ec7d6ed7d64dd133158add1d4f4611f62cfe2ba12e3fbb",
+        "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA8IHo7KoOP+T3tg2MUzGUjuHLMk1PU+EIy3afcgNWnHA=\n-----END PUBLIC KEY-----\n",
+        "status": "active",
+        "valid_from": "2026-08-29T11:00:00.000Z"
+      }
+    ],
+    "spec": "aic.trust/0.1",
+    "updated_at": "2026-08-29T11:00:00.000Z"
+  },
+  "attestation": {
+    "artifact_type": "aic_signed_attestation",
+    "payload_type": "application/vnd.aic.trust-statement+json",
+    "signature": {
+      "algorithm": "ed25519",
+      "key_id": "sha256:fb7d32adb67c1dbd91ec7d6ed7d64dd133158add1d4f4611f62cfe2ba12e3fbb",
+      "value": "VFFGT6rBIHXBriEswf7Kn1HmM64ZjW3xWCSJPDVtIHFdyA2fHeJgKoQgbI2jjQezxaV+HgNh1MAuVFT3NS6NAg=="
+    },
+    "spec": "aic.trust/0.1",
+    "statement": {
+      "artifact_type": "aic_trust_statement",
+      "deployment": {
+        "deployment_id": "interop-1",
+        "environment": "test",
+        "origin": "https://interop.example",
+        "source_revision": "0123456789abcdef0123456789abcdef01234567"
+      },
+      "expires_at": "2026-08-30T12:00:00.000Z",
+      "issued_at": "2026-08-29T12:00:02.000Z",
+      "issuer": {
+        "id": "interop.fixture",
+        "kind": "organization"
+      },
+      "runner": {
+        "id": "interop-runner",
+        "kind": "remote"
+      },
+      "spec": "aic.trust/0.1",
+      "subject": {
+        "contract_digest": "sha256:e2a8b1bc652765c7d38f678aebc813a87fd4a4d1c3c0d16356aa0859fb923bd7",
+        "contract_id": "interop.read.behavior",
+        "evidence_level": "executed",
+        "generated_at": "2026-08-29T12:00:01.000Z",
+        "operation_id": "record.read.domain",
+        "proof_digest": "sha256:539f992ae804231c6eabf945dcfcf45a26b192079eaf25c74d2e93c304f1501a",
+        "proof_status": "passed"
+      }
+    }
+  }
+}

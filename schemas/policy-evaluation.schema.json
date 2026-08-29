@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/policy-evaluation.schema.json",
+  "title": "AIC Policy Evaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "spec", "policy", "evaluated_at", "decision", "subjects", "context", "rules", "findings"],
+  "properties": {
+    "artifact_type": { "const": "aic_policy_evaluation" },
+    "spec": { "const": "aic.policy/0.1" },
+    "policy": { "$ref": "#/$defs/digestRef" },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "decision": { "enum": ["passed", "failed", "indeterminate"] },
+    "subjects": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contract_digest": { "$ref": "#/$defs/digest" },
+        "observations_digest": { "$ref": "#/$defs/digest" },
+        "proof_digest": { "$ref": "#/$defs/digest" },
+        "attestation_digest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "environment": { "enum": ["production", "staging", "test", "development"] },
+        "expected_origin": { "type": "string", "minLength": 1 },
+        "expected_revision": { "type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$" }
+      }
+    },
+    "rules": { "type": "array", "items": { "$ref": "#/$defs/rule" } },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "digestRef": { "type": "object", "additionalProperties": false, "required": ["id", "digest"], "properties": { "id": { "type": "string", "minLength": 1 }, "digest": { "$ref": "#/$defs/digest" } } },
+    "finding": { "type": "object", "additionalProperties": false, "required": ["code", "message"], "properties": { "code": { "type": "string", "minLength": 1 }, "message": { "type": "string", "minLength": 1 }, "rule_id": { "type": "string", "minLength": 1 } } },
+    "rule": { "type": "object", "additionalProperties": false, "required": ["id", "status", "findings"], "properties": { "id": { "type": "string", "minLength": 1 }, "status": { "enum": ["passed", "failed", "not_applicable"] }, "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } } } }
+  }
+}

@@ -6,35 +6,35 @@
         "path": "AGENTS.md",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "wrapper",
         "path": "CLAUDE.md",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "wrapper",
         "path": "GEMINI.md",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "copilot_instructions",
         "path": ".github/copilot-instructions.md",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "cursor_rule",
         "path": ".cursor/rules/aic.mdc",
         "recommended": true,
         "status": "present",
-        "template_version": "4"
+        "template_version": "5"
       },
       {
         "kind": "wrapper",
@@ -50,7 +50,7 @@
       "stale": 0,
       "warnings": 0
     },
-    "template_version": "4",
+    "template_version": "5",
     "warnings": []
   },
   "diagnostics": [],

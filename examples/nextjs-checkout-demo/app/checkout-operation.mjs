@@ -1,6 +1,7 @@
 /**
  * @typedef {{ order_id: string; order_total: string; payment_method: string }} CheckoutRequest
  * @typedef {{ order_id: string; payment_status: "charged"; status: "submitted" }} CheckoutResult
+ * @typedef {{ fail_before_commit?: boolean }} CheckoutExecutionOptions
  */
 
 export const CHECKOUT_REQUEST = /** @type {Readonly<CheckoutRequest>} */ (
@@ -41,17 +42,45 @@ export function authorizeCheckoutRequest(input, orderStatus, permissionGranted =
   );
 }
 
+export class CheckoutExecutionError extends Error {
+  /** @type {string} */
+  code;
+
+  /**
+   * @param {string} code
+   * @param {string} message
+   */
+  constructor(code, message) {
+    super(message);
+    this.name = "CheckoutExecutionError";
+    this.code = code;
+  }
+}
+
 /**
  * The one domain operation used after either the human UI or WebMCP guardrails pass.
  *
  * @param {CheckoutRequest} input
- * @param {(status: "processing" | "submitted") => void} [transition]
+ * @param {(status: "draft" | "processing" | "submitted") => void} [transition]
+ * @param {CheckoutExecutionOptions} [options]
  * @returns {Promise<CheckoutResult>}
  */
-export async function executeCheckoutDomainOperation(input, transition = () => undefined) {
+export async function executeCheckoutDomainOperation(
+  input,
+  transition = () => undefined,
+  options = {}
+) {
   validateCheckoutRequest(input);
   transition("processing");
   await Promise.resolve();
+
+  if (options.fail_before_commit) {
+    transition("draft");
+    throw new CheckoutExecutionError(
+      "payment_provider_unavailable",
+      "The payment provider was unavailable before the charge committed."
+    );
+  }
 
   const result = /** @type {CheckoutResult} */ ({
     order_id: input.order_id,

@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/conformance-pack.schema.json",
+  "title": "AIC Conformance Pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "spec", "id", "version", "title", "description", "profiles"],
+  "properties": {
+    "artifact_type": { "const": "aic_conformance_pack" },
+    "spec": { "const": "aic.conformance/0.1" },
+    "id": { "$ref": "#/$defs/stableId" },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/profile" }
+    }
+  },
+  "$defs": {
+    "stableId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "scenarioClass": {
+      "enum": [
+        "success",
+        "authorization_denial",
+        "confirmation_decline",
+        "business_failure",
+        "recovery"
+      ]
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "description",
+        "required_scenario_classes",
+        "requirements",
+        "scenarios"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "required_scenario_classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioClass" }
+        },
+        "requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/requirement" }
+        },
+        "scenarios": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/scenario" }
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "phase", "description", "minimum_bindings"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "phase": {
+          "enum": ["precondition", "invariant", "side_effect", "postcondition", "recovery"]
+        },
+        "description": { "type": "string", "minLength": 1 },
+        "minimum_bindings": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "class",
+        "allowed_statuses",
+        "requirement_refs",
+        "surface_roles",
+        "parity"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/stableId" },
+        "class": { "$ref": "#/$defs/scenarioClass" },
+        "allowed_statuses": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["succeeded", "denied", "cancelled", "failed", "recovered"]
+          }
+        },
+        "allowed_confirmations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["accepted", "declined", "not_required", "not_reached"]
+          }
+        },
+        "requirement_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/stableId" }
+        },
+        "forbidden_requirement_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/stableId" }
+        },
+        "surface_roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["human", "agent"] }
+        },
+        "parity": { "enum": ["independent", "required"] }
+      }
+    }
+  }
+}

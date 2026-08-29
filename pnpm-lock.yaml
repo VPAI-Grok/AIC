@@ -339,12 +339,33 @@ importers:
       '@aicorg/automation-core':
         specifier: workspace:*
         version: link:../automation-core
+      '@aicorg/conformance-packs':
+        specifier: workspace:*
+        version: link:../conformance-packs
+      '@aicorg/evidence-core':
+        specifier: workspace:*
+        version: link:../evidence-core
+      '@aicorg/evidence-http':
+        specifier: workspace:*
+        version: link:../evidence-http
+      '@aicorg/evidence-mcp':
+        specifier: workspace:*
+        version: link:../evidence-mcp
       '@aicorg/plugin-vite':
         specifier: workspace:*
         version: link:../plugin-vite
       '@aicorg/runtime':
         specifier: workspace:*
         version: link:../runtime
+      '@aicorg/runner-remote':
+        specifier: workspace:*
+        version: link:../runner-remote
+      '@aicorg/spec':
+        specifier: workspace:*
+        version: link:../spec
+
+  packages/conformance-packs:
+    dependencies:
       '@aicorg/spec':
         specifier: workspace:*
         version: link:../spec
@@ -363,6 +384,30 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.2.4
+
+  packages/evidence-core:
+    dependencies:
+      '@aicorg/spec':
+        specifier: workspace:*
+        version: link:../spec
+
+  packages/evidence-http:
+    dependencies:
+      '@aicorg/evidence-core':
+        specifier: workspace:*
+        version: link:../evidence-core
+      '@aicorg/spec':
+        specifier: workspace:*
+        version: link:../spec
+
+  packages/evidence-mcp:
+    dependencies:
+      '@aicorg/evidence-core':
+        specifier: workspace:*
+        version: link:../evidence-core
+      '@aicorg/spec':
+        specifier: workspace:*
+        version: link:../spec
 
   packages/integrations-radix:
     dependencies:
@@ -426,6 +471,15 @@ importers:
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
+
+  packages/runner-remote:
+    dependencies:
+      '@aicorg/evidence-core':
+        specifier: workspace:*
+        version: link:../evidence-core
+      '@aicorg/spec':
+        specifier: workspace:*
+        version: link:../spec
 
   packages/runtime:
     dependencies:

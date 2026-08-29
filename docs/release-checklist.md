@@ -32,6 +32,26 @@
 - Trusted branch runs create GitHub artifact provenance for the packaged evidence archive.
 - Registry inclusion is described as discoverability, not endorsement or certification.
 
+## Open ecosystem conformance gates
+
+- Every built-in conformance pack and profile validates, includes the required scenario classes, and has a stable digest.
+- Contract-to-pack bindings reject missing mappings, unknown obligations, stale contract/pack/profile/mapping digests, and unreviewed substitution.
+- Proof-level conformance rejects failed proofs and checks phases, confirmation behavior, and surface roles.
+- Assurance policy regenerates proof from the supplied observations instead of trusting a producer summary.
+- Every matching policy rule is applied cumulatively, and an unmatched operation fails closed.
+- Policy tests cover freshness, required scenarios, evidence level, parity, conformance bindings, trust, origin/revision, and allowed issuer, key, runner kind, and runner identity pins.
+- Evidence plans and remote jobs reject unknown fields, executable modules, shell commands, callbacks, implicit secrets, and undeclared projections.
+- HTTP/OpenAPI and MCP adapters fail closed on malformed responses, missing projections, protocol errors, and observations that cannot satisfy the contract.
+- Remote collection resolves and pins public-network targets, rejects redirects, binds exact origin/deployment/source revision, and keeps raw evidence within declared limits.
+- Remote mutations are denied by default; mutation tests require exact operation/canary and operator grants, and uncertain mutations are never retried.
+- Evidence-bundle verification recomputes plan, observation, deployment-identity, and receipt bindings and verifies a pinned runner key when one is required.
+- Interoperability suites reject empty or structurally unknown suites and cover canonical JSON, digests, stable finding codes, attestation verification, and registry verification without checked-in usable private keys.
+- Transparency tests cover domain-separated entry and checkpoint digests, append-only sequence/previous-head rules, pinned checkpoint signatures, artifact bindings, and prefix consistency.
+- External receipt references are artifact-bound and reported `not_checked`; no provider receipt is described as cryptographically verified by AIC core.
+- Scheduled key transitions require valid signatures from both retiring and successor keys, bind prior and next trust stores, retain the retiring active key through `valid_until`, and reject origin broadening.
+- Rotation is documented as scheduled maintenance, not automated compromise recovery; revocation and out-of-band recovery remain separate operations.
+- The public adopter registry stays empty unless a genuine external submission passes the documented evidence-first checks.
+
 ## Clean-workspace gate
 
 - verification creates no unexpected tracked diffs;
@@ -58,9 +78,9 @@
 - package manifests remain public and include publish metadata;
 - tarball smoke tests pass;
 - package matrix docs match the exact publish wave;
-- `@aicorg/webmcp` and behavior assurance are not called published before registry verification; and
+- `@aicorg/webmcp`, the evidence packages, `@aicorg/runner-remote`, `@aicorg/conformance-packs`, and the extended behavior/trust tooling are not called published before registry verification; and
 - the manual publish workflow completes its configured checks before publishing.
 
 ## Not a release claim
 
-Passing these gates does not provide GA stability, non-React support, independent proof of production reachability, or independent certification.
+Passing these gates does not provide GA stability, non-React support, an external adopter, an independently operated hosted runner, independent proof of production reachability, a globally witnessed transparency service, provider verification of external receipt metadata, or independent certification.

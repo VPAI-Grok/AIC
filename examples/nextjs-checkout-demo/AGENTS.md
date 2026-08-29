@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 5 -->
 # AIC Agent Onboarding
 
 This example demonstrates the recommended AIC coding-agent onboarding file set.
@@ -13,3 +13,5 @@ This example demonstrates the recommended AIC coding-agent onboarding file set.
 6. Reuse the same checkout domain function for the human button and WebMCP tool.
 7. Keep `aic-behavior-contract.json` aligned with the domain operation and run `pnpm aic:verify` before claiming parity.
 8. Run `pnpm aic:verify:browser` for rendered/native claims, and treat signed claims or registry entries as issuer assertions rather than independent production certification.
+9. Regenerate and verify the authored `aic.pack.checkout/complete` binding after any contract change.
+10. Require the critical assurance policy to regenerate browser proof, pass all five scenarios, and verify the pinned origin/revision-bound CI claim.

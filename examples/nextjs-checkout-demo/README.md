@@ -9,9 +9,10 @@ This is the canonical end-to-end AIC example for a consequential action. It comb
 - progressive fallback when `document.modelContext` is unavailable;
 - one `executeCheckoutDomainOperation` used by both human UI and WebMCP paths;
 - an `aic.behavior/0.1` contract independent of either entrypoint;
-- executed success, authorization-denial, and confirmation-decline scenarios;
+- executed success, authorization-denial, confirmation-decline, business-failure, and recovery scenarios;
 - a deterministic domain proof;
-- a real Chrome proof that drives rendered human controls and native `document.modelContext` tools; and
+- a real Chrome proof that drives rendered human controls and native `document.modelContext` tools;
+- an authored, digest-bound `aic.pack.checkout/complete` mapping with passing deterministic and browser conformance results; and
 - digest-addressed screenshot evidence plus `/.well-known/aic-trust` registry discovery.
 
 The checked-in browser proof demonstrates this local fixture in Chrome `152.0.7977.65`. The CI workflow additionally creates a revision-bound signed claim and GitHub provenance bundle. Neither is independent proof that a production deployment is live.
@@ -26,9 +27,13 @@ The checked-in browser proof demonstrates this local fixture in Chrome `152.0.79
 | [`aic-behavior-contract.json`](./aic-behavior-contract.json) | Protocol-neutral requirements and parity scenarios |
 | [`aic-verification-harness.mjs`](./aic-verification-harness.mjs) | Trusted local observation collector |
 | [`aic-proof.json`](./aic-proof.json) | Generated behavior proof fixture |
+| [`aic-conformance-mapping.json`](./aic-conformance-mapping.json) | Reviewed checkout-pack-to-contract mapping source |
+| [`aic-conformance-binding.json`](./aic-conformance-binding.json) | Generated digest-bound `aic.pack.checkout/complete` binding |
+| [`aic-conformance-result.json`](./aic-conformance-result.json) | Passing conformance result for the deterministic proof |
 | [`aic-browser-verification-harness.mjs`](./aic-browser-verification-harness.mjs) | Real rendered UI and native WebMCP collector |
-| [`aic-browser-observations.json`](./aic-browser-observations.json) | Six browser observations with environment and screenshot references |
+| [`aic-browser-observations.json`](./aic-browser-observations.json) | Ten browser observations with environment and screenshot references |
 | [`aic-browser-proof.json`](./aic-browser-proof.json) | Passed native browser parity proof |
+| [`aic-browser-conformance-result.json`](./aic-browser-conformance-result.json) | Passing checkout conformance result for the native browser proof |
 | [`aic-browser-evidence/`](./aic-browser-evidence/) | Screenshot evidence with recorded SHA-256 digests |
 | [`aic.project.json`](./aic.project.json) | Project identity, permissions, and workflows |
 
@@ -42,6 +47,8 @@ pnpm --dir examples/nextjs-checkout-demo run aic:generate
 pnpm --dir examples/nextjs-checkout-demo run aic:webmcp
 pnpm --dir examples/nextjs-checkout-demo run aic:verify
 pnpm --dir examples/nextjs-checkout-demo run aic:verify:browser
+pnpm aic conformance bind aic.pack.checkout complete ./examples/nextjs-checkout-demo/aic-behavior-contract.json ./examples/nextjs-checkout-demo/aic-conformance-mapping.json --out-file ./examples/nextjs-checkout-demo/aic-conformance-binding.json
+pnpm aic conformance verify aic.pack.checkout ./examples/nextjs-checkout-demo/aic-conformance-binding.json ./examples/nextjs-checkout-demo/aic-behavior-contract.json --proof ./examples/nextjs-checkout-demo/aic-proof.json --generated-at 2026-08-29T00:00:00.000Z --out-file ./examples/nextjs-checkout-demo/aic-conformance-result.json
 pnpm --dir examples/nextjs-checkout-demo run dev
 ```
 
@@ -62,10 +69,12 @@ Expected summary:
 ```text
 Status: passed
 Evidence: executed
-Scenarios: 3/3 passed
-Observations: 6/6
+Scenarios: 5/5 passed
+Observations: 10/10
 Findings: 0
 ```
+
+The conformance results additionally report 11 requirement obligations, 5 scenario obligations, and zero findings. Bindings and results are generated through the library-backed CLI; only the mapping file is authored directly.
 
 The behavior test suite also mutates the WebMCP success outcome and asserts that both outcome conformance and parity fail.
 
@@ -76,8 +85,10 @@ The browser-evidence test recomputes every screenshot digest and verifies that e
 With the app running:
 
 - `/aic-proof` returns the deterministic proof;
+- `/aic-conformance-result` returns its checkout conformance result;
 - `/aic-browser-proof` returns the native browser proof;
-- `/aic-browser-observations` returns the raw observation set; and
+- `/aic-browser-observations` returns the raw observation set;
+- `/aic-browser-conformance-result` returns the native browser proof's checkout conformance result; and
 - `/.well-known/aic-trust` returns the open registry artifact.
 
 The checked-in registry is intentionally empty until a real issuer claim is added. CI-generated signed claims and trust stores are uploaded with the workflow evidence bundle rather than committed with an unsafe private key.

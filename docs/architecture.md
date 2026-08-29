@@ -288,6 +288,37 @@ The GitHub workflow adds a second provenance layer by using GitHub OIDC/Sigstore
 
 See [AIC Verified Trust Layer](./trust-layer.md).
 
+## Open Ecosystem Conformance
+
+The ecosystem layer keeps protocol execution, behavior proof, conformance, and reliance policy separate:
+
+```mermaid
+flowchart LR
+    BROWSER["human UI / WebMCP"] --> OBS["behavior observations"]
+    HTTP["HTTP / OpenAPI plan"] --> OBS
+    MCP["MCP plan"] --> OBS
+    REMOTE["remote deployment preflight"] --> HTTP
+    REMOTE --> MCP
+    CONTRACT["authored behavior contract"] --> PROOF["regenerated proof"]
+    OBS --> PROOF
+    PACK["versioned conformance pack"] --> CONF["digest-bound conformance result"]
+    BINDING["authored application mapping"] --> CONF
+    PROOF --> CONF
+    POLICY["consumer assurance policy"] --> DECISION["reliance decision"]
+    PROOF --> DECISION
+    CLAIM["signed deployment claim"] --> DECISION
+    CONF --> DECISION
+    DECISION --> HISTORY["signed checkpoint / external receipt reference"]
+```
+
+`@aicorg/evidence-core` owns strict plans, projections, artifacts, receipts, and bundle verification. `@aicorg/evidence-http` and `@aicorg/evidence-mcp` adapt their native protocols. `@aicorg/runner-remote` adds exact production identity, public-network pinning, bounded execution, and operator capabilities; it never executes submitted code.
+
+`@aicorg/conformance-packs` supplies versioned operation-class obligations. The application binding is explicit and digest-bound. `@aicorg/automation-core` then regenerates proof, verifies conformance, applies every matching assurance-policy rule, verifies portable compatibility suites, operates the reference transparency format, and validates scheduled dual-signed key transitions.
+
+The deployment application's source revision and the runner software revision are distinct bindings. They are not required to match.
+
+See [Protocol Evidence and Remote Observation](./evidence-adapters.md), [Conformance Packs](./conformance-packs.md), [Assurance Policy](./assurance-policy.md), and [Transparency and Key Rotation](./transparency-and-key-rotation.md).
+
 ---
 
 ## Bootstrap Pipeline (AI-Assisted Annotation)
@@ -339,6 +370,12 @@ flowchart TD
 | `aic trust attest` | Bind and sign a passed proof for an exact origin, deployment, and revision |
 | `aic trust verify` | Verify signature, issuer policy, expectations, contract, and proof bindings |
 | `aic registry build/verify/query` | Publish and consume independently verifiable signed-claim registries |
+| `aic evidence run-remote/verify` | Collect a data-only production job and recompute its bundle/receipt bindings |
+| `aic conformance list/show/bind/verify` | Inspect packs, author digest-bound mappings, and verify contract or proof conformance |
+| `aic policy evaluate` | Regenerate proof and apply cumulative consumer reliance policy |
+| `aic interop verify` | Execute portable canonicalization, digest, attestation, and registry vectors |
+| `aic transparency init/append/verify/consistency` | Operate and verify the signed reference history format |
+| `aic trust rotate/transition` | Prepare, verify, and apply dual-signed scheduled key transitions |
 | `aic bootstrap <url>` | Crawl with Playwright → LLM suggestions → bootstrap draft & report |
 | `aic generate project <config>` | Full artifact generation from `aic.project.json` |
 | `aic generate authoring-plan` | Build a proposal list from a runtime snapshot + bootstrap review |
