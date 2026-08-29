@@ -45,11 +45,15 @@ function parseToolResult(value) {
 async function waitForServer(baseUrl, timeoutMs = 90000) {
   const deadline = Date.now() + timeoutMs;
   let lastError;
+  let serverErrorCount = 0;
   while (Date.now() < deadline) {
     try {
       const response = await fetch(baseUrl, { redirect: "manual" });
       if (response.status < 500) return;
-      lastError = new Error(`HTTP ${response.status}`);
+      serverErrorCount += 1;
+      const body = (await response.text()).trim().slice(0, 2000);
+      lastError = new Error(`HTTP ${response.status}${body ? `: ${body}` : ""}`);
+      if (serverErrorCount >= 5) break;
     } catch (error) {
       lastError = error;
     }
@@ -82,18 +86,24 @@ async function ensureDemoServer(baseUrl) {
       stdio: ["ignore", "pipe", "pipe"]
     }
   );
-  let output = "";
+  let outputStart = "";
+  let outputTail = "";
+  const captureOutput = (chunk) => {
+    const text = chunk.toString();
+    if (outputStart.length < 6000) outputStart = `${outputStart}${text}`.slice(0, 6000);
+    outputTail = `${outputTail}${text}`.slice(-12000);
+  };
   child.stdout.on("data", (chunk) => {
-    output = `${output}${chunk.toString()}`.slice(-12000);
+    captureOutput(chunk);
   });
   child.stderr.on("data", (chunk) => {
-    output = `${output}${chunk.toString()}`.slice(-12000);
+    captureOutput(chunk);
   });
   try {
     await waitForServer(baseUrl);
   } catch (error) {
     child.kill();
-    throw new Error(`${String(error)}\n${output}`);
+    throw new Error(`${String(error)}\n--- server start ---\n${outputStart}\n--- server tail ---\n${outputTail}`);
   }
   return async () => {
     if (child.exitCode !== null) return;

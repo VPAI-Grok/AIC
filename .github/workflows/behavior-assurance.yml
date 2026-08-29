@@ -59,7 +59,7 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Build behavior assurance dependencies
-        run: pnpm --filter @aicorg/evidence-playwright --filter @aicorg/cli... build
+        run: pnpm --filter @aicorg/cli... --filter @aicorg/example-nextjs-checkout-demo... build
 
       - name: Run behavior assurance tests
         run: node --test tests/behavior-assurance.test.mjs tests/browser-evidence.test.mjs tests/trust-layer.test.mjs
