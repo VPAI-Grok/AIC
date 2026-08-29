@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   AICButton,
   AICForm,
@@ -51,6 +51,13 @@ interface CheckoutSummary {
 export function CheckoutDemoContent() {
   const registry = useAICRegistry();
   const [orderStatus, setOrderStatus] = useState<"draft" | "processing" | "submitted">("draft");
+  const orderStatusRef = useRef<"draft" | "processing" | "submitted">("draft");
+  const [paymentStatus, setPaymentStatus] = useState<"charged" | "unpaid">("unpaid");
+  const [chargeCount, setChargeCount] = useState(0);
+  const [confirmationResult, setConfirmationResult] = useState<
+    "accepted" | "declined" | "not_reached"
+  >("not_reached");
+  const [lastErrorCode, setLastErrorCode] = useState("");
   const { attributes: checkoutSummaryAttributes } = useAICElement(
     {
       agentAction: "read",
@@ -105,16 +112,43 @@ export function CheckoutDemoContent() {
     [getCheckoutSummary, registry]
   );
 
+  const permissionGranted = useCallback(() => {
+    return new URLSearchParams(window.location.search).get("aic_fixture_permission") !== "denied";
+  }, []);
+
+  const authorizeCheckout = useCallback((input: CheckoutToolInput) => {
+    const allowed = authorizeCheckoutRequest(input, orderStatusRef.current, permissionGranted());
+    if (!allowed) {
+      setConfirmationResult("not_reached");
+      setLastErrorCode("authorization_denied");
+    }
+    return allowed;
+  }, [permissionGranted]);
+
+  const confirmCheckout = useCallback((prompt: string) => {
+    const accepted = window.confirm(prompt);
+    setConfirmationResult(accepted ? "accepted" : "declined");
+    setLastErrorCode(accepted ? "" : "confirmation_declined");
+    return accepted;
+  }, []);
+
   const completeOrder = useCallback(async (input: CheckoutToolInput): Promise<CheckoutToolResult> => {
-    return executeCheckoutDomainOperation(input, setOrderStatus);
+    return executeCheckoutDomainOperation(input, (status) => {
+      orderStatusRef.current = status;
+      setOrderStatus(status);
+      if (status === "submitted") {
+        setChargeCount((count) => count + 1);
+        setPaymentStatus("charged");
+        setLastErrorCode("");
+      }
+    });
   }, []);
 
   const checkoutWebMCP = useAICWebMCPTool<CheckoutToolInput, CheckoutToolResult>(
     () => ({
       action: SUBMIT_ORDER_ACTION,
-      authorize: async (input) =>
-        authorizeCheckoutRequest(input, orderStatus),
-      confirm: async (request) => window.confirm(request.prompt),
+      authorize: async (input) => authorizeCheckout(input),
+      confirm: async (request) => confirmCheckout(request.prompt),
       element: SUBMIT_ORDER_ELEMENT,
       execute: async (input) => completeOrder(input),
       registry,
@@ -158,21 +192,21 @@ export function CheckoutDemoContent() {
         result.payment_status === "charged" &&
         result.status === "submitted"
     }),
-    [completeOrder, orderStatus, registry]
+    [authorizeCheckout, completeOrder, confirmCheckout, registry]
   );
 
   const submitFromHumanUI = useCallback(async () => {
     validateCheckoutRequest(CHECKOUT_REQUEST);
-    if (!authorizeCheckoutRequest(CHECKOUT_REQUEST, orderStatus)) {
+    if (!authorizeCheckout(CHECKOUT_REQUEST)) {
       return;
     }
 
-    if (!window.confirm("Charge Visa ending 4242 for $177.00 and submit order ord_100245?")) {
+    if (!confirmCheckout("Charge Visa ending 4242 for $177.00 and submit order ord_100245?")) {
       return;
     }
 
     await completeOrder(CHECKOUT_REQUEST);
-  }, [completeOrder, orderStatus]);
+  }, [authorizeCheckout, completeOrder, confirmCheckout]);
 
   return (
     <>
@@ -325,9 +359,17 @@ export function CheckoutDemoContent() {
         <div
           {...checkoutSummaryAttributes}
           aria-live="polite"
+          data-aic-evidence="checkout-state"
+          data-charge-count={String(chargeCount)}
+          data-confirmation={confirmationResult}
+          data-error-code={lastErrorCode}
+          data-order-id="ord_100245"
+          data-order-status={orderStatus}
+          data-payment-status={paymentStatus}
           style={{ color: "#57534e", display: "flex", flexWrap: "wrap", gap: 16, fontSize: 14 }}
         >
           <span>Order: {orderStatus}</span>
+          <span>Payment: {paymentStatus}; charges: {chargeCount}</span>
           <span>
             WebMCP: summary {summaryWebMCP.status}; checkout {checkoutWebMCP.status}
           </span>
@@ -345,16 +387,25 @@ export function CheckoutDemoContent() {
         }}
       >
         <span style={{ color: "#c4b5fd", fontSize: 12, fontWeight: 800, letterSpacing: "0.1em" }}>
-          AIC BEHAVIOR PROOF
+          AIC BROWSER EVIDENCE
         </span>
-        <h2 style={{ fontSize: 24, margin: 0 }}>Reference harness parity: passed</h2>
+        <h2 style={{ fontSize: 24, margin: 0 }}>Native browser parity: passed</h2>
         <p style={{ color: "#d6d3d1", margin: 0 }}>
-          Three scenarios, six executed observations, zero findings: success, authorization denial,
-          and confirmation decline all produce equivalent behavior across both surfaces.
+          Real human controls and native document.modelContext tools produced six executed
+          observations with zero findings across success, authorization denial, and confirmation
+          decline. The deterministic domain harness remains a faster lower-level check.
         </p>
-        <a href="/aic-proof" style={{ color: "#ddd6fe", fontWeight: 700 }}>
-          Inspect the generated proof JSON
-        </a>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+          <a href="/aic-browser-proof" style={{ color: "#ddd6fe", fontWeight: 700 }}>
+            Inspect browser proof
+          </a>
+          <a href="/aic-browser-observations" style={{ color: "#ddd6fe", fontWeight: 700 }}>
+            Inspect raw observations
+          </a>
+          <a href="/aic-proof" style={{ color: "#ddd6fe", fontWeight: 700 }}>
+            Inspect deterministic proof
+          </a>
+        </div>
       </section>
     </>
   );

@@ -8,7 +8,7 @@ WebMCP, MCP, OpenAPI, UI metadata, and future protocols can describe entrypoints
 
 ## Artifact model
 
-The current `aic.behavior/0.1` model has three artifacts.
+The current `aic.behavior/0.1` model has three artifacts. `aic.trust/0.1` can bind and sign a passed proof without changing the protocol-neutral behavior model.
 
 ### Behavior contract
 
@@ -64,6 +64,15 @@ Run a local harness and write a proof:
 aic verify ./aic-behavior-contract.json \
   --harness ./aic-verification-harness.mjs \
   --out-file ./public/aic-proof.json
+```
+
+Preserve the collected observations as a separate artifact when the runner produces raw evidence:
+
+```bash
+aic verify ./aic-behavior-contract.json \
+  --harness ./aic-browser-verification-harness.mjs \
+  --observations-out-file ./aic-browser-observations.json \
+  --out-file ./aic-browser-proof.json
 ```
 
 Verify imported observations instead:
@@ -134,15 +143,16 @@ The [Next.js checkout example](../examples/nextjs-checkout-demo/README.md) conta
 
 - [`aic-behavior-contract.json`](../examples/nextjs-checkout-demo/aic-behavior-contract.json);
 - [`aic-verification-harness.mjs`](../examples/nextjs-checkout-demo/aic-verification-harness.mjs);
+- [`aic-browser-verification-harness.mjs`](../examples/nextjs-checkout-demo/aic-browser-verification-harness.mjs), which uses real rendered controls and native WebMCP;
 - a shared checkout domain operation;
 - six executed observations across three scenarios and two surfaces; and
-- a checked-in [`aic-proof.json`](../examples/nextjs-checkout-demo/aic-proof.json).
+- checked-in deterministic and [`native browser`](../examples/nextjs-checkout-demo/aic-browser-proof.json) proofs plus digest-addressed screenshots.
 
-The fixture proof is deterministic and useful for review. It demonstrates the local reference harness; it is not evidence about a deployed checkout.
+The deterministic fixture is useful for fast domain review. The browser fixture was executed in Chrome `152.0.7977.65` against `document.modelContext`; it demonstrates the local rendered app and browser implementation, not a remote production deployment.
 
 ## CI policy
 
-The repository's `Behavior Assurance` workflow builds the verifier, runs the behavior-assurance tests, executes the checkout harness, and uploads the proof artifact.
+The repository's `Behavior Assurance` workflow builds the verifier and native evidence package, runs the trust and behavior suites, executes both checkout harnesses, signs a revision/origin-bound CI claim, builds and verifies a registry, and uploads the evidence bundle. Trusted non-pull-request runs also use GitHub artifact attestation to bind that bundle to repository/workflow provenance.
 
 A production project should decide which contracts block merging. A sensible starting policy is:
 
@@ -163,7 +173,9 @@ A passed proof means the supplied observations conformed to the supplied contrac
 - that no unmodeled behavior occurred; or
 - that another verifier will interpret a future spec version identically.
 
-Planned hardening can include signed proofs, remote runners, deployment binding, transparency logs, policy bundles, and independent conformance suites. Those capabilities are not claimed today.
+The repository now provides Ed25519 signed claims, explicit deployment/source bindings, trust stores, registries, and GitHub CI provenance. Those mechanisms prove the integrity and issuer of an exact claim; they do not independently prove that its origin was reachable or that the claimed revision was actually deployed.
+
+Independent remote production runners, general transparency-log operation, policy thresholds, and certification remain ecosystem work. See [AIC Verified Trust Layer](./trust-layer.md) for commands and precise semantics.
 
 ## Schemas
 

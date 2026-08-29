@@ -9,6 +9,7 @@ AIC is a **contract-first framework** that makes web apps reliably operable by A
 3. **Serving** — framework plugins expose manifests on `.well-known/` HTTP endpoints at runtime
 4. **Consuming** — the MCP server exposes those manifests as tools that any AI agent can call
 5. **Proving** — protocol-neutral contracts and executed observations verify behavior across UI, WebMCP, MCP, and API surfaces
+6. **Attesting** — signed statements bind a passed proof to an issuer, origin, deployment, and source revision for independent verification
 
 ---
 
@@ -22,6 +23,7 @@ graph TD
         validate["validate.ts (manifest validators)"]
         diff["diff.ts (manifest diff engine)"]
         behavior["behavior.ts (behavior contracts and proof types)"]
+        trust["trust.ts (signed claims, trust stores, registries)"]
     end
 
     subgraph RUNTIME["⚙️ @aicorg/runtime"]
@@ -43,7 +45,13 @@ graph TD
         doctor["createAICDoctorReport"]
         initializer["initializeAICProject (scaffolding)"]
         assurance["verifyAICBehavior (parity and evidence engine)"]
+        trustEngine["trust.ts (signing and registry verification)"]
         writer["writeArtifactFiles"]
+    end
+
+    subgraph EVIDENCE["🌐 @aicorg/evidence-playwright"]
+        browserRunner["Chromium evidence session"]
+        nativeWebMCP["document.modelContext inspection and execution"]
     end
 
     subgraph BOOTSTRAP["🤖 @aicorg/ai-bootstrap"]
@@ -67,6 +75,8 @@ graph TD
         cmd_doctor["aic doctor"]
         cmd_validate["aic validate"]
         cmd_verify["aic verify"]
+        cmd_trust["aic trust keygen/attest/verify"]
+        cmd_registry["aic registry build/verify/query"]
         cmd_bootstrap["aic bootstrap"]
         cmd_generate["aic generate project/discovery/ui/permissions/operate"]
         cmd_authoring["aic generate authoring-plan"]
@@ -107,6 +117,7 @@ graph TD
     SDK --> SPEC
     AUTOMATION --> RUNTIME
     AUTOMATION --> SPEC
+    EVIDENCE --> SPEC
     PLUGINS --> AUTOMATION
     PLUGINS --> SPEC
     CLI --> AUTOMATION
@@ -249,9 +260,33 @@ flowchart LR
     VERIFY --> PROOF
 ```
 
-The contract maps protocol-specific entrypoints to one stable domain `operation_id`. The verifier checks expected status, confirmation, error, outcome, required and forbidden behavior, and canonical parity across required surfaces. Proofs include evidence classification and SHA-256 digests, but are not signed attestations.
+The contract maps protocol-specific entrypoints to one stable domain `operation_id`. The verifier checks expected status, confirmation, error, outcome, required and forbidden behavior, and canonical parity across required surfaces. Proofs include evidence classification and SHA-256 digests. Signing remains a separate layer so proof semantics do not depend on one issuer or registry.
 
 See [Behavior Assurance](./behavior-assurance.md).
+
+## AIC Verified — Portable Trust Claims
+
+```mermaid
+flowchart LR
+    PROOF["passed behavior proof"]
+    DEPLOY["origin + deployment + revision"]
+    STATEMENT["aic_trust_statement"]
+    SIGN["Ed25519 signature"]
+    REGISTRY["embedded-attestation registry"]
+    STORE["consumer-pinned trust store"]
+    VERIFY["verifyAICSignedAttestation"]
+
+    PROOF --> STATEMENT
+    DEPLOY --> STATEMENT
+    STATEMENT --> SIGN --> REGISTRY --> VERIFY
+    STORE --> VERIFY
+```
+
+The browser evidence package executes real rendered human controls and native WebMCP tools. The trust engine binds the resulting passed proof to deployment claims and signs canonical JSON with Ed25519. Registries remain untrusted discovery surfaces; verification uses consumer-pinned issuer keys and re-derives every convenience field.
+
+The GitHub workflow adds a second provenance layer by using GitHub OIDC/Sigstore artifact attestation for the complete evidence archive on trusted runs. Neither signature layer alone proves that a production origin is currently reachable.
+
+See [AIC Verified Trust Layer](./trust-layer.md).
 
 ---
 
@@ -300,6 +335,10 @@ flowchart TD
 | `aic doctor [root] --webmcp` | Add WebMCP compatibility and source-readiness findings to doctor output |
 | `aic validate <kind> <file>` | Validate a manifest or behavior contract |
 | `aic verify <behavior-contract> --harness <module>` | Execute observations, verify scenarios and parity, and emit a behavior proof |
+| `aic trust keygen` | Generate an Ed25519 issuer key and pinned trust store |
+| `aic trust attest` | Bind and sign a passed proof for an exact origin, deployment, and revision |
+| `aic trust verify` | Verify signature, issuer policy, expectations, contract, and proof bindings |
+| `aic registry build/verify/query` | Publish and consume independently verifiable signed-claim registries |
 | `aic bootstrap <url>` | Crawl with Playwright → LLM suggestions → bootstrap draft & report |
 | `aic generate project <config>` | Full artifact generation from `aic.project.json` |
 | `aic generate authoring-plan` | Build a proposal list from a runtime snapshot + bootstrap review |

@@ -7,6 +7,10 @@
 - Added `aic validate behavior`, `aic verify`, and behavior-proof inspection.
 - Added a shared-domain checkout reference with executed human UI/WebMCP success, authorization-denial, and confirmation-decline proof scenarios.
 - Added a dedicated behavior-assurance CI workflow and regression tests that prove divergent WebMCP outcomes fail.
+- Added `@aicorg/evidence-playwright` and a strict native Chrome/WebMCP evidence harness with digest-addressed screenshots.
+- Added `aic.trust/0.1` deployment-bound statements, Ed25519 signed claims, issuer trust stores, registries, validators, and public JSON Schemas.
+- Added `aic trust keygen/attest/verify`, `aic registry build/verify/query`, trust-aware inspection, and well-known registry discovery.
+- Added CI claim generation, registry verification, evidence packaging, and GitHub OIDC/Sigstore artifact provenance on trusted runs.
 - Repositioned WebMCP as a native execution surface and AIC as the protocol-neutral assurance layer.
 
 ## 0.1.0

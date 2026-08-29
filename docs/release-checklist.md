@@ -15,11 +15,22 @@
 
 - `aic validate behavior` accepts every shipped behavior contract.
 - `pnpm --dir examples/nextjs-checkout-demo run aic:verify` passes.
+- `pnpm --dir examples/nextjs-checkout-demo run aic:verify:browser` passes against native `document.modelContext`.
 - The proof contains executed evidence, all required observations, zero findings, and passed parity for the checkout scenarios.
+- Browser screenshot references exist and their SHA-256 digests match.
 - A deliberate WebMCP outcome divergence makes the verifier and CLI fail.
 - Checked-in schemas match the public TypeScript types and validator behavior.
 - Harnesses are reviewed as trusted code and CI uses least-privilege credentials.
 - Documentation does not call an unsigned local proof a production attestation.
+
+## AIC Verified gates
+
+- Signed-attestation, trust-store, and registry validators reject unknown or malformed fields.
+- Signature tampering, wrong origin/revision expectations, revoked keys, and registry field tampering fail verification.
+- `aic trust verify` is run with the original contract, proof, expected origin, and expected revision where available.
+- CI private keys stay in the runner temporary directory and are never uploaded.
+- Trusted branch runs create GitHub artifact provenance for the packaged evidence archive.
+- Registry inclusion is described as discoverability, not endorsement or certification.
 
 ## Clean-workspace gate
 
@@ -52,4 +63,4 @@
 
 ## Not a release claim
 
-Passing these gates does not provide GA stability, non-React support, proof signing, deployment binding, or independent certification.
+Passing these gates does not provide GA stability, non-React support, independent proof of production reachability, or independent certification.

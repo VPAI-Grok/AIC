@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
 # AIC Onboarding
 
 Use this skill when the task is to make a React, Next.js, or Vite app AIC-ready.
@@ -12,6 +12,7 @@ Use this skill when the task is to make a React, Next.js, or Vite app AIC-ready.
 5. Generate and inspect AIC artifacts.
 6. Leave generated JSON to the tooling unless review requires otherwise.
 7. For consequential multi-surface actions, define a behavior contract and run `aic verify`.
+8. For externally relied-on claims, collect rendered/native evidence and verify an origin/revision-bound signed claim with a separately pinned trust store.
 
 ## Output Expectations
 
@@ -20,3 +21,4 @@ Use this skill when the task is to make a React, Next.js, or Vite app AIC-ready.
 - entity and workflow metadata where applicable
 - current discovery, UI, actions, permissions, and workflows artifacts
 - behavior proof with the intended evidence level when parity is in scope
+- independently verified deployment binding when a signed claim is in scope

@@ -4,7 +4,7 @@ globs:
   - "app/**"
 alwaysApply: false
 ---
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
 
 # AIC Cursor Rule
 

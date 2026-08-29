@@ -2,7 +2,7 @@
   "name": "@aicorg/spec",
   "version": "0.1.0-alpha.1",
   "type": "module",
-  "description": "AIC interaction manifests, behavior contracts, proof types, validators, and diff helpers.",
+  "description": "AIC interaction manifests, behavior contracts, proofs, signed trust claims, registries, validators, and diff helpers.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
     "agents",
     "contracts",
     "assurance",
+    "attestation",
     "testing",
     "manifests"
   ],

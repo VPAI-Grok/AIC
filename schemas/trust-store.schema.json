@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/trust-store.schema.json",
+  "title": "AIC Trust Store",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "keys", "spec", "updated_at"],
+  "properties": {
+    "artifact_type": { "const": "aic_trust_store" },
+    "spec": { "const": "aic.trust/0.1" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "keys": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["issuer_id", "key_id", "public_key_pem", "status"],
+        "properties": {
+          "issuer_id": { "type": "string", "minLength": 1 },
+          "key_id": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+          "public_key_pem": { "type": "string", "pattern": "BEGIN PUBLIC KEY" },
+          "status": { "enum": ["active", "revoked"] },
+          "allowed_origins": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "format": "uri", "pattern": "^https?://[^/]+$" }
+          },
+          "valid_from": { "type": "string", "format": "date-time" },
+          "valid_until": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}

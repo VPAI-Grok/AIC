@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { writeSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { chmod, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { format } from "node:util";
@@ -9,6 +9,8 @@ import {
   analyzeProjectForAICAnnotations,
   analyzeProjectForWebMCPReadiness,
   applyAuthoringPatchPlan,
+  buildAICTrustRegistry,
+  createAICSignedAttestation,
   createAICDoctorReport,
   createProjectArtifactReport,
   createQAAgentTestPlan,
@@ -18,8 +20,12 @@ import {
   diffManifestValuesDetailed,
   generateProjectArtifacts,
   initializeAICProject,
+  generateAICTrustKeyPair,
+  queryAICTrustRegistry,
   scanSourceForAICAnnotations,
   verifyAICBehavior,
+  verifyAICSignedAttestation,
+  verifyAICTrustRegistry,
   writeArtifactFiles,
   type AICAutomationManifestKind,
   type AICQAReadinessReport
@@ -45,11 +51,22 @@ import {
   type AICBehaviorContract,
   type AICBehaviorObservationSet,
   type AICBehaviorProof,
+  type AICSignedAttestation,
+  type AICTrustEnvironment,
+  type AICTrustIssuerKind,
+  type AICTrustRegistry,
+  type AICTrustRunnerKind,
+  type AICTrustStore,
   MANIFEST_VERSION,
   SPEC_VERSION,
   renderAICAuthoringPatchPlanSummary,
   validateDiscoveryManifest,
   validateAICBehaviorContract,
+  validateAICBehaviorProof,
+  validateAICSignedAttestation,
+  validateAICTrustRegistry,
+  validateAICTrustStatement,
+  validateAICTrustStore,
   validatePermissionsManifest,
   validateRuntimeUiManifest,
   validateSemanticActionsManifest,
@@ -133,8 +150,14 @@ Usage:
   aic scan <file-or-directory> [--webmcp]
   aic init [project-root] [--framework <nextjs|vite|react>] [--app-name <name>] [--view-id <id>] [--view-url <url>] [--dry-run] [--force]
   aic doctor [project-root] [--config <file>] [--report-file <file>] [--webmcp]
-  aic validate <discovery|ui|permissions|workflows|actions|behavior> <file>
-  aic verify <behavior-contract-file> (--harness <module> | --observations <file>) [--out-file <file>] [--generated-at <iso>]
+  aic validate <discovery|ui|permissions|workflows|actions|behavior|behavior-proof|trust-statement|attestation|trust-store|registry> <file>
+  aic verify <behavior-contract-file> (--harness <module> | --observations <file>) [--observations-out-file <file>] [--out-file <file>] [--generated-at <iso>]
+  aic trust keygen --issuer-id <id> --private-key <file> --public-key <file> --trust-store <file> [--origin <origin>] [--generated-at <iso>] [--force]
+  aic trust attest <contract> <proof> --private-key <file> --origin <origin> --environment <environment> --deployment-id <id> --source-revision <sha> --issuer-id <id> --runner-id <id> --out-file <file> [binding options]
+  aic trust verify <attestation> --trust-store <file> [--contract <file>] [--proof <file>] [--expect-origin <origin>] [--expect-revision <sha>]
+  aic registry build <attestations-dir> --trust-store <file> --registry-id <id> --out-file <file> [--updated-at <iso>]
+  aic registry verify <registry> --trust-store <file> [--verified-at <iso>]
+  aic registry query <registry-file-or-url> [--origin <origin>] [--operation-id <id>] [--environment <environment>]
   aic bootstrap <url> [routes-csv] [--app-name <name>] [--captures-file <file>] [--suggestions-file <file>] [--provider-kind <http|openai>] [--provider-endpoint <url>] [--provider-model <name>] [--provider-header <k=v>] [--provider-selector <path>] [--provider-bearer-env <env>] [--provider-timeout-ms <ms>] [--provider-retries <n>] [--openai-api-key-env <env>] [--openai-base-url <url>] [--draft-file <file>] [--review-file <file>] [--report-file <file>] [--prompt-file <file>] [--min-confidence <0-1>] [--max-suggestions <n>] [--print-prompt]
   aic generate discovery <config-file>
   aic generate ui <elements-file> <url> <view-id>
@@ -236,6 +259,304 @@ async function validateBehavior(filePath: string): Promise<number> {
   return 0;
 }
 
+async function validateBehaviorProof(filePath: string): Promise<number> {
+  const proof = await readJson<unknown>(filePath);
+  const result = validateAICBehaviorProof(proof);
+  printIssues(result.issues);
+  if (!result.ok) return 1;
+  console.log("behavior proof is valid.");
+  return 0;
+}
+
+type TrustArtifactKind = "attestation" | "registry" | "trust-statement" | "trust-store";
+
+async function validateTrustArtifact(kind: TrustArtifactKind, filePath: string): Promise<number> {
+  const value = await readJson<unknown>(filePath);
+  const result =
+    kind === "attestation"
+      ? validateAICSignedAttestation(value)
+      : kind === "registry"
+        ? validateAICTrustRegistry(value)
+        : kind === "trust-statement"
+          ? validateAICTrustStatement(value)
+          : validateAICTrustStore(value);
+  printIssues(result.issues);
+  if (!result.ok) return 1;
+  console.log(`${kind} is valid.`);
+  return 0;
+}
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await stat(resolve(process.cwd(), filePath));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function requireOption(args: string[], optionName: string): string {
+  const value = readOptionValue(args, optionName);
+  if (!value) throw new Error(`Missing required option: ${optionName} <value>.`);
+  return value;
+}
+
+function readTrustEnvironment(value: string): AICTrustEnvironment {
+  if (!["production", "staging", "test", "development"].includes(value)) {
+    throw new Error("--environment must be production, staging, test, or development.");
+  }
+  return value as AICTrustEnvironment;
+}
+
+function readIssuerKind(value: string | undefined): AICTrustIssuerKind {
+  const kind = value ?? "organization";
+  if (!["github_actions", "ci", "developer", "organization", "other"].includes(kind)) {
+    throw new Error("--issuer-kind must be github_actions, ci, developer, organization, or other.");
+  }
+  return kind as AICTrustIssuerKind;
+}
+
+function readRunnerKind(value: string | undefined): AICTrustRunnerKind {
+  const kind = value ?? "local";
+  if (!["github_actions", "ci", "local", "remote"].includes(kind)) {
+    throw new Error("--runner-kind must be github_actions, ci, local, or remote.");
+  }
+  return kind as AICTrustRunnerKind;
+}
+
+async function readJsonSource<T>(source: string): Promise<T> {
+  if (!/^https?:\/\//i.test(source)) return readJson<T>(source);
+  const url = new URL(source);
+  const localHttp =
+    url.protocol === "http:" && ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
+  if (url.protocol !== "https:" && !localHttp) {
+    throw new Error("Remote registry URLs must use HTTPS; HTTP is allowed only for localhost.");
+  }
+  const response = await fetch(url, { headers: { accept: "application/json" } });
+  if (!response.ok) {
+    throw new Error(`Unable to load ${url.href}: HTTP ${response.status}.`);
+  }
+  return (await response.json()) as T;
+}
+
+async function trustKeygen(args: string[]): Promise<number> {
+  try {
+    const issuerId = requireOption(args, "--issuer-id");
+    const privateKeyFile = requireOption(args, "--private-key");
+    const publicKeyFile = requireOption(args, "--public-key");
+    const trustStoreFile = requireOption(args, "--trust-store");
+    const outputFiles = [privateKeyFile, publicKeyFile, trustStoreFile];
+    if (!args.includes("--force")) {
+      const existing = (
+        await Promise.all(outputFiles.map(async (file) => ({ exists: await fileExists(file), file })))
+      ).filter((item) => item.exists);
+      if (existing.length > 0) {
+        console.error(`Refusing to overwrite existing key material: ${existing.map((item) => item.file).join(", ")}. Use --force to replace it.`);
+        return 1;
+      }
+    }
+    const keyPair = generateAICTrustKeyPair({
+      allowedOrigins: readOptionValues(args, "--origin"),
+      generatedAt: readOptionValue(args, "--generated-at"),
+      issuerId
+    });
+    await writeTextFile(privateKeyFile, keyPair.private_key_pem);
+    try {
+      await chmod(resolve(process.cwd(), privateKeyFile), 0o600);
+    } catch {
+      // Some filesystems, including Windows, do not expose POSIX permission bits.
+    }
+    await writeTextFile(publicKeyFile, keyPair.public_key_pem);
+    await writeTextFile(trustStoreFile, `${JSON.stringify(keyPair.trust_store, null, 2)}\n`);
+    printJson({
+      artifact_type: "aic_trust_keygen_result",
+      key_id: keyPair.key_id,
+      private_key: resolve(process.cwd(), privateKeyFile),
+      public_key: resolve(process.cwd(), publicKeyFile),
+      trust_store: resolve(process.cwd(), trustStoreFile)
+    });
+    return 0;
+  } catch (error) {
+    console.error(`Unable to generate trust key material: ${String(error)}`);
+    return 1;
+  }
+}
+
+async function trustAttest(args: string[]): Promise<number> {
+  try {
+    const [contractFile, proofFile] = readPositionalArgs(args);
+    if (!contractFile || !proofFile) {
+      throw new Error("trust attest expects <contract> and <proof> positional files.");
+    }
+    const privateKeyFile = requireOption(args, "--private-key");
+    const sourceRevision = requireOption(args, "--source-revision");
+    const runnerKind = readRunnerKind(readOptionValue(args, "--runner-kind"));
+    const attestation = createAICSignedAttestation({
+      contract: await readJson<unknown>(contractFile),
+      deployment: {
+        ...(readOptionValue(args, "--artifact-digest")
+          ? { artifact_digest: readOptionValue(args, "--artifact-digest") }
+          : {}),
+        ...(readOptionValue(args, "--deployed-at")
+          ? { deployed_at: readOptionValue(args, "--deployed-at") }
+          : {}),
+        deployment_id: requireOption(args, "--deployment-id"),
+        environment: readTrustEnvironment(requireOption(args, "--environment")),
+        origin: requireOption(args, "--origin"),
+        ...(readOptionValue(args, "--source-repository")
+          ? { source_repository: readOptionValue(args, "--source-repository") }
+          : {}),
+        source_revision: sourceRevision
+      },
+      expiresAt: readOptionValue(args, "--expires-at"),
+      issuedAt: readOptionValue(args, "--issued-at"),
+      issuer: {
+        id: requireOption(args, "--issuer-id"),
+        kind: readIssuerKind(readOptionValue(args, "--issuer-kind"))
+      },
+      privateKeyPem: await readFile(resolve(process.cwd(), privateKeyFile), "utf8"),
+      proof: await readJson<unknown>(proofFile),
+      references: {
+        ...(readOptionValue(args, "--contract-ref")
+          ? { contract: readOptionValue(args, "--contract-ref") }
+          : {}),
+        ...(readOptionValue(args, "--observations-ref")
+          ? { observations: readOptionValue(args, "--observations-ref") }
+          : {}),
+        ...(readOptionValue(args, "--proof-ref")
+          ? { proof: readOptionValue(args, "--proof-ref") }
+          : {})
+      },
+      runner: {
+        ...(readOptionValue(args, "--runner-commit")
+          ? { commit_sha: readOptionValue(args, "--runner-commit") }
+          : runnerKind !== "local"
+            ? { commit_sha: sourceRevision }
+            : {}),
+        id: requireOption(args, "--runner-id"),
+        kind: runnerKind,
+        ...(readOptionValue(args, "--runner-repository")
+          ? { repository: readOptionValue(args, "--runner-repository") }
+          : {}),
+        ...(readOptionValue(args, "--runner-run-id")
+          ? { run_id: readOptionValue(args, "--runner-run-id") }
+          : {}),
+        ...(readOptionValue(args, "--runner-workflow")
+          ? { workflow: readOptionValue(args, "--runner-workflow") }
+          : {})
+      }
+    });
+    const outFile = requireOption(args, "--out-file");
+    await writeTextFile(outFile, `${JSON.stringify(attestation, null, 2)}\n`);
+    printJson({
+      artifact_type: attestation.artifact_type,
+      assurance_class: runnerKind === "local" ? "local_signed_claim" : runnerKind === "remote" ? "remote_signed_claim" : "ci_signed_claim",
+      key_id: attestation.signature.key_id,
+      origin: attestation.statement.deployment.origin,
+      output: resolve(process.cwd(), outFile),
+      proof_digest: attestation.statement.subject.proof_digest
+    });
+    return 0;
+  } catch (error) {
+    console.error(`Unable to create signed attestation: ${String(error)}`);
+    return 1;
+  }
+}
+
+async function trustVerify(args: string[]): Promise<number> {
+  try {
+    const [attestationFile] = readPositionalArgs(args);
+    if (!attestationFile) throw new Error("trust verify expects an <attestation> file.");
+    const contractFile = readOptionValue(args, "--contract");
+    const proofFile = readOptionValue(args, "--proof");
+    const result = verifyAICSignedAttestation({
+      attestation: await readJson<unknown>(attestationFile),
+      ...(contractFile ? { contract: await readJson<unknown>(contractFile) } : {}),
+      expectedOrigin: readOptionValue(args, "--expect-origin"),
+      expectedRevision: readOptionValue(args, "--expect-revision"),
+      ...(proofFile ? { proof: await readJson<unknown>(proofFile) } : {}),
+      trustStore: await readJson<unknown>(requireOption(args, "--trust-store")),
+      verifiedAt: readOptionValue(args, "--verified-at")
+    });
+    printJson(result);
+    return result.status === "trusted" ? 0 : 1;
+  } catch (error) {
+    console.error(`Unable to verify signed attestation: ${String(error)}`);
+    return 1;
+  }
+}
+
+async function registryBuild(args: string[]): Promise<number> {
+  try {
+    const [attestationsDirectory] = readPositionalArgs(args);
+    if (!attestationsDirectory) throw new Error("registry build expects an <attestations-dir>.");
+    const directory = resolve(process.cwd(), attestationsDirectory);
+    const files = (await readdir(directory, { withFileTypes: true }))
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+      .map((entry) => entry.name)
+      .sort();
+    if (files.length === 0) throw new Error("No JSON attestations were found.");
+    const attestations: AICSignedAttestation[] = [];
+    for (const file of files) {
+      const value = JSON.parse(await readFile(resolve(directory, file), "utf8")) as unknown;
+      const validation = validateAICSignedAttestation(value);
+      if (!validation.ok) {
+        throw new Error(`${file} is not a valid signed attestation: ${validation.issues.map((issue) => `${issue.path}: ${issue.message}`).join("; ")}`);
+      }
+      attestations.push(validation.value);
+    }
+    const registry = buildAICTrustRegistry({
+      attestations,
+      id: requireOption(args, "--registry-id"),
+      trustStore: await readJson<unknown>(requireOption(args, "--trust-store")),
+      updatedAt: readOptionValue(args, "--updated-at")
+    });
+    const outFile = requireOption(args, "--out-file");
+    await writeTextFile(outFile, `${JSON.stringify(registry, null, 2)}\n`);
+    printJson({ entries: registry.entries.length, id: registry.id, output: resolve(process.cwd(), outFile), status: "trusted" });
+    return 0;
+  } catch (error) {
+    console.error(`Unable to build trust registry: ${String(error)}`);
+    return 1;
+  }
+}
+
+async function registryVerify(args: string[]): Promise<number> {
+  try {
+    const [registryFile] = readPositionalArgs(args);
+    if (!registryFile) throw new Error("registry verify expects a <registry> file.");
+    const result = verifyAICTrustRegistry({
+      registry: await readJson<unknown>(registryFile),
+      trustStore: await readJson<unknown>(requireOption(args, "--trust-store")),
+      verifiedAt: readOptionValue(args, "--verified-at")
+    });
+    printJson(result);
+    return result.status === "trusted" ? 0 : 1;
+  } catch (error) {
+    console.error(`Unable to verify trust registry: ${String(error)}`);
+    return 1;
+  }
+}
+
+async function registryQuery(args: string[]): Promise<number> {
+  try {
+    const [registrySource] = readPositionalArgs(args);
+    if (!registrySource) throw new Error("registry query expects a <registry-file-or-url>.");
+    const registry = await readJsonSource<AICTrustRegistry>(registrySource);
+    const entries = queryAICTrustRegistry({
+      environment: readOptionValue(args, "--environment"),
+      operationId: readOptionValue(args, "--operation-id"),
+      origin: readOptionValue(args, "--origin"),
+      registry
+    });
+    printJson({ entries, matches: entries.length, registry_id: registry.id });
+    return 0;
+  } catch (error) {
+    console.error(`Unable to query trust registry: ${String(error)}`);
+    return 1;
+  }
+}
+
 interface AICBehaviorHarnessModule {
   collectAICBehaviorObservations?: (context: {
     contract: AICBehaviorContract;
@@ -245,6 +566,7 @@ interface AICBehaviorHarnessModule {
 async function verifyBehavior(contractFile: string, args: string[]): Promise<number> {
   const harnessFile = readOptionValue(args, "--harness");
   const observationsFile = readOptionValue(args, "--observations");
+  const observationsOutFile = readOptionValue(args, "--observations-out-file");
   const outFile = readOptionValue(args, "--out-file");
   const generatedAt = readOptionValue(args, "--generated-at");
 
@@ -281,6 +603,10 @@ async function verifyBehavior(contractFile: string, args: string[]): Promise<num
   } catch (error) {
     console.error(`Unable to collect behavior observations: ${String(error)}`);
     return 1;
+  }
+
+  if (observationsOutFile) {
+    await writeTextFile(observationsOutFile, `${JSON.stringify(observations, null, 2)}\n`);
   }
 
   const proof = verifyAICBehavior({
@@ -1049,6 +1375,30 @@ function isBehaviorProof(value: unknown): value is AICBehaviorProof {
   );
 }
 
+function isSignedAttestation(value: unknown): value is AICSignedAttestation {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  return (
+    record.artifact_type === "aic_signed_attestation" &&
+    typeof record.statement === "object" &&
+    record.statement !== null &&
+    typeof record.signature === "object" &&
+    record.signature !== null
+  );
+}
+
+function isTrustRegistry(value: unknown): value is AICTrustRegistry {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  return record.artifact_type === "aic_trust_registry" && Array.isArray(record.entries);
+}
+
+function isTrustStore(value: unknown): value is AICTrustStore {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  return record.artifact_type === "aic_trust_store" && Array.isArray(record.keys);
+}
+
 function summarizeCodeCounts(values: Array<{ code: string }>, limit = 3): string | undefined {
   const counts = new Map<string, number>();
 
@@ -1311,6 +1661,40 @@ async function inspectQAReadiness(filePath: string, args: string[]): Promise<num
 
 async function inspect(filePath: string): Promise<number> {
   const value = await readJson<unknown>(filePath);
+  if (isSignedAttestation(value)) {
+    const validation = validateAICSignedAttestation(value);
+    console.log(`AIC signed claim for ${value.statement.deployment.origin}`);
+    console.log(`Operation: ${value.statement.subject.operation_id}`);
+    console.log(`Deployment: ${value.statement.deployment.deployment_id} (${value.statement.deployment.environment})`);
+    console.log(`Source revision: ${value.statement.deployment.source_revision}`);
+    console.log(`Proof: ${value.statement.subject.proof_digest}`);
+    console.log(`Issuer: ${value.statement.issuer.id}`);
+    console.log(`Key: ${value.signature.key_id}`);
+    console.log(`Schema: ${validation.ok ? "valid" : "invalid"}`);
+    console.log("Trust: not evaluated; run `aic trust verify` with a pinned trust store.");
+    return validation.ok ? 0 : 1;
+  }
+
+  if (isTrustRegistry(value)) {
+    const validation = validateAICTrustRegistry(value);
+    console.log(`AIC trust registry ${value.id}`);
+    console.log(`Entries: ${value.entries.length}`);
+    console.log(`Updated: ${value.updated_at}`);
+    console.log(`Schema: ${validation.ok ? "valid" : "invalid"}`);
+    console.log("Trust: not evaluated; run `aic registry verify` with a pinned trust store.");
+    return validation.ok ? 0 : 1;
+  }
+
+  if (isTrustStore(value)) {
+    const validation = validateAICTrustStore(value);
+    console.log("AIC trust store");
+    console.log(`Keys: ${value.keys.length}`);
+    console.log(`Active: ${value.keys.filter((key) => key.status === "active").length}`);
+    console.log(`Revoked: ${value.keys.filter((key) => key.status === "revoked").length}`);
+    console.log(`Schema: ${validation.ok ? "valid" : "invalid"}`);
+    return validation.ok ? 0 : 1;
+  }
+
   if (isBehaviorProof(value)) {
     console.log(`AIC behavior proof for ${value.contract.id}`);
     console.log(`Status: ${value.status}`);
@@ -1570,8 +1954,53 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (command === "validate" && kind === "behavior-proof" && firstArg) {
+    process.exitCode = await validateBehaviorProof(firstArg);
+    return;
+  }
+
+  if (
+    command === "validate" &&
+    kind &&
+    ["attestation", "registry", "trust-statement", "trust-store"].includes(kind) &&
+    firstArg
+  ) {
+    process.exitCode = await validateTrustArtifact(kind as TrustArtifactKind, firstArg);
+    return;
+  }
+
   if (command === "verify" && kind) {
     process.exitCode = await verifyBehavior(kind, args);
+    return;
+  }
+
+  if (command === "trust" && kind === "keygen") {
+    process.exitCode = await trustKeygen(args);
+    return;
+  }
+
+  if (command === "trust" && kind === "attest") {
+    process.exitCode = await trustAttest(args);
+    return;
+  }
+
+  if (command === "trust" && kind === "verify") {
+    process.exitCode = await trustVerify(args);
+    return;
+  }
+
+  if (command === "registry" && kind === "build") {
+    process.exitCode = await registryBuild(args);
+    return;
+  }
+
+  if (command === "registry" && kind === "verify") {
+    process.exitCode = await registryVerify(args);
+    return;
+  }
+
+  if (command === "registry" && kind === "query") {
+    process.exitCode = await registryQuery(args);
     return;
   }
 

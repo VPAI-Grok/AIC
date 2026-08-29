@@ -1,0 +1,517 @@
+{
+  "artifact_type": "aic_behavior_observation_set",
+  "contract_id": "checkout.complete.behavior",
+  "generated_at": "2026-08-29T16:38:41.096Z",
+  "observations": [
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T16:38:41.096Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 1027,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "not_applicable",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "false",
+        "surface": "human-ui",
+        "tool_result_type": "none",
+        "webmcp_api": "not_applicable"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:3850b04158a06acdecc198bf6027f6305178d4f54c57a82a056e77320c8c3585",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/success--human-ui.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "human-ui",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": 1,
+          "passed": true,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "submitted",
+          "passed": true,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "charged",
+          "passed": true,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": "",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "accepted",
+          "passed": false,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "submitted",
+            "payment_status": "charged"
+          },
+          "passed": false,
+          "requirement_id": "order.unchanged"
+        }
+      ],
+      "confirmation": "accepted",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "submitted",
+        "payment_status": "charged"
+      },
+      "scenario_id": "success",
+      "status": "succeeded"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T16:38:41.096Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 929,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "json_string_compat",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "true",
+        "surface": "webmcp",
+        "tool_result_type": "object",
+        "webmcp_api": "document.modelContext"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:84c8426f024740586dfef30db96802a5e0f46f3de6735dc813a88f539eb2c9ee",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/success--webmcp.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "webmcp",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "accepted",
+          "passed": true,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": 1,
+          "passed": true,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "submitted",
+          "passed": true,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "charged",
+          "passed": true,
+          "requirement_id": "payment.charged"
+        },
+        {
+          "actual": "",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "accepted",
+          "passed": false,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "submitted",
+            "payment_status": "charged"
+          },
+          "passed": false,
+          "requirement_id": "order.unchanged"
+        }
+      ],
+      "confirmation": "accepted",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "submitted",
+        "payment_status": "charged"
+      },
+      "scenario_id": "success",
+      "status": "succeeded"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T16:38:41.096Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 907,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "not_applicable",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "false",
+        "surface": "human-ui",
+        "tool_result_type": "none",
+        "webmcp_api": "not_applicable"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:201be7fed0e5c68abab98ea3c3f0dbef3a55eeb0aa534b1b070aebf8e3b3f95a",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/authorization-denied--human-ui.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "human-ui",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": "authorization_denied",
+          "passed": true,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": "not_reached",
+          "passed": false,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": "not_reached",
+          "passed": false,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        }
+      ],
+      "confirmation": "not_reached",
+      "error_code": "authorization_denied",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "authorization-denied",
+      "status": "denied"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T16:38:41.096Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 911,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "json_string_compat",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "true",
+        "surface": "webmcp",
+        "tool_result_type": "object",
+        "webmcp_api": "document.modelContext"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:6fd7cde8d50d85196c675c3d73a7d224885dabf9e0cbc749f1d51f8a7c06c35b",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/authorization-denied--webmcp.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "webmcp",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": "authorization_denied",
+          "passed": true,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": "not_reached",
+          "passed": false,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": "not_reached",
+          "passed": false,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        }
+      ],
+      "confirmation": "not_reached",
+      "error_code": "authorization_denied",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "authorization-denied",
+      "status": "denied"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T16:38:41.096Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 948,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "not_applicable",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "false",
+        "surface": "human-ui",
+        "tool_result_type": "none",
+        "webmcp_api": "not_applicable"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:201be7fed0e5c68abab98ea3c3f0dbef3a55eeb0aa534b1b070aebf8e3b3f95a",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/confirmation-declined--human-ui.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "human-ui",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": "declined",
+          "passed": true,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "declined",
+          "passed": true,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": "confirmation_declined",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "declined",
+          "passed": false,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        }
+      ],
+      "confirmation": "declined",
+      "error_code": "confirmation_declined",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "confirmation-declined",
+      "status": "cancelled"
+    },
+    {
+      "artifact_type": "aic_behavior_observation",
+      "captured_at": "2026-08-29T16:38:41.096Z",
+      "contract_id": "checkout.complete.behavior",
+      "duration_ms": 910,
+      "environment": {
+        "adapter": "@aicorg/evidence-playwright",
+        "argument_encoding": "json_string_compat",
+        "browser": "Google Chrome",
+        "browser_version": "152.0.7977.65",
+        "feature_mode": "testing_flag",
+        "native_webmcp": "true",
+        "surface": "webmcp",
+        "tool_result_type": "object",
+        "webmcp_api": "document.modelContext"
+      },
+      "evidence": [
+        {
+          "digest": "sha256:6fd7cde8d50d85196c675c3d73a7d224885dabf9e0cbc749f1d51f8a7c06c35b",
+          "kind": "screenshot",
+          "ref": "aic-browser-evidence/confirmation-declined--webmcp.png"
+        }
+      ],
+      "mode": "executed",
+      "operation_id": "checkout.complete.domain",
+      "surface_id": "webmcp",
+      "checks": [
+        {
+          "actual": "draft",
+          "passed": true,
+          "requirement_id": "order.is_draft"
+        },
+        {
+          "actual": "declined",
+          "passed": true,
+          "requirement_id": "authorization.allowed"
+        },
+        {
+          "actual": "declined",
+          "passed": true,
+          "requirement_id": "confirmation.declined"
+        },
+        {
+          "actual": {
+            "order_id": "ord_100245",
+            "order_status": "draft",
+            "payment_status": "unpaid"
+          },
+          "passed": true,
+          "requirement_id": "order.unchanged"
+        },
+        {
+          "actual": "confirmation_declined",
+          "passed": false,
+          "requirement_id": "authorization.denied"
+        },
+        {
+          "actual": "declined",
+          "passed": false,
+          "requirement_id": "confirmation.accepted"
+        },
+        {
+          "actual": 0,
+          "passed": false,
+          "requirement_id": "payment.charge"
+        },
+        {
+          "actual": "draft",
+          "passed": false,
+          "requirement_id": "order.submitted"
+        },
+        {
+          "actual": "unpaid",
+          "passed": false,
+          "requirement_id": "payment.charged"
+        }
+      ],
+      "confirmation": "declined",
+      "error_code": "confirmation_declined",
+      "outcome": {
+        "order_id": "ord_100245",
+        "order_status": "draft",
+        "payment_status": "unpaid"
+      },
+      "scenario_id": "confirmation-declined",
+      "status": "cancelled"
+    }
+  ]
+}

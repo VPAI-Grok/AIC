@@ -15,6 +15,7 @@
       "@aicorg/plugin-next": ["packages/plugin-next/src/index.ts"],
       "@aicorg/plugin-vite": ["packages/plugin-vite/src/index.ts"],
       "@aicorg/devtools": ["packages/devtools/src/index.tsx"],
+      "@aicorg/evidence-playwright": ["packages/evidence-playwright/src/index.ts"],
       "@aicorg/ai-bootstrap": ["packages/ai-bootstrap/src/index.ts"],
       "@aicorg/ai-bootstrap-http": ["packages/ai-bootstrap-http/src/index.ts"],
       "@aicorg/ai-bootstrap-openai": ["packages/ai-bootstrap-openai/src/index.ts"],

@@ -1076,3 +1076,176 @@ export function validateAICBehaviorObservationSet(
 
   return createResult(value as unknown as AICBehaviorObservationSet, issues);
 }
+
+export function validateAICBehaviorProof(value: unknown): ValidationResult<AICBehaviorProof> {
+  const issues: AICValidationIssue[] = [];
+  if (!isRecord(value)) {
+    pushIssue(issues, "fatal", "$", "Expected an object", "behavior_proof.object");
+    return { issues, ok: false };
+  }
+
+  validateAllowedKeys(
+    value,
+    [
+      "artifact_type",
+      "contract",
+      "evidence_level",
+      "findings",
+      "generated_at",
+      "observations_digest",
+      "proof_version",
+      "scenarios",
+      "status",
+      "summary"
+    ],
+    "$",
+    issues,
+    "behavior_proof.unknown_field"
+  );
+  if (value.artifact_type !== "aic_behavior_proof") {
+    pushIssue(issues, "error", "$.artifact_type", "Expected aic_behavior_proof", "behavior_proof.artifact_type");
+  }
+  if (value.proof_version !== AIC_BEHAVIOR_PROOF_VERSION) {
+    pushIssue(issues, "error", "$.proof_version", `Expected ${AIC_BEHAVIOR_PROOF_VERSION}`, "behavior_proof.version");
+  }
+  if (!isIsoDateTime(value.generated_at)) {
+    pushIssue(issues, "error", "$.generated_at", "Expected an ISO date-time", "behavior_proof.generated_at");
+  }
+  if (value.status !== "passed" && value.status !== "failed") {
+    pushIssue(issues, "error", "$.status", "Expected passed or failed", "behavior_proof.status");
+  }
+  if (!["executed", "imported", "mixed", "none"].includes(String(value.evidence_level))) {
+    pushIssue(issues, "error", "$.evidence_level", "Expected a supported evidence level", "behavior_proof.evidence_level");
+  }
+  if (!/^sha256:[0-9a-f]{64}$/.test(String(value.observations_digest))) {
+    pushIssue(issues, "error", "$.observations_digest", "Expected sha256:<64 lowercase hex characters>", "behavior_proof.observations_digest");
+  }
+
+  if (!isRecord(value.contract)) {
+    pushIssue(issues, "error", "$.contract", "Expected an object", "behavior_proof.contract");
+  } else {
+    const contract = value.contract;
+    validateAllowedKeys(contract, ["digest", "id", "spec"], "$.contract", issues, "behavior_proof.contract_unknown_field");
+    ["id", "spec"].forEach((field) => {
+      if (!isNonEmptyString(contract[field])) {
+        pushIssue(issues, "error", `$.contract.${field}`, "Expected a non-empty string", `behavior_proof.contract_${field}`);
+      }
+    });
+    if (!/^sha256:[0-9a-f]{64}$/.test(String(contract.digest))) {
+      pushIssue(issues, "error", "$.contract.digest", "Expected sha256:<64 lowercase hex characters>", "behavior_proof.contract_digest");
+    }
+  }
+
+  const scenarioValues = Array.isArray(value.scenarios) ? value.scenarios : [];
+  if (!Array.isArray(value.scenarios)) {
+    pushIssue(issues, "error", "$.scenarios", "Expected an array", "behavior_proof.scenarios");
+  }
+  const scenarioIds = new Set<string>();
+  scenarioValues.forEach((scenario, index) => {
+    const path = `$.scenarios[${index}]`;
+    if (!isRecord(scenario)) {
+      pushIssue(issues, "error", path, "Expected an object", "behavior_proof.scenario");
+      return;
+    }
+    validateAllowedKeys(scenario, ["finding_count", "parity", "scenario_id", "status", "surfaces"], path, issues, "behavior_proof.scenario_unknown_field");
+    if (!isNonEmptyString(scenario.scenario_id)) {
+      pushIssue(issues, "error", `${path}.scenario_id`, "Expected a non-empty string", "behavior_proof.scenario_id");
+    } else if (scenarioIds.has(scenario.scenario_id)) {
+      pushIssue(issues, "error", `${path}.scenario_id`, `Duplicate scenario: ${scenario.scenario_id}`, "behavior_proof.scenario_unique");
+    } else {
+      scenarioIds.add(scenario.scenario_id);
+    }
+    if (scenario.status !== "passed" && scenario.status !== "failed") {
+      pushIssue(issues, "error", `${path}.status`, "Expected passed or failed", "behavior_proof.scenario_status");
+    }
+    if (!["passed", "failed", "not_required"].includes(String(scenario.parity))) {
+      pushIssue(issues, "error", `${path}.parity`, "Expected passed, failed, or not_required", "behavior_proof.scenario_parity");
+    }
+    if (!Number.isInteger(scenario.finding_count) || Number(scenario.finding_count) < 0) {
+      pushIssue(issues, "error", `${path}.finding_count`, "Expected a non-negative integer", "behavior_proof.scenario_finding_count");
+    }
+    if (!Array.isArray(scenario.surfaces)) {
+      pushIssue(issues, "error", `${path}.surfaces`, "Expected an array", "behavior_proof.surfaces");
+      return;
+    }
+    const surfaceIds = new Set<string>();
+    scenario.surfaces.forEach((surface, surfaceIndex) => {
+      const surfacePath = `${path}.surfaces[${surfaceIndex}]`;
+      if (!isRecord(surface)) {
+        pushIssue(issues, "error", surfacePath, "Expected an object", "behavior_proof.surface");
+        return;
+      }
+      validateAllowedKeys(surface, ["finding_count", "observation_mode", "status", "surface_id"], surfacePath, issues, "behavior_proof.surface_unknown_field");
+      if (!isNonEmptyString(surface.surface_id)) {
+        pushIssue(issues, "error", `${surfacePath}.surface_id`, "Expected a non-empty string", "behavior_proof.surface_id");
+      } else if (surfaceIds.has(surface.surface_id)) {
+        pushIssue(issues, "error", `${surfacePath}.surface_id`, `Duplicate surface: ${surface.surface_id}`, "behavior_proof.surface_unique");
+      } else {
+        surfaceIds.add(surface.surface_id);
+      }
+      if (surface.status !== "passed" && surface.status !== "failed") {
+        pushIssue(issues, "error", `${surfacePath}.status`, "Expected passed or failed", "behavior_proof.surface_status");
+      }
+      if (!Number.isInteger(surface.finding_count) || Number(surface.finding_count) < 0) {
+        pushIssue(issues, "error", `${surfacePath}.finding_count`, "Expected a non-negative integer", "behavior_proof.surface_finding_count");
+      }
+      if (surface.observation_mode !== undefined && surface.observation_mode !== "executed" && surface.observation_mode !== "imported") {
+        pushIssue(issues, "error", `${surfacePath}.observation_mode`, "Expected executed or imported", "behavior_proof.observation_mode");
+      }
+    });
+  });
+
+  const findingValues = Array.isArray(value.findings) ? value.findings : [];
+  if (!Array.isArray(value.findings)) {
+    pushIssue(issues, "error", "$.findings", "Expected an array", "behavior_proof.findings");
+  }
+  findingValues.forEach((finding, index) => {
+    const path = `$.findings[${index}]`;
+    if (!isRecord(finding)) {
+      pushIssue(issues, "error", path, "Expected an object", "behavior_proof.finding");
+      return;
+    }
+    validateAllowedKeys(finding, ["code", "message", "requirement_id", "scenario_id", "severity", "surface_id"], path, issues, "behavior_proof.finding_unknown_field");
+    ["code", "message"].forEach((field) => {
+      if (!isNonEmptyString(finding[field])) {
+        pushIssue(issues, "error", `${path}.${field}`, "Expected a non-empty string", `behavior_proof.finding_${field}`);
+      }
+    });
+    if (finding.severity !== "error" && finding.severity !== "warning") {
+      pushIssue(issues, "error", `${path}.severity`, "Expected error or warning", "behavior_proof.finding_severity");
+    }
+    ["requirement_id", "scenario_id", "surface_id"].forEach((field) => {
+      if (finding[field] !== undefined && !isNonEmptyString(finding[field])) {
+        pushIssue(issues, "error", `${path}.${field}`, "Expected a non-empty string", `behavior_proof.finding_${field}`);
+      }
+    });
+  });
+
+  if (!isRecord(value.summary)) {
+    pushIssue(issues, "error", "$.summary", "Expected an object", "behavior_proof.summary");
+  } else {
+    const summary = value.summary;
+    validateAllowedKeys(summary, ["failed_scenarios", "observations", "passed_scenarios", "required_observations", "scenarios"], "$.summary", issues, "behavior_proof.summary_unknown_field");
+    ["failed_scenarios", "observations", "passed_scenarios", "required_observations", "scenarios"].forEach((field) => {
+      if (!Number.isInteger(summary[field]) || Number(summary[field]) < 0) {
+        pushIssue(issues, "error", `$.summary.${field}`, "Expected a non-negative integer", `behavior_proof.summary_${field}`);
+      }
+    });
+    const passedScenarios = scenarioValues.filter((scenario) => isRecord(scenario) && scenario.status === "passed").length;
+    const failedScenarios = scenarioValues.filter((scenario) => isRecord(scenario) && scenario.status === "failed").length;
+    if (summary.scenarios !== scenarioValues.length || summary.passed_scenarios !== passedScenarios || summary.failed_scenarios !== failedScenarios) {
+      pushIssue(issues, "error", "$.summary", "Scenario totals do not match the scenario results", "behavior_proof.summary_consistency");
+    }
+  }
+
+  const hasErrorFinding = findingValues.some((finding) => isRecord(finding) && finding.severity === "error");
+  const hasFailedScenario = scenarioValues.some((scenario) => isRecord(scenario) && scenario.status === "failed");
+  if (value.status === "passed" && (hasErrorFinding || hasFailedScenario)) {
+    pushIssue(issues, "error", "$.status", "A passed proof cannot contain error findings or failed scenarios", "behavior_proof.status_consistency");
+  }
+  if (value.status === "failed" && !hasErrorFinding && !hasFailedScenario) {
+    pushIssue(issues, "warning", "$.status", "A failed proof has no error finding or failed scenario", "behavior_proof.failed_without_error");
+  }
+
+  return createResult(value as unknown as AICBehaviorProof, issues);
+}

@@ -1,4 +1,4 @@
-# Next.js Checkout: WebMCP and AIC Behavior Proof
+# Next.js Checkout: WebMCP, Browser Evidence, and AIC Verified
 
 This is the canonical end-to-end AIC example for a consequential action. It combines explicit React semantics, generated manifests, MCP discovery, native WebMCP registration, a shared checkout domain operation, and protocol-neutral behavior assurance.
 
@@ -9,10 +9,12 @@ This is the canonical end-to-end AIC example for a consequential action. It comb
 - progressive fallback when `document.modelContext` is unavailable;
 - one `executeCheckoutDomainOperation` used by both human UI and WebMCP paths;
 - an `aic.behavior/0.1` contract independent of either entrypoint;
-- executed success, authorization-denial, and confirmation-decline scenarios; and
-- a deterministic proof that the two surfaces produced equivalent behavior in the local harness.
+- executed success, authorization-denial, and confirmation-decline scenarios;
+- a deterministic domain proof;
+- a real Chrome proof that drives rendered human controls and native `document.modelContext` tools; and
+- digest-addressed screenshot evidence plus `/.well-known/aic-trust` registry discovery.
 
-The proof demonstrates this fixture and harness. It is not a signed or production-bound attestation.
+The checked-in browser proof demonstrates this local fixture in Chrome `152.0.7977.65`. The CI workflow additionally creates a revision-bound signed claim and GitHub provenance bundle. Neither is independent proof that a production deployment is live.
 
 ## Key files
 
@@ -24,6 +26,10 @@ The proof demonstrates this fixture and harness. It is not a signed or productio
 | [`aic-behavior-contract.json`](./aic-behavior-contract.json) | Protocol-neutral requirements and parity scenarios |
 | [`aic-verification-harness.mjs`](./aic-verification-harness.mjs) | Trusted local observation collector |
 | [`aic-proof.json`](./aic-proof.json) | Generated behavior proof fixture |
+| [`aic-browser-verification-harness.mjs`](./aic-browser-verification-harness.mjs) | Real rendered UI and native WebMCP collector |
+| [`aic-browser-observations.json`](./aic-browser-observations.json) | Six browser observations with environment and screenshot references |
+| [`aic-browser-proof.json`](./aic-browser-proof.json) | Passed native browser parity proof |
+| [`aic-browser-evidence/`](./aic-browser-evidence/) | Screenshot evidence with recorded SHA-256 digests |
 | [`aic.project.json`](./aic.project.json) | Project identity, permissions, and workflows |
 
 ## Run from the repository root
@@ -35,6 +41,7 @@ pnpm --dir examples/nextjs-checkout-demo run aic:doctor
 pnpm --dir examples/nextjs-checkout-demo run aic:generate
 pnpm --dir examples/nextjs-checkout-demo run aic:webmcp
 pnpm --dir examples/nextjs-checkout-demo run aic:verify
+pnpm --dir examples/nextjs-checkout-demo run aic:verify:browser
 pnpm --dir examples/nextjs-checkout-demo run dev
 ```
 
@@ -47,6 +54,7 @@ In a browser without `document.modelContext`, both WebMCP registrations report `
 ```bash
 pnpm aic validate behavior ./examples/nextjs-checkout-demo/aic-behavior-contract.json
 pnpm aic inspect ./examples/nextjs-checkout-demo/aic-proof.json
+pnpm aic inspect ./examples/nextjs-checkout-demo/aic-browser-proof.json
 ```
 
 Expected summary:
@@ -60,6 +68,19 @@ Findings: 0
 ```
 
 The behavior test suite also mutates the WebMCP success outcome and asserts that both outcome conformance and parity fail.
+
+The browser-evidence test recomputes every screenshot digest and verifies that each native WebMCP observation records `document.modelContext`, the exact browser version, and the actual draft argument encoding.
+
+## Discovery endpoints
+
+With the app running:
+
+- `/aic-proof` returns the deterministic proof;
+- `/aic-browser-proof` returns the native browser proof;
+- `/aic-browser-observations` returns the raw observation set; and
+- `/.well-known/aic-trust` returns the open registry artifact.
+
+The checked-in registry is intentionally empty until a real issuer claim is added. CI-generated signed claims and trust stores are uploaded with the workflow evidence bundle rather than committed with an unsafe private key.
 
 ## Readiness versus proof
 
@@ -76,6 +97,7 @@ pnpm --dir examples/nextjs-checkout-demo run aic:verify
 - WebMCP readiness finds source and compatibility gaps.
 - QA readiness measures interaction-metadata coverage.
 - `aic verify` evaluates actual supplied observations against behavior scenarios.
+- `aic trust verify` separately validates who signed exact proof/deployment bindings.
 
 ## MCP discovery simulation
 
@@ -95,4 +117,4 @@ Override the app URL with `AIC_BASE_URL` when needed.
 
 ## Adoption path
 
-Use [Adopt AIC in an Existing App](../../docs/adopt-existing-app.md) for an owned application and [Behavior Assurance](../../docs/behavior-assurance.md) before making proof claims.
+Use [Adopt AIC in an Existing App](../../docs/adopt-existing-app.md) for an owned application, [Behavior Assurance](../../docs/behavior-assurance.md) for proof semantics, and [AIC Verified Trust Layer](../../docs/trust-layer.md) before making signed-claim or deployment claims.

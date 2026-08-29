@@ -6,11 +6,11 @@ The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 
 | Package | Purpose |
 | --- | --- |
-| `@aicorg/spec` | Interaction manifests plus behavior-contract, observation, and proof types and validators |
+| `@aicorg/spec` | Published interaction manifest types and validators |
 | `@aicorg/runtime` | Runtime registry and manifest serialization |
 | `@aicorg/sdk-react` | React SDK for explicit AIC annotations |
-| `@aicorg/automation-core` | Deterministic scanning, generation, readiness analysis, and behavior verification |
-| `@aicorg/cli` | AIC onboarding, generation, validation, verification, and inspection commands |
+| `@aicorg/automation-core` | Published deterministic scanning, generation, and readiness analysis |
+| `@aicorg/cli` | Published onboarding, generation, validation, and inspection commands |
 | `@aicorg/plugin-vite` | Vite scanning and artifact generation helpers |
 | `@aicorg/plugin-next` | Next.js scanning and artifact generation helpers |
 | `@aicorg/integrations-radix` | Radix UI helper factories |
@@ -28,9 +28,9 @@ The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 
 ## Next Alpha Wave
 
-`@aicorg/webmcp` and the new behavior-assurance additions to `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg/cli` are implemented in the repository. They are not claimed as published until the next npm alpha release completes.
+`@aicorg/webmcp`, `@aicorg/evidence-playwright`, and the behavior/trust additions to `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg/cli` are implemented in the repository. They are not claimed as published until the next npm alpha release completes.
 
-The next wave adds `aic validate behavior`, `aic verify`, protocol-neutral behavior artifacts, and deterministic parity proof generation. No separate package is required for the verifier.
+The next wave adds protocol-neutral behavior artifacts, deterministic and native-browser parity proof generation, `aic.trust/0.1` signed claims and registries, and the related CLI commands. The verifier and trust engine remain in `@aicorg/automation-core`; browser collection is the focused `@aicorg/evidence-playwright` package.
 
 ## Install Targets
 
@@ -67,6 +67,18 @@ pnpm add -D webmcp-types@0.1.5
 ```
 
 Use this only for explicit task-level tools. Generated and inferred AIC contracts remain review-only and cannot be registered by the adapter.
+
+### Native Browser Evidence
+
+```bash
+# Inside this monorepo
+pnpm add -D @aicorg/evidence-playwright@workspace:*
+
+# After the next npm alpha release
+pnpm add -D @aicorg/evidence-playwright@alpha
+```
+
+The package launches Chromium-family browsers, inspects native `document.modelContext`, safely probes draft argument encoding through a confirmed read-only tool, and executes consequential tools once with explicit evidence metadata.
 
 ### CLI-Driven Onboarding And Artifact Generation
 

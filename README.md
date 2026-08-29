@@ -2,13 +2,14 @@
 
 # AIC — Agent Interaction Control
 
-**Behavioral assurance for agent-operated software.**
+**Behavioral assurance and verifiable trust for agent-operated software.**
 
 [![npm](https://img.shields.io/npm/v/@aicorg/cli?label=%40aicorg%2Fcli&color=4f9cf9)](https://www.npmjs.com/package/@aicorg/cli)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![Status](https://img.shields.io/badge/status-alpha-orange.svg)](./docs/release-status.md)
 [![WebMCP](https://img.shields.io/badge/WebMCP-native--first-0f766e.svg)](./docs/webmcp.md)
 [![Behavior Proof](https://img.shields.io/badge/AIC%20Proof-executed-7c3aed.svg)](./docs/behavior-assurance.md)
+[![AIC Verified](https://img.shields.io/badge/AIC%20Verified-signed%20claims-2563eb.svg)](./docs/trust-layer.md)
 
 **Standards describe. AIC proves.**
 
@@ -23,24 +24,24 @@ AIC is an open-source assurance layer for that gap. It helps teams:
 - define protocol-neutral behavioral contracts;
 - execute the same scenarios across multiple surfaces;
 - fail CI when those surfaces diverge; and
-- emit a portable, digest-addressed behavior proof.
+- emit portable behavior proofs and deployment-bound, signed trust claims.
 
 AIC does not compete with WebMCP, MCP, OpenAPI, or future browser standards. Those are execution and description surfaces. AIC verifies the behavior behind them.
 
-## What is new
+## What is new: AIC Verified
 
-The repository now includes the first AIC Behavior Assurance vertical slice:
+The repository now implements the first open AIC Verified milestone:
 
-- `aic.behavior/0.1` contracts for actions, surfaces, invariants, side effects, outcomes, and parity scenarios;
-- validators and public JSON Schemas;
-- a deterministic verification engine in `@aicorg/automation-core`;
-- `aic validate behavior` and `aic verify` commands;
-- executed, imported, mixed, and no-evidence classifications;
-- canonical SHA-256 digests for contracts and observation sets;
-- a checkout harness proving human UI/WebMCP parity for success, authorization denial, and confirmation decline; and
-- a dedicated GitHub Actions gate that publishes the proof as a CI artifact.
+- `aic.behavior/0.1` contracts, observations, parity verification, and digest-addressed proofs;
+- `@aicorg/evidence-playwright`, which executes real human controls and native `document.modelContext` tools in Chrome;
+- checked-in screenshot evidence with SHA-256 digests for success, authorization denial, and confirmation decline;
+- `aic.trust/0.1` deployment-bound trust statements and Ed25519 signed claims;
+- issuer trust stores with origin policy, validity windows, and revocation state;
+- independently verifiable registries plus `/.well-known/aic-trust` discovery;
+- CLI commands for key generation, attestation, verification, registry build, and registry query; and
+- CI evidence packaging with GitHub OIDC/Sigstore artifact provenance on trusted runs.
 
-This proves what the supplied evidence demonstrates. It is not yet a cryptographic signature, remote attestation, or guarantee about production.
+The reference native-browser run produced six executed observations, passed parity, and zero findings. A signature verifies an issuer's exact claim; it does not by itself prove that a production origin is live or independently certified. Read [AIC Verified Trust Layer](./docs/trust-layer.md) for the boundary.
 
 ## Quick start
 
@@ -123,11 +124,35 @@ pnpm aic verify ./examples/nextjs-checkout-demo/aic-behavior-contract.json \
   --harness ./examples/nextjs-checkout-demo/aic-verification-harness.mjs \
   --out-file ./examples/nextjs-checkout-demo/aic-proof.json
 pnpm aic inspect ./examples/nextjs-checkout-demo/aic-proof.json
+pnpm --dir examples/nextjs-checkout-demo run aic:verify:browser
 ```
 
 `aic verify` exits nonzero when observations are missing, expected behavior fails, operation identities differ, or required surfaces are not behaviorally equivalent. Harness modules are trusted local code and execute with the permissions of the CLI process.
 
-See [Behavior Assurance](./docs/behavior-assurance.md) for the full contract and evidence model.
+See [Behavior Assurance](./docs/behavior-assurance.md) for the contract model and [AIC Verified Trust Layer](./docs/trust-layer.md) for signing and registry workflows.
+
+### 4. Bind a proof other systems can verify
+
+```bash
+aic trust keygen --issuer-id example.release \
+  --private-key ./.aic/private.pem \
+  --public-key ./.aic/public.pem \
+  --trust-store ./.aic/trust-store.json \
+  --origin https://app.example.com
+
+aic trust attest ./aic-behavior-contract.json ./aic-browser-proof.json \
+  --private-key ./.aic/private.pem \
+  --origin https://app.example.com \
+  --environment production \
+  --deployment-id deploy_001 \
+  --source-revision 0123456789abcdef0123456789abcdef01234567 \
+  --issuer-id example.release \
+  --runner-id release-evidence \
+  --runner-kind ci \
+  --out-file ./checkout-attestation.json
+```
+
+The consumer runs `aic trust verify` with its own pinned trust store plus the expected origin and revision. Never distribute the private key with the proof.
 
 ## WebMCP: native first, AIC verified
 
@@ -160,6 +185,7 @@ agent-permissions.json           permission and risk policy
 agent-workflows.json             multi-step workflows
 operate.txt                      compact operation guidance
 aic-proof.json                   behavior verification result
+/.well-known/aic-trust           signed-claim registry discovery
 ```
 
 The MCP server exposes the discovery manifests through read-only tools, so MCP-compatible agents can inspect a supported app without relying on CSS selectors or visible labels.
@@ -183,7 +209,8 @@ See [MCP Server Setup](./docs/mcp-server.md).
 |---|---|
 | `@aicorg/spec` | Interaction manifests, behavior contracts, proof types, and validators |
 | `@aicorg/automation-core` | Deterministic scanning, generation, readiness analysis, and behavior verification |
-| `@aicorg/cli` | `init`, `doctor`, `scan`, `generate`, `validate`, `verify`, `inspect`, `diff`, and `apply` |
+| `@aicorg/evidence-playwright` | Native browser and WebMCP evidence collection primitives |
+| `@aicorg/cli` | Onboarding, behavior verification, trust signing/verification, registry, inspection, diff, and guarded apply commands |
 | `@aicorg/runtime` | Browser registry and live UI manifest serialization |
 | `@aicorg/sdk-react` | React hooks and components for explicit `agent*` semantics |
 | `@aicorg/webmcp` | Native WebMCP compatibility and guarded registration |
@@ -202,8 +229,10 @@ Start with the [Next.js checkout demo](./examples/nextjs-checkout-demo). It cont
 - an AIC-instrumented critical checkout action;
 - native WebMCP registration;
 - a shared checkout domain operation;
-- a behavior contract and executable harness; and
-- a checked-in [behavior proof](./examples/nextjs-checkout-demo/aic-proof.json).
+- a behavior contract and deterministic harness;
+- a strict native browser/WebMCP harness;
+- a checked-in [browser proof](./examples/nextjs-checkout-demo/aic-browser-proof.json) and [raw observations](./examples/nextjs-checkout-demo/aic-browser-observations.json); and
+- six screenshot evidence files with verified digests.
 
 The broader benchmark corpus includes real browser-agent experiments on TailAdmin and a measured adoption slice on Twenty CRM. Those benchmarks measure agent task performance; the new behavior proof measures contract conformance and cross-surface parity. They answer different questions.
 
@@ -222,8 +251,9 @@ Current limitations:
 - dynamic JSX extraction produces diagnostics instead of guesses;
 - bootstrap suggestions require review;
 - WebMCP tracks an experimental browser API;
-- the included harness proof is local evidence, not production attestation;
-- proof signing, transparency logs, remote runners, and hosted policy enforcement are not implemented yet.
+- the included signed-claim primitives verify issuer intent, not current production reachability;
+- the public registry interface has no fabricated external-adopter entries;
+- independent remote production runners, a general transparency log, hosted policy enforcement, and certification are not implemented yet.
 
 Read [Supported Today](./docs/supported-today.md) and [Threat Model](./docs/threat-model.md) before making assurance claims.
 
@@ -236,6 +266,7 @@ pnpm build
 pnpm test
 pnpm test:goldens
 pnpm --dir examples/nextjs-checkout-demo run aic:verify
+pnpm --dir examples/nextjs-checkout-demo run aic:verify:browser
 ```
 
 Generated AIC JSON should be regenerated and reviewed, not hand-edited.
@@ -245,6 +276,7 @@ Generated AIC JSON should be regenerated and reviewed, not hand-edited.
 | Document | Focus |
 |---|---|
 | [Behavior Assurance](./docs/behavior-assurance.md) | Contracts, observations, proof semantics, harnesses, and CI |
+| [AIC Verified Trust Layer](./docs/trust-layer.md) | Native browser evidence, signed claims, trust stores, registries, and trust boundaries |
 | [WebMCP with AIC](./docs/webmcp.md) | Native-first integration and compatibility boundary |
 | [Architecture](./docs/architecture.md) | Packages, data flow, and trust boundaries |
 | [Manifest Spec](./docs/manifest-spec.md) | Discovery and interaction artifacts |
@@ -263,7 +295,7 @@ JSON Schemas live under [`schemas/`](./schemas/).
 
 AIC is Apache-2.0 licensed for commercial and non-commercial use. The core contract, verifier, CLI, adapters, examples, and schemas are intended to remain open so teams and agent vendors can build on a neutral assurance layer.
 
-Commercial work can sit above the open core: hosted evidence collection, policy gates, signed attestations, conformance programs, and implementation support. See [Services](./SERVICES.md) and [Contributor Licensing](./CONTRIBUTOR-LICENSING.md).
+Commercial work can sit above the open core: hosted evidence collection, managed remote runners, policy dashboards, transparency services, conformance programs, and implementation support. See [Services](./SERVICES.md) and [Contributor Licensing](./CONTRIBUTOR-LICENSING.md).
 
 <div align="center">
 

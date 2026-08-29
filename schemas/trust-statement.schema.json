@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/trust-statement.schema.json",
+  "title": "AIC Trust Statement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "deployment",
+    "issued_at",
+    "issuer",
+    "runner",
+    "spec",
+    "subject"
+  ],
+  "properties": {
+    "artifact_type": { "const": "aic_trust_statement" },
+    "spec": { "const": "aic.trust/0.1" },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "issuer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": {
+          "enum": ["github_actions", "ci", "developer", "organization", "other"]
+        }
+      }
+    },
+    "runner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["github_actions", "ci", "local", "remote"] },
+        "repository": { "type": "string", "minLength": 1 },
+        "workflow": { "type": "string", "minLength": 1 },
+        "run_id": { "type": "string", "minLength": 1 },
+        "commit_sha": { "$ref": "#/$defs/sourceRevision" }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deployment_id", "environment", "origin", "source_revision"],
+      "properties": {
+        "deployment_id": { "type": "string", "minLength": 1 },
+        "environment": { "enum": ["production", "staging", "test", "development"] },
+        "origin": { "type": "string", "format": "uri", "pattern": "^https?://[^/]+$" },
+        "source_revision": { "$ref": "#/$defs/sourceRevision" },
+        "source_repository": { "type": "string", "minLength": 1 },
+        "artifact_digest": { "$ref": "#/$defs/digest" },
+        "deployed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_digest",
+        "contract_id",
+        "evidence_level",
+        "generated_at",
+        "operation_id",
+        "proof_digest",
+        "proof_status"
+      ],
+      "properties": {
+        "contract_digest": { "$ref": "#/$defs/digest" },
+        "contract_id": { "type": "string", "minLength": 1 },
+        "evidence_level": { "enum": ["executed", "imported", "mixed", "none"] },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "operation_id": { "type": "string", "minLength": 1 },
+        "proof_digest": { "$ref": "#/$defs/digest" },
+        "proof_status": { "const": "passed" }
+      }
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contract": { "type": "string", "minLength": 1 },
+        "observations": { "type": "string", "minLength": 1 },
+        "proof": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "sourceRevision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
+    }
+  }
+}

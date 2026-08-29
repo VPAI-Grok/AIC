@@ -1,0 +1,7 @@
+{
+  "artifact_type": "aic_trust_registry",
+  "entries": [],
+  "id": "https://github.com/VPAI-Grok/AIC/tree/main/registry",
+  "spec": "aic.trust/0.1",
+  "updated_at": "2026-08-29T00:00:00.000Z"
+}

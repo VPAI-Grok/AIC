@@ -7,9 +7,15 @@ on:
       - "examples/nextjs-checkout-demo/**"
       - "packages/automation-core/**"
       - "packages/cli/**"
+      - "packages/evidence-playwright/**"
       - "packages/spec/**"
+      - "registry/**"
       - "schemas/behavior-*.schema.json"
+      - "schemas/signed-attestation.schema.json"
+      - "schemas/trust-*.schema.json"
       - "tests/behavior-assurance.test.mjs"
+      - "tests/browser-evidence.test.mjs"
+      - "tests/trust-layer.test.mjs"
   push:
     branches:
       - main
@@ -18,14 +24,24 @@ on:
       - "examples/nextjs-checkout-demo/**"
       - "packages/automation-core/**"
       - "packages/cli/**"
+      - "packages/evidence-playwright/**"
       - "packages/spec/**"
+      - "registry/**"
       - "schemas/behavior-*.schema.json"
+      - "schemas/signed-attestation.schema.json"
+      - "schemas/trust-*.schema.json"
       - "tests/behavior-assurance.test.mjs"
+      - "tests/browser-evidence.test.mjs"
+      - "tests/trust-layer.test.mjs"
   workflow_dispatch:
 
 jobs:
   prove-checkout-parity:
     runs-on: ubuntu-latest
+    permissions:
+      attestations: write
+      contents: read
+      id-token: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -33,7 +49,7 @@ jobs:
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.8.1
+          version: 10.28.2
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -45,16 +61,108 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Build behavior assurance dependencies
-        run: pnpm --filter @aicorg/cli... build
+        run: pnpm --filter @aicorg/evidence-playwright --filter @aicorg/cli... build
 
       - name: Run behavior assurance tests
-        run: node --test tests/behavior-assurance.test.mjs
+        run: node --test tests/behavior-assurance.test.mjs tests/browser-evidence.test.mjs tests/trust-layer.test.mjs
 
       - name: Generate checkout behavior proof
         run: pnpm --dir examples/nextjs-checkout-demo run aic:verify
 
+      - name: Locate installed Chrome
+        shell: bash
+        run: |
+          chrome_path="$(command -v google-chrome || command -v google-chrome-stable || true)"
+          if [ -z "$chrome_path" ]; then
+            echo "Google Chrome is required for the strict native WebMCP evidence lane." >&2
+            exit 1
+          fi
+          echo "AIC_BROWSER_EXECUTABLE_PATH=$chrome_path" >> "$GITHUB_ENV"
+          "$chrome_path" --version
+
+      - name: Generate native WebMCP browser proof
+        run: pnpm --dir examples/nextjs-checkout-demo run aic:verify:browser
+
+      - name: Create deployment-bound signed claim and registry
+        shell: bash
+        run: |
+          issuer_dir="$RUNNER_TEMP/aic-issuer"
+          attestations_dir="$RUNNER_TEMP/aic-attestations"
+          mkdir -p "$issuer_dir" "$attestations_dir"
+          node packages/cli/dist/cli/src/index.js trust keygen \
+            --issuer-id "github:${GITHUB_REPOSITORY}:behavior-assurance" \
+            --private-key "$issuer_dir/private.pem" \
+            --public-key examples/nextjs-checkout-demo/aic-ci-public.pem \
+            --trust-store examples/nextjs-checkout-demo/aic-ci-trust-store.json \
+            --origin http://127.0.0.1:3100
+          node packages/cli/dist/cli/src/index.js trust attest \
+            examples/nextjs-checkout-demo/aic-behavior-contract.json \
+            examples/nextjs-checkout-demo/aic-browser-proof.json \
+            --private-key "$issuer_dir/private.pem" \
+            --origin http://127.0.0.1:3100 \
+            --environment test \
+            --deployment-id "github-actions-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --source-revision "$GITHUB_SHA" \
+            --source-repository "https://github.com/${GITHUB_REPOSITORY}" \
+            --issuer-id "github:${GITHUB_REPOSITORY}:behavior-assurance" \
+            --issuer-kind github_actions \
+            --runner-id "github-actions:${GITHUB_RUN_ID}:${GITHUB_RUN_ATTEMPT}" \
+            --runner-kind github_actions \
+            --runner-commit "$GITHUB_SHA" \
+            --runner-repository "$GITHUB_REPOSITORY" \
+            --runner-workflow behavior-assurance.yml \
+            --runner-run-id "$GITHUB_RUN_ID" \
+            --contract-ref ./aic-behavior-contract.json \
+            --observations-ref ./aic-browser-observations.json \
+            --proof-ref ./aic-browser-proof.json \
+            --out-file "$attestations_dir/checkout.json"
+          cp "$attestations_dir/checkout.json" examples/nextjs-checkout-demo/aic-ci-attestation.json
+          node packages/cli/dist/cli/src/index.js trust verify \
+            examples/nextjs-checkout-demo/aic-ci-attestation.json \
+            --trust-store examples/nextjs-checkout-demo/aic-ci-trust-store.json \
+            --contract examples/nextjs-checkout-demo/aic-behavior-contract.json \
+            --proof examples/nextjs-checkout-demo/aic-browser-proof.json \
+            --expect-origin http://127.0.0.1:3100 \
+            --expect-revision "$GITHUB_SHA"
+          node packages/cli/dist/cli/src/index.js registry build \
+            "$attestations_dir" \
+            --trust-store examples/nextjs-checkout-demo/aic-ci-trust-store.json \
+            --registry-id "github:${GITHUB_REPOSITORY}:checkout" \
+            --out-file examples/nextjs-checkout-demo/aic-ci-registry.json
+          node packages/cli/dist/cli/src/index.js registry verify \
+            examples/nextjs-checkout-demo/aic-ci-registry.json \
+            --trust-store examples/nextjs-checkout-demo/aic-ci-trust-store.json
+
+      - name: Package AIC Verified evidence
+        shell: bash
+        run: |
+          tar -czf aic-verified-checkout.tgz \
+            examples/nextjs-checkout-demo/aic-behavior-contract.json \
+            examples/nextjs-checkout-demo/aic-browser-observations.json \
+            examples/nextjs-checkout-demo/aic-browser-proof.json \
+            examples/nextjs-checkout-demo/aic-browser-evidence \
+            examples/nextjs-checkout-demo/aic-ci-attestation.json \
+            examples/nextjs-checkout-demo/aic-ci-public.pem \
+            examples/nextjs-checkout-demo/aic-ci-registry.json \
+            examples/nextjs-checkout-demo/aic-ci-trust-store.json
+
+      - name: Attest CI evidence provenance
+        if: github.event_name != 'pull_request'
+        uses: actions/attest@v4
+        with:
+          subject-path: aic-verified-checkout.tgz
+
       - name: Upload behavior proof
         uses: actions/upload-artifact@v4
         with:
-          name: checkout-behavior-proof
-          path: examples/nextjs-checkout-demo/aic-proof.json
+          name: aic-verified-checkout
+          path: |
+            aic-verified-checkout.tgz
+            examples/nextjs-checkout-demo/aic-proof.json
+            examples/nextjs-checkout-demo/aic-browser-observations.json
+            examples/nextjs-checkout-demo/aic-browser-proof.json
+            examples/nextjs-checkout-demo/aic-browser-evidence
+            examples/nextjs-checkout-demo/aic-ci-attestation.json
+            examples/nextjs-checkout-demo/aic-ci-public.pem
+            examples/nextjs-checkout-demo/aic-ci-registry.json
+            examples/nextjs-checkout-demo/aic-ci-trust-store.json

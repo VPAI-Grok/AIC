@@ -43,6 +43,10 @@ function normalizeRelativePath(pathValue) {
   return pathValue.replaceAll("\\", "/").replace(/^\/+/, "");
 }
 
+function normalizeFileContents(contents) {
+  return contents.replaceAll("\r\n", "\n");
+}
+
 function sortObject(value) {
   if (Array.isArray(value)) {
     return value.map((item) => sortObject(item));
@@ -94,7 +98,9 @@ export async function readDirectoryFileMap(rootDir, baseDir = rootDir) {
       }
 
       return {
-        [normalizeRelativePath(entryPath.slice(`${resolvedBaseDir}/`.length))]: await readFile(entryPath, "utf8")
+        [normalizeRelativePath(entryPath.slice(`${resolvedBaseDir}/`.length))]: normalizeFileContents(
+          await readFile(entryPath, "utf8")
+        )
       };
     })
   );

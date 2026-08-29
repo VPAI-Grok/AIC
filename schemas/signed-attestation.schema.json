@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/signed-attestation.schema.json",
+  "title": "AIC Signed Attestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "payload_type", "signature", "spec", "statement"],
+  "properties": {
+    "artifact_type": { "const": "aic_signed_attestation" },
+    "spec": { "const": "aic.trust/0.1" },
+    "payload_type": { "const": "application/vnd.aic.trust-statement+json" },
+    "statement": { "$ref": "./trust-statement.schema.json" },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "key_id", "value"],
+      "properties": {
+        "algorithm": { "const": "ed25519" },
+        "key_id": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "value": { "type": "string", "contentEncoding": "base64", "minLength": 1 }
+      }
+    }
+  }
+}

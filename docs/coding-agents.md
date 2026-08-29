@@ -27,6 +27,7 @@ Optional advanced helper:
 4. Run `aic doctor [project-root]` to audit readiness before generating artifacts.
 5. Run `aic scan`, `aic generate project`, `aic inspect report.json`, and `aic validate ...` as part of review.
 6. For consequential actions exposed through more than one surface, map every entrypoint to one domain `operation_id`, define a behavior contract, and run `aic verify`.
+7. Use native browser evidence for rendered UI/WebMCP claims and sign only passed proofs that are bound to an exact origin, deployment, and revision.
 
 Manual fallback:
 
@@ -43,13 +44,15 @@ Manual fallback:
 - Regenerate AIC artifacts instead of hand-editing generated JSON.
 - Prefer native protocol fields when they are equivalent.
 - Keep metadata readiness separate from executed behavior proof.
-- Never describe an unsigned local proof as production attestation.
+- Never describe a local signed claim as independent proof of production reachability or certification.
 
 ## Optional Validation
 
 `aic doctor [project-root]` is the primary readiness audit, and `aic generate project <config-file> --out-dir <dir>` still records an `agent_onboarding` section in `report.json`.
 
 `aic validate behavior` and `aic verify` are separate assurance gates when a behavior contract exists.
+
+`aic trust attest`, `aic trust verify`, and `aic registry verify` are additional gates when an issuer makes a deployment-bound claim. A registry is discovery data; agents must verify embedded attestations against a separately pinned trust store.
 
 - Missing recommended files are warnings only.
 - Template-managed files can be marked stale if their embedded template version falls behind.

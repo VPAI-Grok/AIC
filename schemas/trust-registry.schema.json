@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/trust-registry.schema.json",
+  "title": "AIC Trust Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "entries", "id", "spec", "updated_at"],
+  "properties": {
+    "artifact_type": { "const": "aic_trust_registry" },
+    "spec": { "const": "aic.trust/0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "attestation",
+          "attestation_digest",
+          "deployment_id",
+          "environment",
+          "id",
+          "operation_id",
+          "origin"
+        ],
+        "properties": {
+          "attestation": { "$ref": "./signed-attestation.schema.json" },
+          "attestation_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+          "deployment_id": { "type": "string", "minLength": 1 },
+          "environment": { "enum": ["production", "staging", "test", "development"] },
+          "id": { "type": "string", "minLength": 1 },
+          "operation_id": { "type": "string", "minLength": 1 },
+          "origin": { "type": "string", "format": "uri", "pattern": "^https?://[^/]+$" }
+        }
+      }
+    }
+  }
+}

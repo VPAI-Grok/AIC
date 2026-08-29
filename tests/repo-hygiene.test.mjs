@@ -19,6 +19,7 @@ const requiredFiles = [
   "docs/coding-agents.md",
   "docs/npm-packages.md",
   "docs/supported-today.md",
+  "docs/trust-layer.md",
   ".github/copilot-instructions.md",
   ".github/skills/aic-onboarding/SKILL.md",
   ".cursor/rules/aic.mdc",
@@ -30,6 +31,13 @@ const requiredFiles = [
   "schemas/behavior-contract.schema.json",
   "schemas/behavior-observation-set.schema.json",
   "schemas/behavior-proof.schema.json",
+  "schemas/signed-attestation.schema.json",
+  "schemas/trust-registry.schema.json",
+  "schemas/trust-statement.schema.json",
+  "schemas/trust-store.schema.json",
+  "registry/index.json",
+  "registry/README.md",
+  "packages/evidence-playwright/package.json",
   "templates/agent-onboarding/AGENTS.md",
   "templates/agent-onboarding/CLAUDE.md",
   "templates/agent-onboarding/GEMINI.md",
@@ -37,6 +45,10 @@ const requiredFiles = [
   "templates/agent-onboarding/.cursor/rules/aic.mdc",
   "templates/agent-onboarding/.github/skills/aic-onboarding/SKILL.md"
 ];
+
+function normalizeLineEndings(value) {
+  return value.replaceAll("\r\n", "\n");
+}
 
 test("public launch files exist and README points to the public entrypoints", async () => {
   await Promise.all(
@@ -48,6 +60,8 @@ test("public launch files exist and README points to the public entrypoints", as
   const readme = await readFile(resolveFromRepo("README.md"), "utf8");
   assert.match(readme, /Quick start/i);
   assert.match(readme, /Behavior Assurance/);
+  assert.match(readme, /AIC Verified/);
+  assert.match(readme, /trust-layer\.md/);
   assert.match(readme, /Standards describe\. AIC proves\./);
   assert.match(readme, /release-status\.md/);
   assert.match(readme, /supported-today\.md/);
@@ -83,7 +97,10 @@ test("automation-core onboarding templates stay in sync with checked-in template
         "utf8"
       );
 
-      assert.equal(templateFile.contents, checkedInContents);
+      assert.equal(
+        normalizeLineEndings(templateFile.contents),
+        normalizeLineEndings(checkedInContents)
+      );
     })
   );
 });

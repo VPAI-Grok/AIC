@@ -37,7 +37,21 @@ Supported in the repository:
 - cross-surface parity verification;
 - canonical contract and observation digests;
 - `aic validate behavior`, `aic verify`, and proof inspection; and
-- a checkout reference harness plus a dedicated CI proof workflow.
+- deterministic and native-browser checkout harnesses plus a dedicated CI proof workflow.
+
+## AIC Verified trust
+
+Supported in the repository:
+
+- native Chrome/WebMCP evidence through `@aicorg/evidence-playwright`;
+- `aic.trust/0.1` trust statements bound to passed behavior proofs;
+- Ed25519 signatures and SHA-256-derived key identities;
+- pinned issuer trust stores with origin, validity, and revocation policy;
+- exact deployment, environment, origin, and full source-revision claims;
+- independently verifiable embedded-attestation registries;
+- `/.well-known/aic-trust` registry discovery;
+- CLI key, attestation, verification, registry build, registry verify, and registry query workflows; and
+- GitHub artifact provenance for the CI evidence archive on trusted workflow runs.
 
 ## Not guaranteed
 
@@ -48,15 +62,18 @@ Supported in the repository:
 - automatic promotion of generated or inferred actions to executable tools;
 - correctness or completeness of a user-authored behavior contract;
 - authenticity of imported evidence;
-- binding between a local proof and a deployed production build; or
-- signed attestations, transparency logs, or hosted policy enforcement.
+- independent proof that a claimed revision is currently deployed at an origin;
+- protection from a compromised trusted issuer or dishonest runner;
+- a general public transparency log, hosted policy enforcement, or independent certification; or
+- external adoption merely because the open registry interface exists.
 
 ## Reading AIC claims
 
-There are now three distinct evidence levels:
+There are now four distinct evidence levels:
 
 1. Generated manifests show that semantics were authored or extracted.
 2. QA readiness shows that selected metadata is present and structurally usable.
 3. Behavior proof shows that supplied observations passed explicit scenarios and parity rules.
+4. A verified signed claim shows that a pinned issuer signed exact proof and deployment bindings.
 
-None should be described as stronger than the evidence it contains. See [Behavior Assurance](./behavior-assurance.md) and [Threat Model](./threat-model.md).
+The fourth level verifies an issuer's claim, not current production reachability. None should be described as stronger than its evidence. See [Behavior Assurance](./behavior-assurance.md), [AIC Verified Trust Layer](./trust-layer.md), and [Threat Model](./threat-model.md).

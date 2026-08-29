@@ -17,9 +17,9 @@ The original phases are represented in the repository:
 
 The repo also includes automation core, HTTP and OpenAI bootstrap providers, a read-only MCP server, coding-agent onboarding, guarded source apply, WebMCP compatibility, QA readiness, and real-app benchmarks.
 
-## Current phase: behavior assurance foundation
+## Completed: behavior assurance foundation
 
-The first vertical slice is implemented:
+The protocol-neutral vertical slice is implemented:
 
 - protocol-neutral behavior contracts;
 - observation and proof types plus JSON Schemas;
@@ -29,30 +29,35 @@ The first vertical slice is implemented:
 - success, authorization-denial, and confirmation-decline scenarios; and
 - a CI proof artifact.
 
-This phase establishes the open contract and verifier. It does not yet establish production-grade evidence authenticity.
+## Completed: AIC Verified technical milestone
 
-## Next milestone: trustworthy evidence adapters
+The repository now includes:
+
+1. `@aicorg/evidence-playwright` for rendered browser evidence.
+2. A strict native `document.modelContext` WebMCP runner.
+3. Browser observations with version/API/encoding metadata and digest-addressed screenshots.
+4. `aic.trust/0.1` origin, deployment, revision, contract, operation, and proof bindings.
+5. Ed25519 signatures, pinned trust stores, origin restrictions, key validity, and revocation state.
+6. An open embedded-attestation registry plus `/.well-known/aic-trust` discovery.
+7. CI evidence bundles with GitHub artifact provenance on trusted runs.
+8. Tamper, binding, registry, CLI, and checked-in browser-evidence tests.
+
+This completes the in-repository technical milestone. It does not manufacture independent adoption or turn an issuer's signed claim into independent production certification.
+
+## Next milestone: ecosystem proof and adoption
 
 Priorities:
 
-1. Browser/Playwright observation adapter that proves the rendered human path.
-2. WebMCP browser runner against a supported experimental browser.
-3. MCP and HTTP/OpenAPI observation adapters.
-4. Deployment and commit metadata in evidence without overstating trust.
-5. Reusable contract packs for checkout, billing, account deletion, admin mutations, and record CRUD.
-6. Configurable CI policies by risk, evidence level, scenario class, and parity requirement.
-7. Verifier compatibility fixtures so alternative implementations can conform.
+1. Three real external applications publishing independently verifiable claims.
+2. Remote production observation runners that verify origin, deployment, and revision from outside the app owner's CI.
+3. MCP and HTTP/OpenAPI evidence adapters using the same observation contract.
+4. Reusable conformance packs for checkout, billing, account deletion, admin mutations, and record CRUD.
+5. Configurable CI policies by risk, evidence level, scenario class, freshness, and parity requirement.
+6. Verifier compatibility fixtures for independent implementations.
+7. Tamper-evident public provenance/transparency indexing and key-rotation operations.
+8. Hosted evidence history and policy dashboards that remain compatible with the open verifier.
 
-## Later: ecosystem trust layer
-
-- signed and deployment-bound proofs;
-- remote or attested runners;
-- tamper-evident transparency logs;
-- public conformance profiles and registries;
-- hosted evidence collection and policy dashboards; and
-- independent certification programs.
-
-The open contract, schemas, verifier, and local runner remain the foundation. Hosted capabilities should add convenience and trust, not lock users out of their evidence.
+The contracts, schemas, verifier, signing format, local/browser runner, and registry format remain open. Hosted capabilities should add convenience and independently operated trust, not lock users out of their evidence.
 
 ## Ongoing stabilization
 
@@ -66,6 +71,6 @@ The open contract, schemas, verifier, and local runner remain the foundation. Ho
 
 - replacing WebMCP, MCP, OpenAPI, or browser automation;
 - silently promoting inferred actions to execution-ready status;
-- claiming production attestation from local fixture evidence;
+- claiming production reachability or independent certification from a local or CI-signed claim;
 - broad heuristic repo mutation; and
 - expanding framework breadth before the assurance core is stable.

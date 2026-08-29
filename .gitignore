@@ -7,10 +7,6 @@ coverage
 *.tsbuildinfo
 .DS_Store
 *.log
-examples/nextjs-checkout-demo/public/agent-permissions.json
-examples/nextjs-checkout-demo/public/agent-workflows.json
-examples/nextjs-checkout-demo/public/operate.txt
-examples/nextjs-checkout-demo/public/report.json
 benchmarks/twenty-adoption/benchmark-results-rerun.csv
 benchmarks/twenty-adoption/benchmark-summary-rerun.md
 examples/tailadmin-dashboard/

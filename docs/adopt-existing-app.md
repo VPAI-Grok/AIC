@@ -184,7 +184,26 @@ aic verify ./aic-behavior-contract.json \
 
 Cover success, denial, confirmation decline, declared failures, recovery, and required parity in proportion to the action's risk. See [Behavior Assurance](./behavior-assurance.md).
 
-## 7. Connect An Agent
+## 7. Bind High-Value Claims
+
+For a proof you intend other systems to rely on, collect rendered browser or remote evidence, bind the passed proof to the exact origin/deployment/revision, and sign it with a protected issuer key.
+
+```bash
+aic trust attest ./aic-behavior-contract.json ./aic-browser-proof.json \
+  --private-key "$AIC_ISSUER_PRIVATE_KEY_FILE" \
+  --origin https://app.example.com \
+  --environment production \
+  --deployment-id deploy_001 \
+  --source-revision 0123456789abcdef0123456789abcdef01234567 \
+  --issuer-id example.release \
+  --runner-id production-evidence \
+  --runner-kind remote \
+  --out-file ./checkout-attestation.json
+```
+
+Consumers should verify with a separately pinned trust store and explicit origin/revision expectations. See [AIC Verified Trust Layer](./trust-layer.md). A signature proves the issuer's exact claim, not independent production reachability.
+
+## 8. Connect An Agent
 
 For MCP-compatible tools like Claude Desktop or Cursor:
 
@@ -225,6 +244,7 @@ You are done with the first slice when:
 - generated artifacts are current
 - an agent can resolve the slice through AIC instead of guessing from text or selectors
 - consequential multi-surface actions have passing behavior scenarios and required parity evidence
+- externally relied-on claims are signed, deployment-bound, and independently verified against a pinned issuer key
 
 Expected output after the first slice:
 - a valid `aic.project.json`
@@ -232,3 +252,4 @@ Expected output after the first slice:
 - current discovery/UI/actions/permissions/workflows artifacts
 - an MCP-readable contract for the workflow you instrumented
 - a reviewed behavior contract and proof when the workflow has multiple execution surfaces
+- an optional signed trust claim and well-known registry for consumers that need deployment-bound verification

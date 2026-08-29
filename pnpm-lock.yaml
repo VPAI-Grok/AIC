@@ -56,6 +56,9 @@ importers:
       '@aicorg/devtools':
         specifier: workspace:*
         version: link:../../packages/devtools
+      '@aicorg/evidence-playwright':
+        specifier: workspace:*
+        version: link:../../packages/evidence-playwright
       '@aicorg/sdk-react':
         specifier: workspace:*
         version: link:../../packages/sdk-react
@@ -315,6 +318,12 @@ importers:
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
+
+  packages/evidence-playwright:
+    dependencies:
+      playwright:
+        specifier: ^1.52.0
+        version: 1.58.2
 
   packages/cli:
     dependencies:

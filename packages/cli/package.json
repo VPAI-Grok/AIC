@@ -2,7 +2,7 @@
   "name": "@aicorg/cli",
   "version": "0.1.0-alpha.1",
   "type": "module",
-  "description": "CLI for onboarding, generating, validating, verifying, and inspecting AIC contracts and proofs.",
+  "description": "CLI for AIC onboarding, behavior proof, signed trust claim, and registry workflows.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
     "aic",
     "agents",
     "assurance",
+    "attestation",
     "cli",
     "testing",
     "tooling"

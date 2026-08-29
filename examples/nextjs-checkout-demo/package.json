@@ -9,6 +9,7 @@
     "aic:qa-plan": "node ../../packages/cli/dist/cli/src/index.js generate qa-plan ./public/report.json --out-file ./public/aic-qa-plan.json",
     "aic:qa-readiness": "node ../../packages/cli/dist/cli/src/index.js inspect qa-readiness ./public/report.json",
     "aic:verify": "node ../../packages/cli/dist/cli/src/index.js verify ./aic-behavior-contract.json --harness ./aic-verification-harness.mjs --out-file ./aic-proof.json --generated-at 2026-08-28T00:00:00.000Z",
+    "aic:verify:browser": "node ../../packages/cli/dist/cli/src/index.js verify ./aic-behavior-contract.json --harness ./aic-browser-verification-harness.mjs --observations-out-file ./aic-browser-observations.json --out-file ./aic-browser-proof.json",
     "aic:webmcp": "node ../../packages/cli/dist/cli/src/index.js doctor . --webmcp",
     "aic:webmcp-plan": "node ../../packages/cli/dist/cli/src/index.js generate webmcp-plan ./app --out-file ./webmcp-plan.json",
     "dev": "next dev",
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "@aicorg/devtools": "workspace:*",
+    "@aicorg/evidence-playwright": "workspace:*",
     "@aicorg/sdk-react": "workspace:*",
     "@aicorg/spec": "workspace:*",
     "@aicorg/webmcp": "workspace:*",

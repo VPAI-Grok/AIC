@@ -13,6 +13,7 @@ That means teams can adopt it freely, including in commercial products and inter
 - behavior-assurance sprints that define contracts for consequential operations and execute success, denial, confirmation, failure, and recovery scenarios
 - cross-surface parity work for human UI, WebMCP, MCP, and API entrypoints
 - CI proof gates, evidence adapters, regression suites, and proof-retention policy
+- issuer-key setup, deployment-bound signed claims, trust-store policy, and registry integration
 - WebMCP implementation and compatibility work that remains native-first and routes to shared domain operations
 - private support retainers and faster response channels
 - training, architecture reviews, and integration workshops
@@ -21,7 +22,7 @@ That means teams can adopt it freely, including in commercial products and inter
 
 - hosted evidence collection, proof history, and contract review workflows
 - managed bootstrap and review pipelines
-- signed and deployment-bound attestations, policy gates, and transparency services
+- managed remote evidence runners, policy gates, and transparency services
 - reusable conformance packs and independent certification support
 - enterprise support, SLAs, and compliance packaging
 - premium integrations or managed cloud features
@@ -48,6 +49,7 @@ The recommended strategy for AIC at this stage is:
 - maximize adoption with Apache-2.0
 - monetize implementation, support, and hosted value
 - keep contracts, schemas, the verifier, and local evidence collection open
-- build the official ecosystem around trustworthy runners, reusable conformance packs, and portable proof
+- keep signing, verification, trust-store, registry, and local/browser evidence formats open
+- build the official ecosystem around independently operated runners, reusable conformance packs, and portable proof
 - use WebMCP as a native execution layer while AIC remains the protocol-neutral assurance layer
-- never imply that an unsigned local proof is a production or compliance attestation
+- never imply that an issuer-signed claim independently proves production reachability or compliance certification

@@ -26,5 +26,5 @@ AIC will be a protocol-neutral behavioral assurance layer.
 - AIC remains useful if WebMCP implements current wrapper features.
 - New protocols can become surfaces without redesigning business contracts.
 - Contract packs, evidence adapters, CI policies, proof history, and conformance become the ecosystem strategy.
-- Local proofs must be described honestly until signing, deployment binding, attested runners, and transparency mechanisms exist.
+- Local proofs remain local evidence. The later `aic.trust/0.1` signature and deployment binding identify an issuer's exact claim but do not independently prove production reachability.
 - Open contracts, schemas, verifier, and local runners are required for neutral adoption; commercial value should sit in hosted trust and operational tooling.

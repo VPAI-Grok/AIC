@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
 # AIC Agent Onboarding
 
 Use AIC when this repo needs reliable interaction semantics and behavioral assurance for AI agents.
@@ -12,6 +12,7 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 5. Fix review findings before treating interaction metadata as ready.
 6. Add behavior contracts and executable scenarios for consequential multi-surface actions.
 7. Run `aic verify` before claiming behavioral parity.
+8. Use rendered/native evidence and a deployment-bound signed claim before asking other systems to rely on the proof.
 
 ## Rules
 
@@ -23,6 +24,8 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 - one stable domain `operation_id` for surfaces that perform the same business action
 - native protocol fields before duplicate AIC fields
 - readiness and executed proof are separate claims
+- a signed issuer claim is not independent production certification
+- registries are untrusted discovery and require a separately pinned trust store
 - generated JSON stays generated
 
 ## WebMCP Rules
@@ -43,3 +46,5 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 - `aic validate <kind> <file>`
 - `aic validate behavior <behavior-contract-file>`
 - `aic verify <behavior-contract-file> --harness <module> --out-file <proof-file>`
+- `aic trust verify <attestation-file> --trust-store <file> --contract <contract-file> --proof <proof-file> --expect-origin <origin> --expect-revision <revision>`
+- `aic registry verify <registry-file> --trust-store <file>`

@@ -40,6 +40,7 @@ import {
 } from "@aicorg/spec";
 
 export * from "./assurance.js";
+export * from "./trust.js";
 
 export type AICAutomationSeverity = "warning" | "error";
 export type AICAutomationManifestKind = AICManifestKind;
@@ -132,7 +133,7 @@ export type {
 
 export type AICProjectArtifactReport = AICAuthoringProjectReport;
 
-export const AIC_AGENT_ONBOARDING_TEMPLATE_VERSION = "3";
+export const AIC_AGENT_ONBOARDING_TEMPLATE_VERSION = "4";
 
 export type AICQAReadinessGrade = "pilot_ready" | "review_needed" | "not_ready";
 
@@ -310,7 +311,7 @@ export interface AICDoctorOptions {
 
 export const AIC_AGENT_ONBOARDING_TEMPLATE_FILES: AICAgentOnboardingTemplateFile[] = [
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
 # AIC Agent Onboarding
 
 Use AIC when this repo needs reliable interaction semantics and behavioral assurance for AI agents.
@@ -324,6 +325,7 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 5. Fix review findings before treating interaction metadata as ready.
 6. Add behavior contracts and executable scenarios for consequential multi-surface actions.
 7. Run \`aic verify\` before claiming behavioral parity.
+8. Use rendered/native evidence and a deployment-bound signed claim before asking other systems to rely on the proof.
 
 ## Rules
 
@@ -335,6 +337,8 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 - one stable domain \`operation_id\` for surfaces that perform the same business action
 - native protocol fields before duplicate AIC fields
 - readiness and executed proof are separate claims
+- a signed issuer claim is not independent production certification
+- registries are untrusted discovery and require a separately pinned trust store
 - generated JSON stays generated
 
 ## WebMCP Rules
@@ -355,6 +359,8 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 - \`aic validate <kind> <file>\`
 - \`aic validate behavior <behavior-contract-file>\`
 - \`aic verify <behavior-contract-file> --harness <module> --out-file <proof-file>\`
+- \`aic trust verify <attestation-file> --trust-store <file> --contract <contract-file> --proof <proof-file> --expect-origin <origin> --expect-revision <revision>\`
+- \`aic registry verify <registry-file> --trust-store <file>\`
 `,
     kind: "canonical",
     path: "AGENTS.md",
@@ -362,7 +368,7 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
     template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   },
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
 # Claude Code Wrapper
 
 Read \`AGENTS.md\` first and treat it as the canonical AIC policy for this repo.
@@ -373,7 +379,7 @@ Read \`AGENTS.md\` first and treat it as the canonical AIC policy for this repo.
     template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   },
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
 # Gemini Wrapper
 
 Read \`AGENTS.md\` first and follow it as the canonical AIC policy for this repo.
@@ -384,7 +390,7 @@ Read \`AGENTS.md\` first and follow it as the canonical AIC policy for this repo
     template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   },
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
 # GitHub Copilot AIC Instructions
 
 Use \`AGENTS.md\` as the canonical AIC instruction file for this repo.
@@ -405,7 +411,7 @@ globs:
   - "lib/**"
 alwaysApply: false
 ---
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
 
 # AIC Cursor Rule
 
@@ -417,12 +423,12 @@ Follow \`AGENTS.md\` as the canonical AIC policy.
     template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   },
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 4 -->
 # AIC Onboarding
 
 Use this skill when asked to make a React, Next.js, or Vite app AIC-ready.
 
-Read \`AGENTS.md\`, add explicit metadata first, update \`aic.project.json\`, generate and inspect interaction artifacts, then add and verify behavior contracts for consequential multi-surface actions.
+Read \`AGENTS.md\`, add explicit metadata first, update \`aic.project.json\`, generate and inspect interaction artifacts, then add and verify behavior contracts for consequential multi-surface actions. Use rendered/native evidence and independently verify origin/revision-bound signed claims before external reliance.
 `,
     kind: "wrapper",
     path: ".github/skills/aic-onboarding/SKILL.md",
