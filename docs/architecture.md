@@ -8,6 +8,7 @@ AIC is a **contract-first framework** that makes web apps reliably operable by A
 2. **Generating** — build-time tools extract those annotations into standardized JSON manifests
 3. **Serving** — framework plugins expose manifests on `.well-known/` HTTP endpoints at runtime
 4. **Consuming** — the MCP server exposes those manifests as tools that any AI agent can call
+5. **Proving** — protocol-neutral contracts and executed observations verify behavior across UI, WebMCP, MCP, and API surfaces
 
 ---
 
@@ -20,6 +21,7 @@ graph TD
         authoring["authoring.ts (patch plan builder)"]
         validate["validate.ts (manifest validators)"]
         diff["diff.ts (manifest diff engine)"]
+        behavior["behavior.ts (behavior contracts and proof types)"]
     end
 
     subgraph RUNTIME["⚙️ @aicorg/runtime"]
@@ -40,6 +42,7 @@ graph TD
         generator["generateProjectArtifacts (manifest builder)"]
         doctor["createAICDoctorReport"]
         initializer["initializeAICProject (scaffolding)"]
+        assurance["verifyAICBehavior (parity and evidence engine)"]
         writer["writeArtifactFiles"]
     end
 
@@ -63,6 +66,7 @@ graph TD
         cmd_init["aic init"]
         cmd_doctor["aic doctor"]
         cmd_validate["aic validate"]
+        cmd_verify["aic verify"]
         cmd_bootstrap["aic bootstrap"]
         cmd_generate["aic generate project/discovery/ui/permissions/operate"]
         cmd_authoring["aic generate authoring-plan"]
@@ -215,11 +219,39 @@ flowchart TD
 
 ## WebMCP — Browser-Native Execution
 
-`@aicorg/webmcp` is a separate, feature-detected execution adapter. WebMCP supplies browser-native tool discovery and invocation; AIC supplies the authored action-readiness gate and the validation, authorization, confirmation, entity, verification, recovery, and audit behavior around it.
+`@aicorg/webmcp` is a separate, feature-detected compatibility adapter. WebMCP supplies browser-native tool discovery and invocation. AIC consumes native protocol capabilities first and currently adds fail-closed readiness gates while the API remains experimental.
 
 The adapter does not convert runtime elements or generated actions automatically. Only an explicit task-level binding backed by an authored `execution_ready` action contract can register. The human UI and tool path must call the same application/domain function.
 
 The read-only MCP server and AIC manifests remain available for headless discovery, unsupported browsers, and consumers that need the richer AIC contract surface.
+
+## Behavior Assurance — Protocol-Neutral Proof
+
+Behavior Assurance sits below individual protocols:
+
+```mermaid
+flowchart LR
+    CONTRACT["aic_behavior_contract"]
+    HARNESS["trusted local harness or imported observations"]
+    UI["human UI"]
+    WEBMCP["WebMCP"]
+    OTHER["MCP / OpenAPI / custom"]
+    VERIFY["verifyAICBehavior"]
+    PROOF["aic_behavior_proof"]
+
+    CONTRACT --> VERIFY
+    HARNESS --> UI
+    HARNESS --> WEBMCP
+    HARNESS --> OTHER
+    UI --> VERIFY
+    WEBMCP --> VERIFY
+    OTHER --> VERIFY
+    VERIFY --> PROOF
+```
+
+The contract maps protocol-specific entrypoints to one stable domain `operation_id`. The verifier checks expected status, confirmation, error, outcome, required and forbidden behavior, and canonical parity across required surfaces. Proofs include evidence classification and SHA-256 digests, but are not signed attestations.
+
+See [Behavior Assurance](./behavior-assurance.md).
 
 ---
 
@@ -265,8 +297,9 @@ flowchart TD
 | `aic scan <path>` | AST-scan for `agent*` props → JSON report of matches & diagnostics |
 | `aic scan <path> --webmcp` | Detect governed, direct, declarative, and obsolete WebMCP usage |
 | `aic doctor [root]` | Audit onboarding files, config, source annotations, and workflows |
-| `aic doctor [root] --webmcp` | Add WebMCP compatibility and governance readiness to doctor output |
-| `aic validate <kind> <file>` | Validate a manifest JSON against the spec schema |
+| `aic doctor [root] --webmcp` | Add WebMCP compatibility and source-readiness findings to doctor output |
+| `aic validate <kind> <file>` | Validate a manifest or behavior contract |
+| `aic verify <behavior-contract> --harness <module>` | Execute observations, verify scenarios and parity, and emit a behavior proof |
 | `aic bootstrap <url>` | Crawl with Playwright → LLM suggestions → bootstrap draft & report |
 | `aic generate project <config>` | Full artifact generation from `aic.project.json` |
 | `aic generate authoring-plan` | Build a proposal list from a runtime snapshot + bootstrap review |
@@ -426,3 +459,6 @@ AIC scaffolds and tracks these files via `aic init` and `aic doctor`:
 
 > [!WARNING]
 > **Never hand-edit generated JSON.** All artifacts under `.well-known/` and `report.json` are generated — regenerate them with `aic generate project`.
+
+> [!IMPORTANT]
+> **Describe natively, prove independently.** Prefer native protocol fields and keep behavioral requirements, evidence, and parity in a protocol-neutral AIC contract.

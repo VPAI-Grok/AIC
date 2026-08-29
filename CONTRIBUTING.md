@@ -13,6 +13,7 @@
 3. Run `pnpm build`.
 4. Run `pnpm test`.
 5. If manifest or fixture outputs changed, run `pnpm test:update-goldens` and then `pnpm test:goldens`.
+6. If behavior contracts, observations, or verification changed, run the checkout `aic:verify` script and inspect the proof.
 
 ## Pull Requests
 
@@ -21,6 +22,7 @@
 - Include tests for any behavior change.
 - Call out intentional contract changes in the PR description.
 - Significant external contributions may be held until contributor licensing terms are in place.
+- Behavior-verifier changes must include both passing evidence and a regression case that fails for the intended divergence.
 - By opening a pull request, you acknowledge that maintainers may ask for a contributor agreement before merging work that affects future relicensing flexibility.
 
 ## Ground Rules
@@ -28,6 +30,8 @@
 - The CLI is the only supported repo-mutation path.
 - Runtime UI is the authoritative source for rich per-element metadata.
 - Bootstrap suggestions remain review inputs, not a source of truth.
+- Native protocol fields take precedence over duplicate AIC metadata.
+- Behavior harnesses are trusted code; proofs must state their evidence level without implying signatures or production attestation.
 
 ## Licensing Flexibility
 

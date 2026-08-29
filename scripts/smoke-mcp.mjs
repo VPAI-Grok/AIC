@@ -3,9 +3,14 @@ import { readFile } from "node:fs/promises";
 import http from "node:http";
 import { resolve, extname } from "node:path";
 import { spawn } from "node:child_process";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-const repoRoot = resolve(new URL("..", import.meta.url).pathname);
+const repoRoot = fileURLToPath(new URL("..", import.meta.url));
+const pnpmCliPath = process.env.npm_execpath;
+
+if (!pnpmCliPath || !pnpmCliPath.toLowerCase().includes("pnpm")) {
+  throw new Error("Run this smoke through pnpm so its CLI path is available.");
+}
 const checkoutRoot = resolve(repoRoot, "examples/nextjs-checkout-demo");
 const publicRoot = resolve(checkoutRoot, "public");
 const mcpToolsIndexPath = resolve(
@@ -124,7 +129,13 @@ async function startStaticServer(rootDir) {
 
 async function main() {
   console.log("Generating checkout artifacts...");
-  await runCommand("pnpm", ["--dir", "examples/nextjs-checkout-demo", "run", "aic:generate"]);
+  await runCommand(process.execPath, [
+    pnpmCliPath,
+    "--dir",
+    "examples/nextjs-checkout-demo",
+    "run",
+    "aic:generate"
+  ]);
   console.log("Starting static manifest host...");
   const server = await startStaticServer(publicRoot);
   console.log(`Static host ready at ${server.baseUrl}`);
@@ -164,7 +175,7 @@ async function main() {
     const actions = JSON.parse(
       await handleActions({
         base_url: server.baseUrl,
-        action_name: "checkout.submit_order"
+        action_name: "checkout.complete"
       })
     );
     assert.equal(actions.success, true);

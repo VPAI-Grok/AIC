@@ -29,6 +29,8 @@ Each paid pilot should produce:
 - generated discovery, runtime UI, actions, permissions, workflows, and `report.json`
 - a QA readiness report from `aic inspect qa-readiness`
 - a generated QA test plan from `aic generate qa-plan`
+- a behavior contract for each in-scope consequential operation
+- an executed behavior proof covering the agreed human and agent surfaces
 - an MCP verification pass proving agents can resolve the workflow by AIC contract
 - a short handoff explaining blockers, warnings, and next actions
 
@@ -55,6 +57,15 @@ npx @aicorg/cli@alpha generate qa-plan ./my-app/public/report.json --out-file ./
 
 6. Connect the MCP server and verify that an agent can discover the workflow, high-risk actions, confirmation metadata, entity metadata, permissions, and workflow steps.
 
+7. For consequential operations, execute the behavior contract:
+
+```bash
+aic validate behavior ./aic-behavior-contract.json
+aic verify ./aic-behavior-contract.json \
+  --harness ./aic-verification-harness.mjs \
+  --out-file ./aic-proof.json
+```
+
 ## What The Readiness Score Means
 
 The QA readiness score is deterministic and conservative. It only rewards metadata that exists in generated artifacts.
@@ -69,7 +80,16 @@ The report checks:
 - generated manifest validity
 - extraction diagnostics
 
-The report does not claim full test coverage. It says whether the generated AIC contract is ready enough for a paid-pilot QA agent to inspect and exercise the selected workflow.
+The report does not claim execution or test coverage. It says whether the generated interaction metadata is complete enough for a QA agent to inspect and exercise the selected workflow.
+
+## Readiness versus proof
+
+QA readiness and behavior assurance answer different questions:
+
+- readiness asks whether stable IDs, risk, confirmation, entity, workflow, validation, execution, and recovery metadata are present;
+- behavior proof asks whether supplied observations actually met the scenario requirements and whether required surfaces behaved equivalently.
+
+A high readiness score cannot substitute for executed evidence. An executed proof also cannot repair an incomplete or incorrect contract.
 
 ## QA Plan Output
 
@@ -96,3 +116,5 @@ A pilot workflow is ready for customer handoff when:
 - at least one meaningful workflow exists for the pilot flow
 - the generated QA plan includes the target workflow
 - an MCP-compatible agent can discover the workflow without relying on DOM text or CSS selectors
+- critical mutations have an executed behavior proof for success, denial, and confirmation decline
+- required human/agent parity scenarios pass with no findings

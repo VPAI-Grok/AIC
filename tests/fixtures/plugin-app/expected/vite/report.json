@@ -45,7 +45,7 @@
       "stale": 0,
       "warnings": 5
     },
-    "template_version": "2",
+    "template_version": "3",
     "warnings": [
       {
         "code": "missing_agent_onboarding_file",

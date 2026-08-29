@@ -1,5 +1,7 @@
 # AIC (Agent Interaction Contract) — Codex Master Spec
 
+> **Current direction (2026-08-28):** This master spec records the original interaction-manifest foundation. The current product is Agent Interaction Control, with protocol-neutral behavior contracts, executed/imported observations, cross-surface parity verification, and digest-addressed proof. WebMCP is a native execution surface, not a protocol AIC should replace. Read [`docs/behavior-assurance.md`](./docs/behavior-assurance.md) and [ADR 0002](./docs/adr/0002-behavioral-assurance.md) as authoritative where this historical specification differs.
+
 > Put this file in the project root.  
 > Ask Codex to read this file first and then implement the project in phases.  
 > This document is the product requirements document, architecture spec, implementation stack, package plan, schema guide, and execution roadmap for the project.

@@ -1,0 +1,166 @@
+{
+  "artifact_type": "aic_behavior_contract",
+  "spec": "aic.behavior/0.1",
+  "id": "checkout.complete.behavior",
+  "title": "Complete checkout behavioral parity",
+  "description": "The human checkout button and WebMCP tool must enforce the same authorization, confirmation, side-effect, and outcome rules.",
+  "action": {
+    "id": "checkout.complete",
+    "operation_id": "checkout.complete.domain",
+    "risk": "critical",
+    "entity": {
+      "entity_id": "ord_100245",
+      "entity_type": "order",
+      "entity_label": "Order #100245"
+    }
+  },
+  "surfaces": [
+    {
+      "id": "human-ui",
+      "kind": "human_ui",
+      "label": "Submit order button",
+      "entrypoint": "checkout.submit_order"
+    },
+    {
+      "id": "webmcp",
+      "kind": "webmcp",
+      "label": "Complete checkout WebMCP tool",
+      "entrypoint": "complete_checkout",
+      "adapter": "@aicorg/webmcp"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "order.is_draft",
+      "phase": "precondition",
+      "description": "The order is still in draft state before execution."
+    },
+    {
+      "id": "authorization.allowed",
+      "phase": "invariant",
+      "description": "The caller is authorized for the displayed order."
+    },
+    {
+      "id": "authorization.denied",
+      "phase": "invariant",
+      "description": "An unauthorized caller is denied before confirmation or execution."
+    },
+    {
+      "id": "confirmation.accepted",
+      "phase": "invariant",
+      "description": "The human accepts the exact charge confirmation."
+    },
+    {
+      "id": "confirmation.declined",
+      "phase": "invariant",
+      "description": "A declined confirmation cancels execution."
+    },
+    {
+      "id": "payment.charge",
+      "phase": "side_effect",
+      "description": "Exactly one payment charge is performed."
+    },
+    {
+      "id": "order.submitted",
+      "phase": "postcondition",
+      "description": "The order ends in submitted state."
+    },
+    {
+      "id": "payment.charged",
+      "phase": "postcondition",
+      "description": "The payment ends in charged state."
+    },
+    {
+      "id": "order.unchanged",
+      "phase": "postcondition",
+      "description": "A stopped operation leaves the draft order and payment unchanged."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "success",
+      "title": "Authorized and confirmed checkout succeeds",
+      "surfaces": ["human-ui", "webmcp"],
+      "parity": "required",
+      "expected": {
+        "status": "succeeded",
+        "confirmation": "accepted",
+        "outcome": {
+          "order_id": "ord_100245",
+          "order_status": "submitted",
+          "payment_status": "charged"
+        },
+        "required_requirements": [
+          "order.is_draft",
+          "authorization.allowed",
+          "confirmation.accepted",
+          "payment.charge",
+          "order.submitted",
+          "payment.charged"
+        ],
+        "forbidden_requirements": [
+          "authorization.denied",
+          "confirmation.declined",
+          "order.unchanged"
+        ]
+      }
+    },
+    {
+      "id": "authorization-denied",
+      "title": "Unauthorized checkout stops before confirmation",
+      "surfaces": ["human-ui", "webmcp"],
+      "parity": "required",
+      "expected": {
+        "status": "denied",
+        "confirmation": "not_reached",
+        "error_code": "authorization_denied",
+        "outcome": {
+          "order_id": "ord_100245",
+          "order_status": "draft",
+          "payment_status": "unpaid"
+        },
+        "required_requirements": [
+          "order.is_draft",
+          "authorization.denied",
+          "order.unchanged"
+        ],
+        "forbidden_requirements": [
+          "confirmation.accepted",
+          "confirmation.declined",
+          "payment.charge",
+          "order.submitted",
+          "payment.charged"
+        ]
+      }
+    },
+    {
+      "id": "confirmation-declined",
+      "title": "Declined confirmation cancels checkout",
+      "surfaces": ["human-ui", "webmcp"],
+      "parity": "required",
+      "expected": {
+        "status": "cancelled",
+        "confirmation": "declined",
+        "error_code": "confirmation_declined",
+        "outcome": {
+          "order_id": "ord_100245",
+          "order_status": "draft",
+          "payment_status": "unpaid"
+        },
+        "required_requirements": [
+          "order.is_draft",
+          "authorization.allowed",
+          "confirmation.declined",
+          "order.unchanged"
+        ],
+        "forbidden_requirements": [
+          "authorization.denied",
+          "confirmation.accepted",
+          "payment.charge",
+          "order.submitted",
+          "payment.charged"
+        ]
+      }
+    }
+  ]
+}

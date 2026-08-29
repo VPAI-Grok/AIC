@@ -3,8 +3,9 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const repoRoot = resolve(new URL("..", import.meta.url).pathname);
+const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const cliPath = resolve(repoRoot, "packages/cli/dist/cli/src/index.js");
 
 function runCommand(command, args, options = {}) {
@@ -67,13 +68,13 @@ async function main() {
       "utf8"
     );
 
-    const dryRun = await runCommand("node", [cliPath, "init", tempDir, "--dry-run"]);
+    const dryRun = await runCommand(process.execPath, [cliPath, "init", tempDir, "--dry-run"]);
     const dryRunPayload = JSON.parse(dryRun.stdout);
     assert.equal(dryRunPayload.artifact_type, "aic_init_result");
     assert.equal(dryRunPayload.framework, "vite");
     assert.equal(dryRunPayload.summary.planned, 7);
 
-    const writeRun = await runCommand("node", [cliPath, "init", tempDir]);
+    const writeRun = await runCommand(process.execPath, [cliPath, "init", tempDir]);
     const writePayload = JSON.parse(writeRun.stdout);
     assert.equal(writePayload.framework, "vite");
     assert.equal(writePayload.summary.created, 7);
@@ -82,7 +83,7 @@ async function main() {
     assert.equal(projectConfig.framework, "vite");
     assert.equal(projectConfig.viewId, "vite.root");
 
-    const doctor = await runCommand("node", [cliPath, "doctor", tempDir]);
+    const doctor = await runCommand(process.execPath, [cliPath, "doctor", tempDir]);
     const doctorPayload = JSON.parse(doctor.stdout);
     assert.equal(doctorPayload.summary.errors, 0);
     assert.equal(doctorPayload.onboarding.summary.present, 5);

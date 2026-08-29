@@ -1,0 +1,60 @@
+name: Behavior Assurance
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/behavior-assurance.yml"
+      - "examples/nextjs-checkout-demo/**"
+      - "packages/automation-core/**"
+      - "packages/cli/**"
+      - "packages/spec/**"
+      - "schemas/behavior-*.schema.json"
+      - "tests/behavior-assurance.test.mjs"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/behavior-assurance.yml"
+      - "examples/nextjs-checkout-demo/**"
+      - "packages/automation-core/**"
+      - "packages/cli/**"
+      - "packages/spec/**"
+      - "schemas/behavior-*.schema.json"
+      - "tests/behavior-assurance.test.mjs"
+  workflow_dispatch:
+
+jobs:
+  prove-checkout-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: pnpm
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Build behavior assurance dependencies
+        run: pnpm --filter @aicorg/cli... build
+
+      - name: Run behavior assurance tests
+        run: node --test tests/behavior-assurance.test.mjs
+
+      - name: Generate checkout behavior proof
+        run: pnpm --dir examples/nextjs-checkout-demo run aic:verify
+
+      - name: Upload behavior proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkout-behavior-proof
+          path: examples/nextjs-checkout-demo/aic-proof.json

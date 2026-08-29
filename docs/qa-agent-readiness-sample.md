@@ -8,6 +8,8 @@ pnpm --dir examples/react-basic run aic:qa-readiness
 pnpm --dir examples/react-basic run aic:qa-plan
 ```
 
+This is metadata-readiness evidence only. It is not an executed behavior proof; use the checkout reference and `aic verify` when conformance or cross-surface parity is required.
+
 ## Readiness Summary
 
 - App: AIC CRM Demo

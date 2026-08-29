@@ -130,6 +130,6 @@ The current minimum AIC adoption loop remains:
 
 ## Related Docs
 
-- [Adopt AIC In An Existing App](/mnt/c/users/vatsa/agentinteractioncontrol/docs/adopt-existing-app.md)
-- [MCP Server](/mnt/c/users/vatsa/agentinteractioncontrol/docs/mcp-server.md)
-- [Coding Agents](/mnt/c/users/vatsa/agentinteractioncontrol/docs/coding-agents.md)
+- [Adopt AIC in an Existing App](./adopt-existing-app.md)
+- [MCP Server](./mcp-server.md)
+- [Coding Agents](./coding-agents.md)

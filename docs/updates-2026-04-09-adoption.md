@@ -65,7 +65,7 @@ After one good first pass, you should have:
 ## Best Starting Point
 
 Use:
-- [Adopt AIC In An Existing App](/mnt/c/users/vatsa/agentinteractioncontrol/docs/adopt-existing-app.md)
+- [Adopt AIC in an Existing App](./adopt-existing-app.md)
 
 That’s the canonical path in this repo now.
 

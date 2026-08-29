@@ -72,6 +72,6 @@ That’s the win.
 
 ## If You Want The Raw Details
 
-- [AIC Case Studies](/mnt/c/users/vatsa/agentinteractioncontrol/docs/case-studies.md)
-- [TailAdmin Benchmark Report](/mnt/c/users/vatsa/agentinteractioncontrol/docs/tailadmin-benchmark-claude-2026-04-02.md)
-- [Twenty Official Benchmark Report](/mnt/c/users/vatsa/agentinteractioncontrol/benchmarks/twenty-adoption/benchmark-report-official.md)
+- [AIC Case Studies](./case-studies.md)
+- [TailAdmin Benchmark Report](./tailadmin-benchmark-claude-2026-04-02.md)
+- [Twenty Official Benchmark Report](../benchmarks/twenty-adoption/benchmark-report-official.md)

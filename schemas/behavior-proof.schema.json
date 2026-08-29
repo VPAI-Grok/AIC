@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/behavior-proof.schema.json",
+  "title": "AIC Behavior Proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "proof_version", "generated_at", "status", "evidence_level", "contract", "observations_digest", "scenarios", "findings", "summary"],
+  "properties": {
+    "artifact_type": { "const": "aic_behavior_proof" },
+    "proof_version": { "const": "0.1" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["passed", "failed"] },
+    "evidence_level": { "enum": ["executed", "imported", "mixed", "none"] },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "spec", "digest"],
+      "properties": {
+        "id": { "type": "string" },
+        "spec": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "observations_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["scenario_id", "status", "parity", "finding_count", "surfaces"],
+        "properties": {
+          "scenario_id": { "type": "string" },
+          "status": { "enum": ["passed", "failed"] },
+          "parity": { "enum": ["passed", "failed", "not_required"] },
+          "finding_count": { "type": "integer", "minimum": 0 },
+          "surfaces": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["surface_id", "status", "finding_count"],
+              "properties": {
+                "surface_id": { "type": "string" },
+                "status": { "enum": ["passed", "failed"] },
+                "finding_count": { "type": "integer", "minimum": 0 },
+                "observation_mode": { "enum": ["executed", "imported"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "severity": { "enum": ["error", "warning"] },
+          "message": { "type": "string" },
+          "scenario_id": { "type": "string" },
+          "surface_id": { "type": "string" },
+          "requirement_id": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scenarios", "passed_scenarios", "failed_scenarios", "observations", "required_observations"],
+      "properties": {
+        "scenarios": { "type": "integer", "minimum": 0 },
+        "passed_scenarios": { "type": "integer", "minimum": 0 },
+        "failed_scenarios": { "type": "integer", "minimum": 0 },
+        "observations": { "type": "integer", "minimum": 0 },
+        "required_observations": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

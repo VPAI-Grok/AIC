@@ -1,108 +1,168 @@
 <div align="center">
 
-# 🤖 AIC — Agent Interaction Control
+# AIC — Agent Interaction Control
 
-**Give your web app a stable, machine-readable interface for AI agents.**
+**Behavioral assurance for agent-operated software.**
 
 [![npm](https://img.shields.io/npm/v/@aicorg/cli?label=%40aicorg%2Fcli&color=4f9cf9)](https://www.npmjs.com/package/@aicorg/cli)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
-[![Status](https://img.shields.io/badge/status-alpha-orange.svg)](./docs/implementation-phases.md)
-[![MCP Compatible](https://img.shields.io/badge/MCP-compatible-8b5cf6.svg)](./docs/mcp-server.md)
-[![WebMCP Ready](https://img.shields.io/badge/WebMCP-AIC%20governed-0f766e.svg)](./docs/webmcp.md)
+[![Status](https://img.shields.io/badge/status-alpha-orange.svg)](./docs/release-status.md)
+[![WebMCP](https://img.shields.io/badge/WebMCP-native--first-0f766e.svg)](./docs/webmcp.md)
+[![Behavior Proof](https://img.shields.io/badge/AIC%20Proof-executed-7c3aed.svg)](./docs/behavior-assurance.md)
 
----
-
-*Stop letting AI agents guess. Give them something real to work with.*
+**Standards describe. AIC proves.**
 
 </div>
 
----
+A browser protocol can describe a tool. It cannot, by itself, prove that the human UI, WebMCP tool, MCP server, and API enforce the same authorization, confirmation, side effects, and outcomes.
 
-## 🧠 Wait — What Problem Does AIC Solve?
+AIC is an open-source assurance layer for that gap. It helps teams:
 
-You know how AI assistants like Claude, Cursor, or Copilot sometimes try to operate your web app — and they click the wrong button, fill in the wrong field, or fail completely? That's not entirely the AI's fault.
+- publish explicit semantics for important UI controls;
+- adopt native WebMCP without duplicating equivalent metadata;
+- define protocol-neutral behavioral contracts;
+- execute the same scenarios across multiple surfaces;
+- fail CI when those surfaces diverge; and
+- emit a portable, digest-addressed behavior proof.
 
-**The real problem:** web apps are built for human eyes, not machine understanding. An AI agent looking at your app sees the same thing a blindfolded person feels when touching a wall — it can sense *something* is there, but has no idea *what* it means.
+AIC does not compete with WebMCP, MCP, OpenAPI, or future browser standards. Those are execution and description surfaces. AIC verifies the behavior behind them.
 
-Today, agents rely on:
-- 🎲 **Brittle CSS selectors** — break whenever the UI changes
-- 👁️ **Screenshots** — the agent reads pixels and guesses
-- 📝 **Button text matching** — "the thing that says Submit"
-- 🔢 **Coordinate clicks** — literally clicking at X, Y on screen
+## What is new
 
-These approaches fail unpredictably. They retry wrong elements, misfire modals, and guess at risky actions without knowing the stakes.
+The repository now includes the first AIC Behavior Assurance vertical slice:
 
-**AIC is the fix.** It gives your app a way to *publish* what each control means — its identity, its purpose, its risk level, what workflow it belongs to — so agents can operate it reliably instead of guessing.
+- `aic.behavior/0.1` contracts for actions, surfaces, invariants, side effects, outcomes, and parity scenarios;
+- validators and public JSON Schemas;
+- a deterministic verification engine in `@aicorg/automation-core`;
+- `aic validate behavior` and `aic verify` commands;
+- executed, imported, mixed, and no-evidence classifications;
+- canonical SHA-256 digests for contracts and observation sets;
+- a checkout harness proving human UI/WebMCP parity for success, authorization denial, and confirmation decline; and
+- a dedicated GitHub Actions gate that publishes the proof as a CI artifact.
 
-> 💡 **The key idea:** expose what the page *means*, not just what it looks like.
+This proves what the supplied evidence demonstrates. It is not yet a cryptographic signature, remote attestation, or guarantee about production.
 
----
+## Quick start
 
-## 🗺️ How AIC Works
+### 1. Instrument an owned React, Next.js, or Vite app
 
-AIC adds a thin layer of *explicit semantics* to your app. Think of it as giving every important control a name tag, a job description, and a risk rating — in a format that agents can read directly.
+```bash
+npx @aicorg/cli@alpha init ./my-app
+npx @aicorg/cli@alpha doctor ./my-app
+npx @aicorg/cli@alpha generate project ./my-app/aic.project.json --out-dir ./my-app/public
+```
 
-### Step 1: You annotate your controls
+Use stable IDs and explicit semantics on important controls:
 
 ```tsx
-// Before AIC — an agent has to guess what this does
-<button onClick={handleDelete}>Delete</button>
-
-// After AIC — the agent knows exactly what this is
-<button
-  onClick={handleDelete}
-  agentId="order.delete"
+<AICButton
+  agentId="checkout.submit_order"
   agentAction="submit"
-  agentDescription="Permanently deletes the selected order"
+  agentDescription="Charges the selected payment method and submits the order"
   agentRisk="critical"
+  agentEntityId="ord_100245"
+  agentEntityType="order"
   agentRequiresConfirmation
   agentConfirmation={{
     type: "human_review",
-    prompt_template: "Delete the selected order. This cannot be undone."
+    prompt_template: "Charge {{payment_method}} for {{order_total}}?"
   }}
 >
-  Delete
-</button>
+  Submit order
+</AICButton>
 ```
 
-### Step 2: AIC turns annotations into agent-readable manifests
+### 2. Define behavior once, independent of protocol
 
-Run one command and AIC generates a suite of artifacts:
-
+```json
+{
+  "artifact_type": "aic_behavior_contract",
+  "spec": "aic.behavior/0.1",
+  "id": "checkout.complete.behavior",
+  "action": {
+    "id": "checkout.complete",
+    "operation_id": "checkout.complete.domain",
+    "risk": "critical"
+  },
+  "surfaces": [
+    { "id": "human-ui", "kind": "human_ui", "label": "Submit button", "entrypoint": "checkout.submit_order" },
+    { "id": "webmcp", "kind": "webmcp", "label": "WebMCP tool", "entrypoint": "complete_checkout" }
+  ],
+  "requirements": [
+    {
+      "id": "order.submitted",
+      "phase": "postcondition",
+      "description": "The order ends in submitted state."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "success",
+      "title": "Checkout succeeds",
+      "surfaces": ["human-ui", "webmcp"],
+      "parity": "required",
+      "expected": {
+        "status": "succeeded",
+        "required_requirements": ["order.submitted"]
+      }
+    }
+  ]
+}
 ```
-/.well-known/agent.json          ← app identity & capabilities
-/.well-known/agent/ui            ← live UI manifest (what's on screen right now)
-/.well-known/agent/actions       ← semantic action contracts
-agent-permissions.json           ← who can do what
-agent-workflows.json             ← multi-step flow definitions
-operate.txt                      ← plain-English operation guide
+
+The sample is intentionally minimal; use the [checkout contract](./examples/nextjs-checkout-demo/aic-behavior-contract.json) as the complete reference.
+
+### 3. Execute and verify
+
+From this repository:
+
+```bash
+pnpm build
+pnpm aic validate behavior ./examples/nextjs-checkout-demo/aic-behavior-contract.json
+pnpm aic verify ./examples/nextjs-checkout-demo/aic-behavior-contract.json \
+  --harness ./examples/nextjs-checkout-demo/aic-verification-harness.mjs \
+  --out-file ./examples/nextjs-checkout-demo/aic-proof.json
+pnpm aic inspect ./examples/nextjs-checkout-demo/aic-proof.json
 ```
 
-### Step 3: Agents use manifests instead of guessing
+`aic verify` exits nonzero when observations are missing, expected behavior fails, operation identities differ, or required surfaces are not behaviorally equivalent. Harness modules are trusted local code and execute with the permissions of the CLI process.
 
-Instead of scraping the DOM, an agent queries the AIC manifest, finds `order.delete`, reads its risk level and confirmation requirements, and executes it correctly — every time.
+See [Behavior Assurance](./docs/behavior-assurance.md) for the full contract and evidence model.
 
+## WebMCP: native first, AIC verified
+
+When WebMCP provides a field or lifecycle primitive, AIC should consume it rather than invent a parallel one. AIC adds value where protocol metadata stops:
+
+1. WebMCP registers and executes the browser tool.
+2. The app routes human and agent entrypoints to the same domain operation.
+3. AIC records explicit requirements and expected outcomes.
+4. AIC runs cross-surface scenarios and produces reviewable proof.
+
+The current `@aicorg/webmcp` adapter remains useful as a fail-closed compatibility bridge for the experimental browser API. Its wrapper is not the long-term moat; portable behavior contracts, evidence, parity verification, and CI policy are.
+
+```bash
+pnpm add @aicorg/webmcp@workspace:*
+pnpm add -D webmcp-types@0.1.5
+pnpm aic scan ./src --webmcp
 ```
-Agent: "Which element deletes an order?"
-AIC:   "agentId=order.delete, risk=critical, confirmation required"
-Agent: ✅ Executes safely
+
+WebMCP remains feature-detected and experimental. In browsers without `document.modelContext`, the human application continues to work. Read [WebMCP with AIC](./docs/webmcp.md).
+
+## Existing discovery and operation surface
+
+AIC can generate and serve:
+
+```text
+/.well-known/agent.json          app identity and capabilities
+/.well-known/agent/ui            current UI semantics
+/.well-known/agent/actions       semantic action contracts
+agent-permissions.json           permission and risk policy
+agent-workflows.json             multi-step workflows
+operate.txt                      compact operation guidance
+aic-proof.json                   behavior verification result
 ```
 
----
-
-![How AIC Works](./docs/images/aic_how_it_works.png)
-
----
-
-## 🚀 Quick Start
-
-If you already have a React, Next.js, or Vite app, start here:
-
-- [Adopt AIC In An Existing App](./docs/adopt-existing-app.md)
-- [QA Agent Readiness](./docs/qa-agent-readiness.md)
-- [Auth0 For AI Agents With AIC](./docs/auth0-ai-agents.md)
-
-### Connect any MCP-compatible AI agent (Claude Desktop, Cursor, etc.)
+The MCP server exposes the discovery manifests through read-only tools, so MCP-compatible agents can inspect a supported app without relying on CSS selectors or visible labels.
 
 ```json
 {
@@ -115,339 +175,98 @@ If you already have a React, Next.js, or Vite app, start here:
 }
 ```
 
-That's it. Your agent now has **6 read-only tools** to discover app capabilities, inspect elements, filter by risk/role/entity, read permissions and workflows, and understand semantic action contracts.
+See [MCP Server Setup](./docs/mcp-server.md).
 
-→ [Full MCP setup guide](./docs/mcp-server.md)
+## Packages
 
-### Add governed WebMCP browser tools
+| Package | Purpose |
+|---|---|
+| `@aicorg/spec` | Interaction manifests, behavior contracts, proof types, and validators |
+| `@aicorg/automation-core` | Deterministic scanning, generation, readiness analysis, and behavior verification |
+| `@aicorg/cli` | `init`, `doctor`, `scan`, `generate`, `validate`, `verify`, `inspect`, `diff`, and `apply` |
+| `@aicorg/runtime` | Browser registry and live UI manifest serialization |
+| `@aicorg/sdk-react` | React hooks and components for explicit `agent*` semantics |
+| `@aicorg/webmcp` | Native WebMCP compatibility and guarded registration |
+| `@aicorg/mcp-server` | Read-only MCP discovery server |
+| `@aicorg/devtools` | Browser overlay, inspection, diffing, and authoring plans |
+| `@aicorg/plugin-next` / `@aicorg/plugin-vite` | Framework artifact generation |
+| `@aicorg/ai-bootstrap*` | Review-assisted annotation suggestions |
+| `@aicorg/integrations-*` | Component-library adapters |
 
-AIC uses WebMCP as the native browser execution layer while adding authored action readiness, validation, authorization, confirmation, entity scope, completion verification, recovery, and audit behavior.
+The published npm line is alpha. Repository-only behavior-assurance additions ship with the next package release. See [npm Packages](./docs/npm-packages.md).
 
-```bash
-pnpm add @aicorg/webmcp@workspace:*
-pnpm add -D webmcp-types@0.1.5
-pnpm aic scan ./src --webmcp
-```
+## Proof and examples
 
-`@aicorg/webmcp` is source-ready for the next alpha wave; use the workspace package until that npm release is published.
+Start with the [Next.js checkout demo](./examples/nextjs-checkout-demo). It contains:
 
-→ [WebMCP with AIC](./docs/webmcp.md)
+- an AIC-instrumented critical checkout action;
+- native WebMCP registration;
+- a shared checkout domain operation;
+- a behavior contract and executable harness; and
+- a checked-in [behavior proof](./examples/nextjs-checkout-demo/aic-proof.json).
 
-### Instrument your React/Next/Vite app
+The broader benchmark corpus includes real browser-agent experiments on TailAdmin and a measured adoption slice on Twenty CRM. Those benchmarks measure agent task performance; the new behavior proof measures contract conformance and cross-surface parity. They answer different questions.
 
-```bash
-npx @aicorg/cli init ./my-app
-```
+- [Case studies](./docs/case-studies.md)
+- [Twenty official benchmark](./benchmarks/twenty-adoption/benchmark-report-official.md)
+- [TailAdmin benchmark](./examples/tailadmin-dashboard)
 
-Then annotate your important controls using the React SDK:
+## Supported boundary
 
-```bash
-npm install @aicorg/sdk-react
-```
+AIC is currently optimized for owned React, Next.js, and Vite applications. It deliberately prefers authored metadata and executable evidence over inference.
 
-```tsx
-import { useAICElement } from '@aicorg/sdk-react';
+Current limitations:
 
-const { attributes } = useAICElement({
-  agentId: 'checkout.submit',
-  agentAction: 'submit',
-  agentDescription: 'Completes the purchase',
-  agentRisk: 'high',
-});
+- alpha APIs can change;
+- unknown third-party sites are outside the supported boundary;
+- dynamic JSX extraction produces diagnostics instead of guesses;
+- bootstrap suggestions require review;
+- WebMCP tracks an experimental browser API;
+- the included harness proof is local evidence, not production attestation;
+- proof signing, transparency logs, remote runners, and hosted policy enforcement are not implemented yet.
 
-<button {...attributes} onClick={handleCheckout}>
-  Complete Purchase
-</button>
-```
+Read [Supported Today](./docs/supported-today.md) and [Threat Model](./docs/threat-model.md) before making assurance claims.
 
-→ [SDK API reference](./docs/sdk-api.md)
-
----
-
-## 📦 What's In The Box
-
-| Package | What It Does |
-|---------|-------------|
-| 🏗️ `@aicorg/spec` | JSON schemas & manifest shapes — the contract |
-| 🧠 `@aicorg/runtime` | In-browser registry, live manifest serialization |
-| 🌉 `@aicorg/webmcp` | Fail-closed WebMCP adapter + React lifecycle helper |
-| ⚛️ `@aicorg/sdk-react` | React hooks & components for `agent*` props |
-| ⚙️ `@aicorg/cli` | `scan`, `generate`, `init`, `doctor`, `diff`, `apply` |
-| 🔌 `@aicorg/plugin-next` | Next.js artifact generation |
-| 🔌 `@aicorg/plugin-vite` | Vite artifact generation |
-| 🖥️ `@aicorg/mcp-server` | MCP server for Claude Desktop, Cursor & friends |
-| 🔬 `@aicorg/devtools` | Browser inspector overlay + DevTools panel |
-| 🤖 `@aicorg/ai-bootstrap` | Playwright-backed capture → model-generated suggestions |
-| 🌐 `@aicorg/ai-bootstrap-openai` | OpenAI adapter for bootstrap generation |
-| 🎨 `@aicorg/integrations-radix` | Radix UI adapter (dialog, dropdown, select...) |
-| 🎨 `@aicorg/integrations-shadcn` | shadcn/ui adapter |
-| 🔧 `@aicorg/automation-core` | Scanning, diagnostics, artifact generation internals |
-
-> Alpha packages are live on npm. Install via `npm install @aicorg/cli@alpha`.  
-> See [npm-packages.md](./docs/npm-packages.md) for the full matrix and install commands.
-
----
-
-## 🧭 Start Here
-
-| I want to… | Go here |
-|------------|---------|
-| 🧩 Adopt AIC in an existing app | [Adopt AIC In An Existing App](./docs/adopt-existing-app.md) |
-| 🧪 Sell a QA-agent readiness pilot | [QA Agent Readiness](./docs/qa-agent-readiness.md) |
-| 🔐 Add Auth0 to an agent-enabled app | [Auth0 For AI Agents With AIC](./docs/auth0-ai-agents.md) |
-| 🚀 Try AIC in 15 minutes | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
-| 🚀 Try AIC in 15 minutes with Vite | [Vite CRM Example](./examples/react-basic) |
-| 🤖 Connect Claude Desktop or Cursor | [MCP Server Setup](./docs/mcp-server.md) |
-| 🌉 Add or harden WebMCP tools | [WebMCP With AIC](./docs/webmcp.md) |
-| ⚛️ Instrument a React/Next.js app | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
-| ⚡ Instrument a Vite/React app | [Vite CRM Example](./examples/react-basic) |
-| 📊 Read case studies and benchmark proof | [AIC Case Studies](./docs/case-studies.md) |
-| 🧪 See the real-app Twenty benchmark | [Twenty Official Benchmark Report](./benchmarks/twenty-adoption/benchmark-report-official.md) |
-| 🧪 Plan a real-app adoption benchmark | [Twenty Adoption Benchmark](./benchmarks/twenty-adoption/README.md) |
-| 🧩 See the real Twenty integration map | [Twenty Instrumentation Plan](./benchmarks/twenty-adoption/instrumentation-plan.md) |
-| 🛠️ Patch a real Twenty fork | [Twenty Local Integration Notes](./benchmarks/twenty-adoption/local-integration-notes.md) |
-| 🧪 See a TodoMVC MCP benchmark | [TodoMVC Example](./examples/todomvc-react) |
-| 🤖 Use AI to bootstrap annotations | [Bootstrap Example](./examples/bootstrap-openai) |
-| 📣 Read launch/adoption/proof posts | [AIC Updates](./docs/updates.md) |
-| 👩‍💻 Onboard a coding agent (Claude, Gemini, Copilot) | [Coding Agent Onboarding](./docs/coding-agents.md) |
-| 📦 Browse all packages | [npm Packages](./docs/npm-packages.md) |
-| 🔬 See what's currently supported | [Supported Today](./docs/supported-today.md) |
-
----
-
-## ⚡ 15-Minute Adoption
-
-Inside this repo, use the local CLI wrapper:
+## Development
 
 ```bash
-pnpm aic --help
-pnpm --dir examples/nextjs-checkout-demo run aic:doctor
-pnpm --dir examples/nextjs-checkout-demo run aic:generate
-pnpm --dir examples/react-basic run aic:doctor
-pnpm smoke:init
-pnpm smoke:adoption
-pnpm smoke:mcp
-pnpm smoke:mcp:stdio
+pnpm install
+pnpm check
+pnpm build
+pnpm test
+pnpm test:goldens
+pnpm --dir examples/nextjs-checkout-demo run aic:verify
 ```
 
-Outside this repo, use the published alpha CLI:
+Generated AIC JSON should be regenerated and reviewed, not hand-edited.
 
-```bash
-npx @aicorg/cli@alpha init ./my-app
-npx @aicorg/cli@alpha doctor ./my-app
-npx @aicorg/cli@alpha generate project ./my-app/aic.project.json --out-dir ./my-app/public
-```
+## Documentation
 
-When those commands pass, you have the minimum AIC adoption loop working:
-- instrumentation in source
-- onboarding files for coding agents
-- generated discovery/UI/permissions/workflow artifacts
-- a doctor report with no blocking errors
-
-What you should have after the first pass:
-- `aic.project.json`
-- onboarding files like `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md`
-- generated discovery, UI, permissions, and workflow artifacts
-- an app contract that an MCP-compatible agent can read without guessing
-
-For the copyable app-integration path, use [Adopt AIC In An Existing App](./docs/adopt-existing-app.md).
-
-## 📈 Benchmarks And Proof
-
-If you want proof before adoption, start with these:
-- [AIC Case Studies](./docs/case-studies.md)
-- [Twenty Official Benchmark Report](./benchmarks/twenty-adoption/benchmark-report-official.md)
-
-We ran a real browser agent benchmark on the [TailAdmin dashboard](./examples/tailadmin-dashboard) using **Claude Sonnet 4.6**.
-
-![Benchmark Results](./docs/images/aic_benchmark_results.png)
-
-### 📅 Calendar Event Creation
-
-| Metric | Baseline Agent | AIC-Powered Agent | Improvement |
-|--------|:--------------:|:-----------------:|:-----------:|
-| ✅ Success Rate | 33.3% | **100%** | +66.7pp |
-| ⏱️ Median Time | 134s | **64s** | 52% faster |
-| 🖱️ Median Steps | 12 | **3** | 75% fewer |
-| 🔁 Retries | 2 | **0** | 100% reduction |
-
-### 👤 Profile Edit
-
-| Metric | Baseline Agent | AIC-Powered Agent | Improvement |
-|--------|:--------------:|:-----------------:|:-----------:|
-| ✅ Success Rate | 100% | **100%** | maintained |
-| ⏱️ Median Time | 99s | **70s** | 29% faster |
-| 🖱️ Median Steps | 20 | **6** | 70% fewer |
-
-These are real browser-agent runs. The agent opened a browser, navigated the UI, filled forms, and verified results.
-
-We also ran a real-app adoption benchmark on a patched local fork of **Twenty CRM**. The current official measured slice is green on detail navigation, destructive safety, record-scoped note creation, record-scoped task creation, list sort plus record open, list filter plus record open, record-level stage mutation, and active filter clear. [Twenty report →](./benchmarks/twenty-adoption/benchmark-report-official.md)
-
-## 🔄 The Three Workflows
-
-### 🤖 Automation — generate manifests from your annotated source
-
-```bash
-pnpm aic init ./my-app                    # scaffold config + onboarding files
-pnpm aic doctor ./my-app                  # audit coverage gaps before generating
-pnpm aic scan ./my-app/src                # preview what was extracted
-pnpm aic generate project aic.project.json \  # emit all manifests
-  --out-dir ./public
-pnpm aic diff ui before.json after.json   # review changes before committing
-```
-
-### 🪄 Bootstrap — let AI suggest annotations for you
-
-```bash
-# Capture your app with Playwright
-# Feed captures to a model (OpenAI, any HTTP provider)
-# Get back reviewed, human-approved annotation suggestions
-
-pnpm aic bootstrap <url> \
-  --captures-file captures.json \
-  --provider-kind openai \
-  --provider-model gpt-4o
-
-pnpm aic generate authoring-plan runtime-snapshot.json \
-  --report public/report.json \
-  --bootstrap-review bootstrap-review.json
-
-pnpm aic apply authoring-plan aic-authoring-plan.json \
-  --project-root ./my-app --write
-```
-
-→ [Full bootstrap guide](./examples/bootstrap-openai/README.md)
-
-### 🔧 Devtools — inspect and author in the browser
-
-1. Mount `AICDevtoolsBridge` next to `AICProvider` in dev
-2. Use `AICDevtoolsOverlay` for quick visual checks
-3. Open the browser DevTools panel for full filtering, diffing, and patch-plan export
-4. Run `pnpm aic apply authoring-plan <plan.json> --project-root ./app --write` to commit edits
-
----
-
-## 💼 Who Is This For?
-
-**For developers building AI-powered or agent-operated apps:**
-AIC gives you control over how agents interact with your app. You define the contract, agents respect it. No more hoping the AI clicks the right button.
-
-**For teams building AI agents and tooling:**
-AIC-instrumented apps are dramatically faster and more reliable to operate autonomously. Less DOM scraping, fewer retries, zero guessing on risky actions.
-
-**For product/non-dev readers:**
-Imagine hiring a new employee to use your software. Without documentation, they'd click around guessing. AIC is the documentation your app publishes *for AI agents* — telling them where everything is, what it does, and how dangerous it is to touch.
-
----
-
-## 📚 Documentation
-
-| Doc | What It Covers |
-|-----|---------------|
-| [architecture.md](./docs/architecture.md) | Full system architecture diagram — packages, data flows, manifests, CLI, MCP |
-| [manifest-spec.md](./docs/manifest-spec.md) | Full manifest shape reference |
-| [sdk-api.md](./docs/sdk-api.md) | React SDK hooks and props |
-| [mcp-server.md](./docs/mcp-server.md) | MCP server setup and tool reference |
-| [webmcp.md](./docs/webmcp.md) | WebMCP compatibility, safe registration, CLI readiness, and services |
-| [release-status.md](./docs/release-status.md) | What is ready to evaluate right now |
-| [release-checklist.md](./docs/release-checklist.md) | Verification and release gates |
-| [coding-agents.md](./docs/coding-agents.md) | Agent onboarding templates |
-| [npm-packages.md](./docs/npm-packages.md) | Published package matrix |
-| [supported-today.md](./docs/supported-today.md) | Implementation boundaries |
-| [threat-model.md](./docs/threat-model.md) | Security and trust model |
-| [implementation-phases.md](./docs/implementation-phases.md) | Roadmap phases |
-| [reference-consumer.test.mjs](./tests/reference-consumer.test.mjs) | End-to-end contract consumer reference test |
+| Document | Focus |
+|---|---|
+| [Behavior Assurance](./docs/behavior-assurance.md) | Contracts, observations, proof semantics, harnesses, and CI |
+| [WebMCP with AIC](./docs/webmcp.md) | Native-first integration and compatibility boundary |
+| [Architecture](./docs/architecture.md) | Packages, data flow, and trust boundaries |
+| [Manifest Spec](./docs/manifest-spec.md) | Discovery and interaction artifacts |
+| [SDK API](./docs/sdk-api.md) | React authoring surface |
+| [QA Agent Readiness](./docs/qa-agent-readiness.md) | Metadata coverage and test planning |
+| [MCP Server](./docs/mcp-server.md) | Read-only agent discovery |
+| [Adopt an Existing App](./docs/adopt-existing-app.md) | Practical onboarding path |
+| [Coding Agents](./docs/coding-agents.md) | Versioned onboarding instructions for coding agents |
+| [npm Packages](./docs/npm-packages.md) | Published and next-wave package matrix |
+| [Release Status](./docs/release-status.md) | Current shipped and repository-only capabilities |
+| [Threat Model](./docs/threat-model.md) | What AIC proof does and does not establish |
 
 JSON Schemas live under [`schemas/`](./schemas/).
 
----
+## Open source
 
-## 🏗️ Repo Status
+AIC is Apache-2.0 licensed for commercial and non-commercial use. The core contract, verifier, CLI, adapters, examples, and schemas are intended to remain open so teams and agent vendors can build on a neutral assurance layer.
 
-- ✅ Public GitHub launch ready
-- ✅ First-wave `@aicorg/*` packages published to npm under `alpha` tag
-- ✅ `@aicorg/devtools` included in the publishable alpha package surface
-- ✅ MCP server live and MCP-compatible with Claude Desktop, Cursor, and others
-- ✅ TailAdmin benchmark validates real agent improvement with AIC semantics
-- ✅ Release and evaluator docs now reflect the current alpha surface
-- 🔄 Further package releases go through the GitHub publish workflow
-- 📋 Apache-2.0 for the repo and all publishable packages
-
----
-
-## 🤝 Adoption & Business Model
-
-AIC is **free and open** under [Apache-2.0](./LICENSE) — commercial and non-commercial use included.
-
-The project earns through services, not software locks:
-- Implementation and onboarding support
-- MCP integration and custom agent work  
-- Future hosted capabilities and ecosystem value
-
-See [SERVICES.md](./SERVICES.md) for the voluntary attribution request and [CONTRIBUTOR-LICENSING.md](./CONTRIBUTOR-LICENSING.md) for the outside contribution policy.
-
----
-
-## ⚠️ Current Limitations (Honest Edition)
-
-AIC is in **alpha**. Here's what isn't ready yet:
-
-- ❌ Arbitrary third-party or unknown sites — AIC is for *owned* apps you instrument
-- ❌ Zero-touch onboarding of dynamic codebases — annotation is still a human decision
-- ❌ Non-React production coverage — React/Next/Vite is the current supported surface
-- ❌ Stable npm GA — still `alpha` tagged; breaking changes are possible
-- ⚠️ Live Playwright capture depends on local browser/sandbox environment
-- ⚠️ Extraction is deterministic only — string literals, template literals, same-file const chains. Dynamic JSX expressions produce diagnostics, not guesses.
-- ⚠️ WebMCP support is pinned to an experimental draft and feature-detected; generated or inferred AIC actions are never exposed automatically.
-
----
-
-## 🔬 Verification & Testing
-
-```bash
-pnpm check           # typecheck every workspace package and example
-pnpm build           # build all packages and apps
-pnpm test            # full contract test suite
-pnpm test:goldens    # verify checked-in golden artifacts
-pnpm test:update-goldens  # regenerate goldens after intentional changes
-```
-
-### Contract Review Workflow
-
-```
-1. Update source annotations, generators, or fixtures
-2. pnpm test:update-goldens
-3. Inspect manifest diffs under tests/fixtures/**/expected
-4. pnpm test:goldens  
-5. pnpm test
-```
-
----
-
-## 🤖 Coding Agent Onboarding
-
-This repo ships onboarding templates for all major coding agents:
-
-| Agent | File |
-|-------|------|
-| Claude | [CLAUDE.md](./CLAUDE.md) |
-| Gemini / Antigravity | [GEMINI.md](./GEMINI.md) |
-| GitHub Copilot | [.github/copilot-instructions.md](./.github/copilot-instructions.md) |
-| Cursor | [.cursor/rules/aic.mdc](./.cursor/rules/aic.mdc) |
-| All agents (canonical) | [AGENTS.md](./AGENTS.md) |
-
-```bash
-pnpm aic init [project-root]    # scaffold aic.project.json + onboarding files
-pnpm aic doctor [project-root]  # audit config, coverage, diagnostics — no mutations
-```
-
----
+Commercial work can sit above the open core: hosted evidence collection, policy gates, signed attestations, conformance programs, and implementation support. See [Services](./SERVICES.md) and [Contributor Licensing](./CONTRIBUTOR-LICENSING.md).
 
 <div align="center">
 
-**AIC is pre-series-A, early-stage, and moving fast.**  
-Stars, feedback, and real-world adoption reports are extremely welcome. 🙏
-
-[📦 npm packages](https://www.npmjs.com/search?q=%40aicorg) · [📖 Docs](./docs/) · [🐛 Issues](https://github.com/VPAI-Grok/AIC/issues)
+[npm packages](https://www.npmjs.com/search?q=%40aicorg) · [issues](https://github.com/VPAI-Grok/AIC/issues) · [release status](./docs/release-status.md)
 
 </div>

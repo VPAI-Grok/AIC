@@ -2,7 +2,7 @@
   "name": "@aicorg/spec",
   "version": "0.1.0-alpha.1",
   "type": "module",
-  "description": "Core AIC manifest types, validators, and diff helpers.",
+  "description": "AIC interaction manifests, behavior contracts, proof types, validators, and diff helpers.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -16,6 +16,8 @@
     "aic",
     "agents",
     "contracts",
+    "assurance",
+    "testing",
     "manifests"
   ],
   "main": "./dist/index.js",

@@ -1,96 +1,63 @@
 # Release Status
 
-## Current Position
+## Current position
 
-AIC should currently be read as:
+AIC is alpha software: usable for evaluation and owned-app pilots, strongest on React/Next/Vite, and still allowed to make breaking changes.
 
-- alpha on npm
-- real and usable for evaluation
-- strongest on owned React, Next.js, and Vite apps
-- still in stabilization and capability-deepening mode
+The durable product direction is behavioral assurance for agent-operated software. WebMCP is a native execution surface; AIC verifies business behavior across WebMCP, human UI, MCP, API, and future surfaces.
 
-This is not a toy repo anymore, but it is also not claiming GA maturity.
+## Published alpha
 
-## What Is Ready To Evaluate
+The existing npm alpha includes the core spec, runtime, React SDK, automation, CLI, framework plugins, component integrations, bootstrap providers, devtools, and MCP server. See [npm Packages](./npm-packages.md) for the exact published matrix.
 
-- `@aicorg/cli`
-  - `init`
-  - `doctor`
-  - `generate`
-  - `inspect`
-  - `validate`
-- React SDK instrumentation through explicit `agent*` metadata
-- generated discovery, UI, actions, permissions, and workflow artifacts
-- published devtools bridge/overlay helpers for in-app inspection and proposal export
-- `@aicorg/mcp-server`
-  - handler-level MCP validation
-  - real stdio transport validation
-- source-ready `@aicorg/webmcp` next-alpha package
-  - authored-only execution readiness
-  - fail-closed imperative registration and React lifecycle cleanup
-  - declarative WebMCP props with risky auto-submit suppression
-  - CLI readiness scanning and implementation-plan generation
-- starter adoption paths for:
-  - Next.js
-  - Vite/React
-- bootstrap review bundles from saved captures plus guarded authoring-plan/apply handoff
+## Implemented in this repository for the next release
 
-## What The Repo Verifies Today
+- `@aicorg/webmcp` compatibility adapter, declarative props, readiness analysis, and tests;
+- `aic.behavior/0.1` contract and observation types;
+- `verifyAICBehavior` in `@aicorg/automation-core`;
+- `aic validate behavior` and `aic verify`;
+- behavior-contract, observation-set, and proof schemas;
+- checkout human UI/WebMCP parity harness and deterministic proof; and
+- the `Behavior Assurance` GitHub Actions gate.
 
-Mainline verification:
-- `pnpm check`
-- `pnpm build`
-- `pnpm test`
-- `pnpm test:goldens`
-- `pnpm smoke:init`
-- `pnpm smoke:adoption`
-- `pnpm smoke:mcp`
+Do not describe repository-only additions as published npm capabilities until the next alpha publish succeeds.
 
-Separate transport verification:
-- `pnpm smoke:mcp:stdio`
+## Verification surfaces
 
-Manual package publish path:
-- `publish-packages.yml`
-- includes packaging smoke before npm publish
+Workspace verification:
 
-## Best Fit Right Now
+```bash
+pnpm check
+pnpm build
+pnpm test
+pnpm test:goldens
+pnpm smoke:init
+pnpm smoke:adoption
+pnpm smoke:mcp
+pnpm smoke:mcp:stdio
+```
 
-Best current fit:
-- teams who own the app code
-- teams willing to add explicit metadata
-- teams evaluating AI-agent operation on real workflows
-- product/infra teams that want safer agent interaction than DOM guessing
+Behavior assurance:
 
-Not the best fit yet:
-- arbitrary third-party sites
-- zero-touch onboarding of unknown apps
-- non-React production rollouts
-- buyers expecting GA stability guarantees
+```bash
+pnpm --dir examples/nextjs-checkout-demo run aic:verify
+```
 
-## Proof Strength
+The checkout fixture currently produces six executed observations across three parity scenarios with no findings. That is local reference-harness evidence, not a production attestation.
 
-The current proof is strongest in two places:
+## Best fit
 
-- browser-agent proof:
-  - [TailAdmin Benchmark Report](/mnt/c/users/vatsa/agentinteractioncontrol/docs/tailadmin-benchmark-claude-2026-04-02.md)
-- real-app adoption proof:
-  - [Twenty Official Benchmark Report](/mnt/c/users/vatsa/agentinteractioncontrol/benchmarks/twenty-adoption/benchmark-report-official.md)
+- teams that own their app and domain code;
+- teams adopting WebMCP or MCP for consequential workflows;
+- teams willing to author stable semantics and behavioral expectations; and
+- teams that want CI to catch divergence between human and agent paths.
 
-Use [AIC Case Studies](/mnt/c/users/vatsa/agentinteractioncontrol/docs/case-studies.md) for the short version.
+AIC is not yet the best fit for arbitrary websites, unreviewed inferred contracts, non-React production fleets, or buyers requiring GA stability and signed compliance evidence.
 
-## What Is Still Intentionally Rough
+## Evaluation path
 
-- npm surface is still alpha-tagged
-- WebMCP remains an experimental, date-pinned compatibility surface and is not claimed as published until the next npm alpha release succeeds
-- dynamic inference is intentionally conservative
-- write-back mutation remains guarded and limited
-- auth is documented as an integration path, not built into core packages
-
-## Recommended Evaluation Path
-
-1. Read [Supported Today](/mnt/c/users/vatsa/agentinteractioncontrol/docs/supported-today.md).
-2. Follow [Adopt AIC In An Existing App](/mnt/c/users/vatsa/agentinteractioncontrol/docs/adopt-existing-app.md).
-3. Run the verification flow from [Release Checklist](/mnt/c/users/vatsa/agentinteractioncontrol/docs/release-checklist.md).
-4. Review [AIC Case Studies](/mnt/c/users/vatsa/agentinteractioncontrol/docs/case-studies.md).
-
-That path gives the most honest picture of current maturity.
+1. Read [Supported Today](./supported-today.md).
+2. Run the [Next.js checkout example](../examples/nextjs-checkout-demo/README.md).
+3. Review [Behavior Assurance](./behavior-assurance.md) and its trust boundary.
+4. Follow [Adopt AIC in an Existing App](./adopt-existing-app.md).
+5. Run every applicable gate in [Release Checklist](./release-checklist.md).

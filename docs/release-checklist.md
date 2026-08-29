@@ -1,6 +1,6 @@
 # Release Checklist
 
-## Technical Gates
+## Workspace gates
 
 - `pnpm check`
 - `pnpm build`
@@ -11,50 +11,45 @@
 - `pnpm smoke:mcp`
 - `pnpm smoke:mcp:stdio`
 
-## Clean Workspace Gate
+## Behavior-assurance gates
 
-- the documented verification flow does not leave unexpected tracked diffs
-- common generated local outputs are ignored or cleaned up
-- README and docs links resolve to committed files, not local-only notes
+- `aic validate behavior` accepts every shipped behavior contract.
+- `pnpm --dir examples/nextjs-checkout-demo run aic:verify` passes.
+- The proof contains executed evidence, all required observations, zero findings, and passed parity for the checkout scenarios.
+- A deliberate WebMCP outcome divergence makes the verifier and CLI fail.
+- Checked-in schemas match the public TypeScript types and validator behavior.
+- Harnesses are reviewed as trusted code and CI uses least-privilege credentials.
+- Documentation does not call an unsigned local proof a production attestation.
 
-## Contract Proof Gates
+## Clean-workspace gate
 
-- example runtime proof tests are green
-- reference consumer proof tests are green
-- supported-boundary docs reflect the current product surface
+- verification creates no unexpected tracked diffs;
+- intentional generated proof fixtures are deterministic;
+- local generated outputs are ignored or cleaned up; and
+- README and documentation links target committed files.
 
-## Repo Launch Gates
+## Contract and consumer gates
 
-- `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, and `CHANGELOG.md` are present
-- README links to the examples, supported-boundary doc, and proof harness
-- GitHub issue and PR templates are present
-- CI workflow is enabled on the default branch
+- runtime and reference-consumer tests pass;
+- QA readiness and behavior proof are described as distinct evidence;
+- supported-boundary and threat-model documents match the implementation; and
+- generated AIC JSON is regenerated and reviewed rather than hand-edited.
 
-## npm Alpha Release Gates
+## Repository release gates
 
-- first-wave package manifests are public and include publish metadata
-- tarball smoke tests are green
-- package matrix docs match the current publish wave
-- publish workflow is configured with npm-token expectations documented
-- the publish workflow runs:
-  - `pnpm check`
-  - `pnpm build`
-  - `pnpm test:contracts`
-  - `pnpm test:goldens`
-  - `pnpm test:packaging`
+- license, contribution, security, conduct, changelog, and service files are current;
+- root and example READMEs show the current behavior-assurance workflow;
+- CI, MCP stdio, and behavior-assurance workflows are enabled; and
+- package descriptions and changesets match the release contents.
 
-## Workflow Roles
+## npm alpha gates
 
-- `ci.yml`
-  - fast mainline verification for the workspace
-  - includes adoption and MCP handler smokes
-- `mcp-stdio-smoke.yml`
-  - real stdio transport verification for `@aicorg/mcp-server`
-- `publish-packages.yml`
-  - manual npm alpha publish path after verification succeeds
+- package manifests remain public and include publish metadata;
+- tarball smoke tests pass;
+- package matrix docs match the exact publish wave;
+- `@aicorg/webmcp` and behavior assurance are not called published before registry verification; and
+- the manual publish workflow completes its configured checks before publishing.
 
-## Not In This Release
+## Not a release claim
 
-- stable GA npm publishing
-- non-React platform support
-- heuristic repo mutation
+Passing these gates does not provide GA stability, non-React support, proof signing, deployment binding, or independent certification.

@@ -2,7 +2,7 @@
   "name": "@aicorg/cli",
   "version": "0.1.0-alpha.1",
   "type": "module",
-  "description": "CLI for scanning, generating, bootstrapping, and inspecting AIC artifacts.",
+  "description": "CLI for onboarding, generating, validating, verifying, and inspecting AIC contracts and proofs.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -15,7 +15,9 @@
   "keywords": [
     "aic",
     "agents",
+    "assurance",
     "cli",
+    "testing",
     "tooling"
   ],
   "main": "./dist/cli/src/index.js",

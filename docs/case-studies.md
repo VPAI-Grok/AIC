@@ -7,7 +7,7 @@ Use this page when you want proof that AIC works on real agent workflows without
 TailAdmin is the clearest browser-agent proof case in this repo.
 
 Report:
-- [TailAdmin Benchmark Report](/mnt/c/users/vatsa/agentinteractioncontrol/docs/tailadmin-benchmark-claude-2026-04-02.md)
+- [TailAdmin Benchmark Report](./tailadmin-benchmark-claude-2026-04-02.md)
 
 Strongest results:
 - `calendar_event_creation` success improved from `33.3%` to `100.0%`
@@ -24,9 +24,9 @@ What this proves:
 Twenty is the strongest real-app adoption proof in this repo.
 
 Reports and benchmark assets:
-- [Twenty Official Benchmark Report](/mnt/c/users/vatsa/agentinteractioncontrol/benchmarks/twenty-adoption/benchmark-report-official.md)
-- [Twenty Adoption Benchmark](/mnt/c/users/vatsa/agentinteractioncontrol/benchmarks/twenty-adoption/README.md)
-- [Twenty Benchmark Summary](/mnt/c/users/vatsa/agentinteractioncontrol/benchmarks/twenty-adoption/benchmark-summary-official.md)
+- [Twenty Official Benchmark Report](../benchmarks/twenty-adoption/benchmark-report-official.md)
+- [Twenty Adoption Benchmark](../benchmarks/twenty-adoption/README.md)
+- [Twenty Benchmark Summary](../benchmarks/twenty-adoption/benchmark-summary-official.md)
 
 The current official measured slice is green on:
 - detail navigation

@@ -1,78 +1,98 @@
-# Agent Interaction Control: Next.js Checkout Demo
+# Next.js Checkout: WebMCP and AIC Behavior Proof
 
-This is a demonstration of how to integrate the [@aicorg/sdk-react](https://www.npmjs.com/package/@aicorg/sdk-react) and [@aicorg/plugin-next](https://www.npmjs.com/package/@aicorg/plugin-next) into a complex, multi-step Next.js workflow with structured validation and semantic boundaries.
+This is the canonical end-to-end AIC example for a consequential action. It combines explicit React semantics, generated manifests, MCP discovery, native WebMCP registration, a shared checkout domain operation, and protocol-neutral behavior assurance.
 
-## Demo: Autonomous Agent Execution
+## What it demonstrates
 
-This example proves that an AI agent using the standard MCP protocol can autonomously operate a Next.js web application utilizing AIC components, without brittle DOM selectors.
+- stable AIC IDs, risk, entity, confirmation, execution, validation, recovery, and workflow metadata;
+- read-only `get_checkout_summary` and critical `complete_checkout` WebMCP tools;
+- progressive fallback when `document.modelContext` is unavailable;
+- one `executeCheckoutDomainOperation` used by both human UI and WebMCP paths;
+- an `aic.behavior/0.1` contract independent of either entrypoint;
+- executed success, authorization-denial, and confirmation-decline scenarios; and
+- a deterministic proof that the two surfaces produced equivalent behavior in the local harness.
 
-Here is the repo's canonical Next.js AIC starter. It demonstrates generated manifests, MCP discovery, and a critical-action contract with structured confirmation.
+The proof demonstrates this fixture and harness. It is not a signed or production-bound attestation.
 
-It also contains the canonical AIC-governed WebMCP example. `get_checkout_summary` proves read-only browser execution, while the critical `complete_checkout` tool and the human Submit order button call the same domain function. The critical tool adds strict input validation, order-entity authorization, human confirmation, completion verification, runtime events, and automatic lifecycle cleanup.
+## Key files
 
-If you are adopting AIC into an existing app instead of exploring this starter, use [Adopt AIC In An Existing App](/mnt/c/users/vatsa/agentinteractioncontrol/docs/adopt-existing-app.md).
+| File | Purpose |
+|---|---|
+| [`app/CheckoutDemoContent.tsx`](./app/CheckoutDemoContent.tsx) | Human UI and WebMCP entrypoints |
+| [`app/checkout-operation.mjs`](./app/checkout-operation.mjs) | Shared validation, authorization, and domain operation |
+| [`app/checkout-contract.mjs`](./app/checkout-contract.mjs) | AIC interaction metadata and semantic action contracts |
+| [`aic-behavior-contract.json`](./aic-behavior-contract.json) | Protocol-neutral requirements and parity scenarios |
+| [`aic-verification-harness.mjs`](./aic-verification-harness.mjs) | Trusted local observation collector |
+| [`aic-proof.json`](./aic-proof.json) | Generated behavior proof fixture |
+| [`aic.project.json`](./aic.project.json) | Project identity, permissions, and workflows |
 
-## Getting Started
-
-1. Install dependencies from the repository root:
-   ```bash
-   pnpm install
-   ```
-
-2. Generate the AIC manifests using the local CLI toolkit:
-   ```bash
-   pnpm run aic:generate
-   ```
-
-3. Audit the example:
-   ```bash
-   pnpm run aic:doctor
-   pnpm run aic:webmcp
-   ```
-
-4. Start the Next.js development server:
-   ```bash
-   pnpm run dev
-   ```
-
-5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-In a browser without `document.modelContext`, the page reports WebMCP as `unsupported` and the human checkout remains fully usable. In an enabled browser, it reports `registered` after the guarded tool is installed.
-
-Generate a reviewable WebMCP implementation plan with:
+## Run from the repository root
 
 ```bash
-pnpm run aic:webmcp-plan
+pnpm install
+pnpm build
+pnpm --dir examples/nextjs-checkout-demo run aic:doctor
+pnpm --dir examples/nextjs-checkout-demo run aic:generate
+pnpm --dir examples/nextjs-checkout-demo run aic:webmcp
+pnpm --dir examples/nextjs-checkout-demo run aic:verify
+pnpm --dir examples/nextjs-checkout-demo run dev
 ```
 
-## Simulating MCP Tool Usage
+Open [http://localhost:3000](http://localhost:3000).
 
-To verify the MCP integration layer against this Next.js app:
+In a browser without `document.modelContext`, both WebMCP registrations report `unsupported` and the human checkout remains usable. In a compatible browser they report `registered` after the current adapter's authored-readiness gates pass.
 
-1. Keep the Next.js developer server running on `localhost:3000`.
-2. In a new terminal within this directory, run the simulation script:
-   ```bash
-   node simulate-mcp-client.mjs
-   ```
-3. The script calls the same MCP tool handlers shipped in `@aicorg/mcp-server` against the running app and writes the result bundle to `mcp-simulation-result.json`.
+## Inspect the proof
 
-For a real stdio MCP server validation, use the repo-level smoke command from the root:
+```bash
+pnpm aic validate behavior ./examples/nextjs-checkout-demo/aic-behavior-contract.json
+pnpm aic inspect ./examples/nextjs-checkout-demo/aic-proof.json
+```
+
+Expected summary:
+
+```text
+Status: passed
+Evidence: executed
+Scenarios: 3/3 passed
+Observations: 6/6
+Findings: 0
+```
+
+The behavior test suite also mutates the WebMCP success outcome and asserts that both outcome conformance and parity fail.
+
+## Readiness versus proof
+
+These commands are intentionally different:
+
+```bash
+pnpm --dir examples/nextjs-checkout-demo run aic:webmcp
+pnpm --dir examples/nextjs-checkout-demo run aic:webmcp-plan
+pnpm --dir examples/nextjs-checkout-demo run aic:qa-readiness
+pnpm --dir examples/nextjs-checkout-demo run aic:qa-plan
+pnpm --dir examples/nextjs-checkout-demo run aic:verify
+```
+
+- WebMCP readiness finds source and compatibility gaps.
+- QA readiness measures interaction-metadata coverage.
+- `aic verify` evaluates actual supplied observations against behavior scenarios.
+
+## MCP discovery simulation
+
+With the dev server running:
+
+```bash
+node ./examples/nextjs-checkout-demo/simulate-mcp-client.mjs
+```
+
+The script uses the same handlers as `@aicorg/mcp-server` and writes `mcp-simulation-result.json`. For real stdio transport verification, run:
 
 ```bash
 pnpm smoke:mcp:stdio
 ```
 
-You can override the target with:
+Override the app URL with `AIC_BASE_URL` when needed.
 
-```bash
-AIC_BASE_URL=http://localhost:3000 node simulate-mcp-client.mjs
-```
+## Adoption path
 
-## Useful Commands
-
-```bash
-pnpm aic --help
-pnpm run aic:doctor
-pnpm run aic:generate
-pnpm run aic:inspect
-```
+Use [Adopt AIC in an Existing App](../../docs/adopt-existing-app.md) for an owned application and [Behavior Assurance](../../docs/behavior-assurance.md) before making proof claims.

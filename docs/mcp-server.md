@@ -2,7 +2,7 @@
 
 `@aicorg/mcp-server` is an official MCP (Model Context Protocol) server that exposes AIC manifests to AI agents.
 
-Any MCP-compatible agent — Claude Desktop, Cursor, Cline, Windsurf, or any custom client — can instantly discover and reason about an AIC-instrumented web app without parsing raw DOM, screenshots, or brittle selectors.
+An MCP-compatible client can discover an AIC-instrumented app through explicit manifests instead of treating raw DOM, screenshots, or selectors as the primary contract.
 
 ## Quick Setup
 
@@ -53,7 +53,7 @@ Recommended pattern:
 - let the MCP client or browser session access the app as an authenticated user
 - let `@aicorg/mcp-server` read AIC manifests over HTTP from that app
 
-If you use Auth0 for user login, API protection, or delegated third-party API access, keep that in the app/auth layer rather than coupling it directly into the MCP server. See [Auth0 For AI Agents With AIC](/mnt/c/users/vatsa/agentinteractioncontrol/docs/auth0-ai-agents.md).
+If you use Auth0 for user login, API protection, or delegated third-party API access, keep that in the app/auth layer rather than coupling it directly into the MCP server. See [Auth0 for AI Agents with AIC](./auth0-ai-agents.md).
 
 ## Available Tools
 
@@ -137,3 +137,5 @@ Claude will automatically call:
 - **Stateless.** Every tool call fetches fresh data over HTTP. No server-side session or state required.
 - **Minimal dependencies.** Only `@aicorg/spec` (for validation) and `@modelcontextprotocol/sdk`. No Playwright, no runtime library.
 - **Works with any AIC app.** The server fetches manifests over HTTP, so it works with any framework that serves AIC manifests — not just React apps using the SDK.
+
+The current server is a discovery surface, not an execution or assurance engine. If an MCP tool also performs a business operation, model it as an `mcp` surface in an AIC behavior contract and verify it independently. See [Behavior Assurance](./behavior-assurance.md).

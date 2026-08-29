@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Added `aic.behavior/0.1` contracts, observations, proofs, validators, and public JSON Schemas.
+- Added deterministic behavior verification with evidence classification, canonical SHA-256 digests, scenario checks, and cross-surface parity findings.
+- Added `aic validate behavior`, `aic verify`, and behavior-proof inspection.
+- Added a shared-domain checkout reference with executed human UI/WebMCP success, authorization-denial, and confirmation-decline proof scenarios.
+- Added a dedicated behavior-assurance CI workflow and regression tests that prove divergent WebMCP outcomes fail.
+- Repositioned WebMCP as a native execution surface and AIC as the protocol-neutral assurance layer.
+
 ## 0.1.0
 
 - Core AIC platform implemented across spec, runtime, React SDK, framework plugins, CLI, devtools, bootstrap, and reference integrations.

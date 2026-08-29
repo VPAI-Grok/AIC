@@ -1,6 +1,6 @@
 # AIC Manifest Spec
 
-This repo currently treats five JSON artifacts as the stable v1 contract surface:
+This repo treats five JSON artifacts as the v1 interaction-description surface:
 
 - `/.well-known/agent.json`
 - `/.well-known/agent/ui`
@@ -9,6 +9,8 @@ This repo currently treats five JSON artifacts as the stable v1 contract surface
 - `agent-workflows.json`
 
 `operate.txt` is intentionally not a schema-driven contract. It is a human-readable discovery aid.
+
+Behavior assurance uses a separate, protocol-neutral artifact family. Interaction manifests describe what an app exposes; behavior contracts and proofs test what those surfaces actually do.
 
 ## Discovery
 
@@ -108,14 +110,27 @@ Each workflow currently requires:
 
 Use workflows for checkpointing, fallback, rollback, human approvals, and completion signals.
 
+## Behavior assurance artifacts
+
+The `aic.behavior/0.1` family is not generated from UI annotations and should not be mixed into the five discovery manifests.
+
+- `aic_behavior_contract` defines one business action, its stable domain `operation_id`, supported surfaces, behavioral requirements, and expected scenarios.
+- `aic_behavior_observation_set` records executed or imported evidence for each required scenario/surface pair.
+- `aic_behavior_proof` records deterministic verification results, evidence level, artifact digests, findings, and parity status.
+
+Use `aic validate behavior <file>` for contracts and `aic verify` to create proofs. See [Behavior Assurance](./behavior-assurance.md).
+
 ## Schemas
 
-The checked-in v1 JSON Schemas live under [`schemas/`](/mnt/c/users/vatsa/agentinteractioncontrol/schemas):
+The checked-in JSON Schemas live under [`schemas/`](../schemas):
 
-- [agent.schema.json](/mnt/c/users/vatsa/agentinteractioncontrol/schemas/agent.schema.json)
-- [agent-ui.schema.json](/mnt/c/users/vatsa/agentinteractioncontrol/schemas/agent-ui.schema.json)
-- [agent-actions.schema.json](/mnt/c/users/vatsa/agentinteractioncontrol/schemas/agent-actions.schema.json)
-- [agent-permissions.schema.json](/mnt/c/users/vatsa/agentinteractioncontrol/schemas/agent-permissions.schema.json)
-- [agent-workflows.schema.json](/mnt/c/users/vatsa/agentinteractioncontrol/schemas/agent-workflows.schema.json)
+- [agent.schema.json](../schemas/agent.schema.json)
+- [agent-ui.schema.json](../schemas/agent-ui.schema.json)
+- [agent-actions.schema.json](../schemas/agent-actions.schema.json)
+- [agent-permissions.schema.json](../schemas/agent-permissions.schema.json)
+- [agent-workflows.schema.json](../schemas/agent-workflows.schema.json)
+- [behavior-contract.schema.json](../schemas/behavior-contract.schema.json)
+- [behavior-observation-set.schema.json](../schemas/behavior-observation-set.schema.json)
+- [behavior-proof.schema.json](../schemas/behavior-proof.schema.json)
 
 They are intended as the portable artifact definitions for integrators and docs. The repo’s TypeScript validators remain the enforcement source used in tests and CLI validation.

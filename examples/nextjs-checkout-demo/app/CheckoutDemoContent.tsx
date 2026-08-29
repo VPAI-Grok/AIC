@@ -20,6 +20,12 @@ import {
   SUBMIT_ORDER_ELEMENT,
   SUBMIT_ORDER_PROPS
 } from "./checkout-contract.mjs";
+import {
+  CHECKOUT_REQUEST,
+  authorizeCheckoutRequest,
+  executeCheckoutDomainOperation,
+  validateCheckoutRequest
+} from "./checkout-operation.mjs";
 
 interface CheckoutToolInput extends Record<string, unknown> {
   order_id: string;
@@ -100,22 +106,14 @@ export function CheckoutDemoContent() {
   );
 
   const completeOrder = useCallback(async (input: CheckoutToolInput): Promise<CheckoutToolResult> => {
-    setOrderStatus("processing");
-    await Promise.resolve();
-    const result = {
-      order_id: input.order_id,
-      payment_status: "charged" as const,
-      status: "submitted" as const
-    };
-    setOrderStatus(result.status);
-    return result;
+    return executeCheckoutDomainOperation(input, setOrderStatus);
   }, []);
 
   const checkoutWebMCP = useAICWebMCPTool<CheckoutToolInput, CheckoutToolResult>(
     () => ({
       action: SUBMIT_ORDER_ACTION,
       authorize: async (input) =>
-        input.order_id === SUBMIT_ORDER_ELEMENT.entity_ref?.entity_id && orderStatus === "draft",
+        authorizeCheckoutRequest(input, orderStatus),
       confirm: async (request) => window.confirm(request.prompt),
       element: SUBMIT_ORDER_ELEMENT,
       execute: async (input) => completeOrder(input),
@@ -153,13 +151,7 @@ export function CheckoutDemoContent() {
         title: "Complete checkout"
       },
       validate: async (input) => {
-        if (
-          input.order_id !== "ord_100245" ||
-          input.order_total !== "$177.00" ||
-          input.payment_method !== "Visa ending 4242"
-        ) {
-          throw new Error("The requested checkout does not match the displayed order.");
-        }
+        validateCheckoutRequest(input);
       },
       verify: async (result) =>
         result.order_id === "ord_100245" &&
@@ -170,16 +162,17 @@ export function CheckoutDemoContent() {
   );
 
   const submitFromHumanUI = useCallback(async () => {
+    validateCheckoutRequest(CHECKOUT_REQUEST);
+    if (!authorizeCheckoutRequest(CHECKOUT_REQUEST, orderStatus)) {
+      return;
+    }
+
     if (!window.confirm("Charge Visa ending 4242 for $177.00 and submit order ord_100245?")) {
       return;
     }
 
-    await completeOrder({
-      order_id: "ord_100245",
-      order_total: "$177.00",
-      payment_method: "Visa ending 4242"
-    });
-  }, [completeOrder]);
+    await completeOrder(CHECKOUT_REQUEST);
+  }, [completeOrder, orderStatus]);
 
   return (
     <>
@@ -339,6 +332,29 @@ export function CheckoutDemoContent() {
             WebMCP: summary {summaryWebMCP.status}; checkout {checkoutWebMCP.status}
           </span>
         </div>
+      </section>
+
+      <section
+        style={{
+          background: "#1c1917",
+          borderRadius: 24,
+          color: "#fafaf9",
+          display: "grid",
+          gap: 10,
+          padding: 24
+        }}
+      >
+        <span style={{ color: "#c4b5fd", fontSize: 12, fontWeight: 800, letterSpacing: "0.1em" }}>
+          AIC BEHAVIOR PROOF
+        </span>
+        <h2 style={{ fontSize: 24, margin: 0 }}>Reference harness parity: passed</h2>
+        <p style={{ color: "#d6d3d1", margin: 0 }}>
+          Three scenarios, six executed observations, zero findings: success, authorization denial,
+          and confirmation decline all produce equivalent behavior across both surfaces.
+        </p>
+        <a href="/aic-proof" style={{ color: "#ddd6fe", fontWeight: 700 }}>
+          Inspect the generated proof JSON
+        </a>
       </section>
     </>
   );

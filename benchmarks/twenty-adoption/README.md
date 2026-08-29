@@ -4,6 +4,8 @@ This benchmark replaces the demo-only micro-benchmark approach with a real-app a
 
 The goal is not to prove that AIC can make a toy flow faster. The goal is to prove that AIC can be added to a real open-source app and improve agent correctness, safety, and workflow discipline on a hard slice.
 
+This benchmark measures adoption quality and browser-agent task performance. It predates `aic.behavior/0.1` and is not a behavior proof. A future rerun should encode the destructive cancel and record-mutation flows as protocol-neutral contracts so benchmark results and conformance evidence can be reported separately.
+
 ## Benchmark Target
 
 - App: `twentyhq/twenty`

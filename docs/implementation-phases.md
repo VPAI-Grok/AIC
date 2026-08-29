@@ -1,84 +1,71 @@
 # AIC Implementation Phases
 
-This document maps the original master-spec phases to the current repo state.
+This document maps the original product build to the current assurance roadmap.
 
-## Phases 1-8
+## Completed foundation
 
-The master spec defined these implementation phases:
+The original phases are represented in the repository:
 
-1. Spec foundation
-2. Runtime registry
-3. React SDK
-4. Build plugins
-5. CLI
-6. Devtools
-7. AI bootstrap
-8. Integrations and demos
+1. spec foundation;
+2. runtime registry;
+3. React SDK;
+4. Next.js and Vite plugins;
+5. CLI;
+6. devtools;
+7. AI-assisted bootstrap; and
+8. component integrations and reference apps.
 
-The current repo has all of those package families implemented:
+The repo also includes automation core, HTTP and OpenAI bootstrap providers, a read-only MCP server, coding-agent onboarding, guarded source apply, WebMCP compatibility, QA readiness, and real-app benchmarks.
 
-- `@aicorg/spec`
-- `@aicorg/runtime`
-- `@aicorg/sdk-react`
-- `@aicorg/plugin-next`
-- `@aicorg/plugin-vite`
-- `@aicorg/cli`
-- `@aicorg/devtools`
-- `@aicorg/ai-bootstrap`
-- `@aicorg/integrations-radix`
-- `@aicorg/integrations-shadcn`
+## Current phase: behavior assurance foundation
 
-It also includes:
+The first vertical slice is implemented:
 
-- `@aicorg/automation-core`
-- `@aicorg/ai-bootstrap-http`
-- `@aicorg/ai-bootstrap-openai`
+- protocol-neutral behavior contracts;
+- observation and proof types plus JSON Schemas;
+- deterministic contract, evidence, and parity verification;
+- CLI validation, verification, and proof inspection;
+- a shared-domain checkout example across human UI and WebMCP;
+- success, authorization-denial, and confirmation-decline scenarios; and
+- a CI proof artifact.
 
-## Current Milestone
+This phase establishes the open contract and verifier. It does not yet establish production-grade evidence authenticity.
 
-Treat the repo as:
+## Next milestone: trustworthy evidence adapters
 
-- Phase 8 / MVP-baseline complete
-- in stabilization and capability-deepening mode
-- not yet fully production-polished across every edge case
-- already carrying a small amount of post-MVP surface beyond the original master spec
+Priorities:
 
-## Beyond The Original Master Spec
+1. Browser/Playwright observation adapter that proves the rendered human path.
+2. WebMCP browser runner against a supported experimental browser.
+3. MCP and HTTP/OpenAPI observation adapters.
+4. Deployment and commit metadata in evidence without overstating trust.
+5. Reusable contract packs for checkout, billing, account deletion, admin mutations, and record CRUD.
+6. Configurable CI policies by risk, evidence level, scenario class, and parity requirement.
+7. Verifier compatibility fixtures so alternative implementations can conform.
 
-The original master spec stopped the MVP at integrations and demos.
+## Later: ecosystem trust layer
 
-The current repo also includes:
+- signed and deployment-bound proofs;
+- remote or attested runners;
+- tamper-evident transparency logs;
+- public conformance profiles and registries;
+- hosted evidence collection and policy dashboards; and
+- independent certification programs.
 
-- `@aicorg/mcp-server`
-- `@aicorg/automation-core`
-- guarded authoring-plan generation and apply flows wired through the CLI and devtools review loop
+The open contract, schemas, verifier, and local runner remain the foundation. Hosted capabilities should add convenience and trust, not lock users out of their evidence.
 
-Those additions should be read as incremental capability work on top of the completed MVP, not as proof that a new roadmap phase is required before release hardening.
+## Ongoing stabilization
 
-## What v1 Still Needs
+- keep package docs and release claims aligned with the published npm wave;
+- keep WebMCP support date-pinned and native-first;
+- preserve deterministic extraction and guarded write-back;
+- expand React component coverage based on real adoption evidence; and
+- maintain clean builds, tests, goldens, packaging checks, and examples.
 
-- green verification from a clean workspace after the current release-facing changes are committed
-- checked-in schema and docs artifacts that match the shipped surface
-- deeper but still guarded write-back support around the authoring-plan/apply path
-- stronger provider and bootstrap documentation for real evaluation flows
-- fuller Radix/shadcn reference coverage in examples and docs
+## Explicit non-goals for the current milestone
 
-## Next Steps Now
-
-The next milestone should stay inside stabilization:
-
-1. Close the clean-workspace gate so the documented verification flow does not leave unexpected tracked diffs.
-2. Finish docs and schema alignment so package docs, release docs, and generated-contract docs all describe the same shipped surface.
-3. Harden guarded write-back around authoring plans instead of expanding into heuristic repo mutation.
-4. Improve integration examples and reference docs for Radix/shadcn adoption depth.
-
-## Explicit Non-Goals For This Milestone
-
-Do not expand scope to:
-
-- Vue or Svelte adapters
-- new OpenAPI bridge work
-- workflow recording
-- enterprise governance/observability products
-
-Those remain after the current v1 stabilization milestone.
+- replacing WebMCP, MCP, OpenAPI, or browser automation;
+- silently promoting inferred actions to execution-ready status;
+- claiming production attestation from local fixture evidence;
+- broad heuristic repo mutation; and
+- expanding framework breadth before the assurance core is stable.

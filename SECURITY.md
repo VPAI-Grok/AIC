@@ -17,8 +17,12 @@ The highest-sensitivity areas in this repository are:
 
 - bootstrap provider integrations and credential handling
 - CLI apply behavior
+- trusted behavior-harness module execution
+- imported observation authenticity and proof tampering
 - devtools import/export paths
 - generated contract artifacts that may influence agent actions
+
+`aic verify --harness` imports and executes local JavaScript with the CLI process's permissions. Review harness code, isolate CI jobs, and use least-privilege credentials. Current proof digests are integrity identifiers, not signatures or runner attestations.
 
 ## Expectations
 

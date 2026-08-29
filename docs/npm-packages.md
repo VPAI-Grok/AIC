@@ -6,11 +6,11 @@ The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 
 | Package | Purpose |
 | --- | --- |
-| `@aicorg/spec` | Manifest types, validators, and diff helpers |
+| `@aicorg/spec` | Interaction manifests plus behavior-contract, observation, and proof types and validators |
 | `@aicorg/runtime` | Runtime registry and manifest serialization |
 | `@aicorg/sdk-react` | React SDK for explicit AIC annotations |
-| `@aicorg/automation-core` | Deterministic scanning, artifact generation, init, and doctor helpers |
-| `@aicorg/cli` | `aic` command-line interface |
+| `@aicorg/automation-core` | Deterministic scanning, generation, readiness analysis, and behavior verification |
+| `@aicorg/cli` | AIC onboarding, generation, validation, verification, and inspection commands |
 | `@aicorg/plugin-vite` | Vite scanning and artifact generation helpers |
 | `@aicorg/plugin-next` | Next.js scanning and artifact generation helpers |
 | `@aicorg/integrations-radix` | Radix UI helper factories |
@@ -28,7 +28,9 @@ The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 
 ## Next Alpha Wave
 
-`@aicorg/webmcp` is source-ready and covered by the package/build/contract tests, but it is not claimed as published until the next npm alpha release completes.
+`@aicorg/webmcp` and the new behavior-assurance additions to `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg/cli` are implemented in the repository. They are not claimed as published until the next npm alpha release completes.
+
+The next wave adds `aic validate behavior`, `aic verify`, protocol-neutral behavior artifacts, and deterministic parity proof generation. No separate package is required for the verifier.
 
 ## Install Targets
 

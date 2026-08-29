@@ -26,10 +26,11 @@ Optional advanced helper:
 3. Instrument critical flows with explicit `agent*` metadata.
 4. Run `aic doctor [project-root]` to audit readiness before generating artifacts.
 5. Run `aic scan`, `aic generate project`, `aic inspect report.json`, and `aic validate ...` as part of review.
+6. For consequential actions exposed through more than one surface, map every entrypoint to one domain `operation_id`, define a behavior contract, and run `aic verify`.
 
 Manual fallback:
 
-- Copy the starter files from [`templates/agent-onboarding/`](/mnt/c/users/vatsa/agentinteractioncontrol/templates/agent-onboarding) if you are not using the CLI scaffold path.
+- Copy the starter files from [`templates/agent-onboarding/`](../templates/agent-onboarding) if you are not using the CLI scaffold path.
 
 ## What Agents Should Be Told
 
@@ -40,10 +41,15 @@ Manual fallback:
 - Add workflow, validation, execution, and recovery metadata where the app already has those semantics.
 - Treat bootstrap as a review aid, not a source of truth.
 - Regenerate AIC artifacts instead of hand-editing generated JSON.
+- Prefer native protocol fields when they are equivalent.
+- Keep metadata readiness separate from executed behavior proof.
+- Never describe an unsigned local proof as production attestation.
 
 ## Optional Validation
 
 `aic doctor [project-root]` is the primary readiness audit, and `aic generate project <config-file> --out-dir <dir>` still records an `agent_onboarding` section in `report.json`.
+
+`aic validate behavior` and `aic verify` are separate assurance gates when a behavior contract exists.
 
 - Missing recommended files are warnings only.
 - Template-managed files can be marked stale if their embedded template version falls behind.

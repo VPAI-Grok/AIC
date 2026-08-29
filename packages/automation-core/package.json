@@ -2,7 +2,7 @@
   "name": "@aicorg/automation-core",
   "version": "0.1.0-alpha.1",
   "type": "module",
-  "description": "Deterministic scanning, artifact generation, and onboarding helpers for AIC.",
+  "description": "Deterministic scanning, artifact generation, readiness analysis, and behavior verification for AIC.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -15,8 +15,10 @@
   "keywords": [
     "aic",
     "agents",
+    "assurance",
     "automation",
-    "scanning"
+    "scanning",
+    "testing"
   ],
   "main": "./dist/automation-core/src/index.js",
   "types": "./dist/automation-core/src/index.d.ts",

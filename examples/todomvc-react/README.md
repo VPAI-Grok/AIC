@@ -1,48 +1,47 @@
-# TodoMVC React (AIC Instrumented)
+# TodoMVC React: AIC Interaction Demo
 
-This is a benchmark demonstration proving out [Agent Interaction Control (AIC)](https://github.com/aicorg/aic) within a canonical TodoMVC React application. It illustrates how to explicitly add context to standard React forms and interactive elements so that AI agents can holistically control the application without relying strictly on heuristics.
+This fixture shows explicit AIC semantics on a familiar TodoMVC application. It is useful for discovery and MCP demonstrations without the domain complexity of the checkout or CRM examples.
 
-## ✨ Features
-*   **Standard TodoMVC**: Uses canonical `@types/react` patterns alongside standard `todomvc-app-css` styling.
-*   **Agent Controls**: Employs `@aicorg/sdk-react`'s `<AICInput>` and `<AICButton>` to annotate all core interactions.
-*   **Automatic Manifest Generation**: Validates `agentId`, `agentDescription`, and `agentAction` via the `@aicorg/plugin-vite` dev middleware at runtime, allowing AI models to automatically discover available endpoints.
-*   **MCP Playbook Validation**: Simulates how `@aicorg/mcp-server` dynamically queries the Vite middleware proxy during runtime to build semantic knowledge.
+## Included
 
-## 🚀 Getting Started
+- `AICInput` and `AICButton` instrumentation for core todo actions;
+- stable IDs and explicit descriptions instead of visible-text contracts;
+- Vite middleware for `.well-known` AIC endpoints;
+- an MCP discovery simulation; and
+- a historical visual browser-agent recording.
 
-Ensure dependencies are installed at the workspace level, then launch the React dev server from `examples/todomvc-react`:
+This example does not currently contain an `aic.behavior/0.1` contract. It demonstrates interaction discovery, not cross-surface behavioral assurance.
+
+## Run
+
+From the repository root:
 
 ```bash
 pnpm install
-pnpm run dev
+pnpm --dir examples/todomvc-react run dev
 ```
 
-The app will become available at `http://localhost:5173`. 
-The AIC Vite plugin explicitly intercepts metadata requests on this server via the `.well-known` endpoints:
-*   `http://localhost:5173/.well-known/agent.json`
-*   `http://localhost:5173/.well-known/agent/ui`
+The app runs at [http://localhost:5173](http://localhost:5173), with discovery at:
 
-## 🤖 Simulating MCP Tool Usage
+- [/.well-known/agent.json](http://localhost:5173/.well-known/agent.json)
+- [/.well-known/agent/ui](http://localhost:5173/.well-known/agent/ui)
 
-To test how an autonomous agent fetches instructions and interactive boundaries via the AIC MCP tool layer, keep the dev server running and in another terminal run:
+## Simulate MCP discovery
+
+Keep the dev server running, then execute:
 
 ```bash
-node simulate-mcp-client.mjs
+node ./examples/todomvc-react/simulate-mcp-client.mjs
 ```
 
-This invokes the same MCP tool handlers shipped in `@aicorg/mcp-server` against the running app and writes the resulting discovery, UI, actions, and workflow payloads to `mcp-simulation-result.json`.
+The script uses the same handlers as `@aicorg/mcp-server` and writes `mcp-simulation-result.json` with discovery, UI, actions, and workflows.
 
-## 🎦 Demo Recording: Autonomous Browser Execution
+## Historical recording
 
-AIC allows standard Vision+Action agents to semantically interface with applications reliably rather than struggling with inaccessible or opaque UI controls.
+The recording shows a visual agent creating two items, toggling completion, and clearing completed items:
 
-Below is an unedited recording of an AI agent automating the TodoMVC app visually—extracting its knowledge boundaries entirely from our newly attached `<AICProvider>` tree to successfully perform the following workflow:
-1. Entering two distinct items
-2. Confirming successful entry 
-3. Toggling item status checkmarks precisely
-4. Triggers the context-switching 'Clear completed' cleanup via precise layout bounds.
+![TodoMVC AIC browser run](./docs/todomvc_aic_test.webp)
 
-![Subagent Execution Recording](./docs/todomvc_aic_test.webp)
+Treat it as a demonstration, not a controlled benchmark or behavior proof.
 
----
-*Created to demonstrate operability and reliability of modern AI Agents using the Model Context Protocol.*
+For a current executed parity example, use [Next.js Checkout](../nextjs-checkout-demo/README.md). For proof semantics, read [Behavior Assurance](../../docs/behavior-assurance.md).

@@ -1,70 +1,67 @@
-# WebMCP With AIC
+# WebMCP with AIC
 
-AIC treats WebMCP as a complementary browser execution layer, not a competing contract system.
+AIC treats WebMCP as the native browser tool surface. It does not define a competing browser protocol.
 
-> WebMCP exposes task-level browser tools. AIC governs whether those tools are safe, correctly scoped, verifiable, and ready to execute.
+> WebMCP describes and invokes the tool. AIC verifies the behavior behind it.
 
-## Compatibility Baseline
+## Compatibility baseline
 
-This implementation is pinned to:
+The current adapter is pinned to:
 
-- WebMCP draft: `2026-08-26`
-- imperative API: `document.modelContext.registerTool(...)`
-- official TypeScript declarations: `webmcp-types@0.1.5`
-- browser behavior: feature-detected progressive enhancement
+- WebMCP draft `2026-08-26`;
+- imperative `document.modelContext.registerTool(...)`;
+- `webmcp-types@0.1.5`; and
+- feature-detected progressive enhancement.
 
-WebMCP remains an experimental Community Group proposal and can change. Review the [current specification](https://webmachinelearning.github.io/webmcp/) and [Chrome imperative API documentation](https://developer.chrome.com/docs/ai/webmcp/imperative-api) before changing the pinned baseline.
+WebMCP is experimental and can change. Check the [current specification](https://webmachinelearning.github.io/webmcp/) and [Chrome imperative API documentation](https://developer.chrome.com/docs/ai/webmcp/imperative-api) before updating the pinned baseline.
 
-## Product Policy: Support, Enhance, or Prepare
+## Native-first policy
 
-When a WebMCP request appears, classify it as one or more of:
+When WebMCP provides a capability, use it directly. Do not preserve a duplicate AIC field merely because AIC implemented it first.
 
-1. **Support** — use the current native API, feature detection, official types, lifecycle cancellation, and secure origin exposure.
-2. **Enhance** — bind native tools to AIC risk, permission, confirmation, entity, workflow, validation, execution, recovery, and audit metadata.
-3. **Prepare** — produce a readiness report and implementation plan when the app is not ready for safe tool registration.
+AIC remains responsible for protocol-neutral concerns that must survive WebMCP changes:
 
-Do not build a competing browser protocol, generic polyfill, or replacement hook ecosystem inside AIC.
+- stable business-operation identity;
+- shared behavior across human and agent entrypoints;
+- executable success, denial, confirmation, failure, and recovery scenarios;
+- cross-surface parity checks;
+- evidence classification and canonical digests; and
+- CI policy and portable proof artifacts.
+
+The current adapter also supplies fail-closed compatibility gates while the browser API is experimental. Those gates can become thinner as native WebMCP matures.
 
 ## Architecture
 
 ```text
-Human UI ---------------------> shared application/domain function
-                                     ^
-                                     |
-WebMCP -> AIC guard -> validate -> authorize -> confirm
-                                     |
-                                     v
-                         execute -> verify -> audit/UI update
+Human UI -----> guards -----> shared domain operation -----> outcome/evidence
+                     ^                 ^
+                     |                 |
+WebMCP tool --> native API + AIC compatibility adapter
+
+AIC behavior contract + harness --------------------------> parity proof
 ```
 
-The human and WebMCP paths must reuse the same domain operation. A WebMCP-only mutation path can drift away from human validation and is not considered AIC-ready.
+The human and WebMCP paths should call the same domain operation. Protocol tool names and UI IDs can differ; both map to one stable AIC `operation_id`.
 
-AIC manifests and the read-only AIC MCP server remain useful for static discovery, headless consumers, unsupported browsers, and richer semantics that WebMCP does not carry.
-
-## Imperative Tools
-
-Install the adapter and official draft types:
+## Imperative registration
 
 ```bash
-# Inside this monorepo
+# In this monorepo
 pnpm add @aicorg/webmcp@workspace:*
-
-# After the next npm alpha release
-pnpm add @aicorg/webmcp@alpha
 pnpm add -D webmcp-types@0.1.5
+
+# After the package is included in an npm alpha release
+pnpm add @aicorg/webmcp@alpha
 ```
-
-The package is implemented and release-ready in this repository. Do not describe it as published until the npm alpha release succeeds.
-
-Use `registerAICWebMCPTool` directly or the React lifecycle helper:
 
 ```tsx
 import { useAICWebMCPTool } from "@aicorg/webmcp/react";
 
-const state = useAICWebMCPTool(
+const registration = useAICWebMCPTool(
   () => ({
     action: authoredExecutionReadyAction,
-    element: criticalCheckoutElement,
+    element: checkoutElement,
+    registry,
     tool: {
       name: "complete_checkout",
       description: "Complete the displayed checkout after authorization and confirmation.",
@@ -79,36 +76,35 @@ const state = useAICWebMCPTool(
     validate: validateCheckoutInput,
     authorize: authorizeCheckout,
     confirm: requestHumanConfirmation,
-    execute: completeCheckout,
-    verify: verifyCheckoutCompletion,
-    registry
+    execute: executeCheckoutDomainOperation,
+    verify: verifyCheckoutCompletion
   }),
-  [registry, completeCheckout]
+  [registry]
 );
 ```
 
-The adapter returns `unsupported` without failing when `document.modelContext` is unavailable. Use `requireSupport: true` only in a controlled WebMCP test environment.
+The adapter returns `unsupported` without breaking the human app when `document.modelContext` is absent. Use `requireSupport: true` only in a controlled WebMCP test environment.
 
-## Registration Gates
+## Current compatibility gates
 
-Registration fails closed when any blocker is present:
+Registration fails closed when, among other checks:
 
-- action contract is not explicitly `execution_ready`
-- execution readiness is inferred or AI-suggested instead of authored
-- action target and AIC element do not match
-- input schema is not an object schema
-- completion signal or failure modes are placeholders
-- mutating tool has no side effects or verifier
-- high/critical tool has no authorization callback
-- critical tool lacks permissions or entity identity
-- confirmation-gated tool lacks structured metadata or a human confirmation handler
-- read-only annotation conflicts with declared side effects
+- the action is not explicitly authored and `execution_ready`;
+- action and element targets do not match;
+- the input schema is not an object schema;
+- completion or failure behavior is placeholder-only;
+- a mutating tool has no side effects or completion verifier;
+- a high/critical tool lacks authorization;
+- a critical action lacks permission or entity scope; or
+- confirmation metadata and the human confirmation handler disagree.
 
-Generated action contracts are intentionally marked `review_required` and cannot pass these gates.
+Generated actions remain `review_required`; generation alone never enables execution.
 
-## Declarative Forms
+These are current adapter policy, not claims that WebMCP itself lacks or will always lack equivalent controls.
 
-The React SDK maps explicit props to the current declarative WebMCP attributes:
+## Declarative forms
+
+The React SDK maps explicit properties to the current declarative attributes:
 
 ```tsx
 <AIC.Form
@@ -126,57 +122,52 @@ The React SDK maps explicit props to the current declarative WebMCP attributes:
 </AIC.Form>
 ```
 
-This emits `toolname`, `tooldescription`, `toolparamdescription`, and, when safe, `toolautosubmit`. AIC suppresses `toolautosubmit` unless the action is low risk and does not require confirmation.
+AIC suppresses `toolautosubmit` unless the action is low risk and does not require confirmation.
 
-## CLI Readiness
+## Readiness commands
 
 ```bash
 aic scan ./src --webmcp
 aic doctor . --webmcp
-aic generate webmcp-plan ./src --out-file webmcp-plan.json
+aic generate webmcp-plan ./src --out-file ./webmcp-plan.json
 ```
 
-The scanner detects:
+These commands find governed registrations, direct registrations that bypass the current adapter, obsolete API shapes, declarative tools, and risky auto-submit review points. Readiness analysis prepares implementation; it is not executed proof.
 
-- governed `@aicorg/webmcp` registrations
-- current direct `document.modelContext.registerTool` calls that bypass AIC
-- obsolete `navigator.modelContext` and `provideContext` usage
-- declarative tools and auto-submit review points
+## Behavior verification
 
-`aic doctor --webmcp` adds the WebMCP report to the ordinary AIC doctor result. A blocked WebMCP report produces a non-zero exit code.
+Create one contract for the business operation and include `human_ui` and `webmcp` surfaces:
 
-## Verification
+```bash
+aic validate behavior ./aic-behavior-contract.json
+aic verify ./aic-behavior-contract.json \
+  --harness ./aic-verification-harness.mjs \
+  --out-file ./aic-proof.json
+```
 
-Minimum verification for a mutating tool:
+For a consequential mutation, cover at least:
 
-- schema and application validation tests
-- authorization denial test
-- confirmation accept and decline tests
-- cancellation test
-- success and declared failure-mode tests
-- completion-verifier failure test
-- lifecycle disposal test
-- unsupported-browser test
-- parity test proving the human and tool paths use the same domain function
+- valid success;
+- application validation failure;
+- authorization denial;
+- confirmation acceptance and decline;
+- cancellation;
+- declared failure and recovery paths;
+- completion verification failure;
+- unsupported-browser behavior; and
+- parity with the human path.
 
-The checkout reference implementation lives in [`examples/nextjs-checkout-demo`](../examples/nextjs-checkout-demo/README.md). It registers a live read-only `get_checkout_summary` tool and a separately governed critical `complete_checkout` tool.
+The [checkout reference](../examples/nextjs-checkout-demo/README.md) implements the first success/denial/decline parity slice. See [Behavior Assurance](./behavior-assurance.md) for proof semantics and limitations.
 
-## Services Ready To Deliver
+## What AIC should build next
 
-### WebMCP Readiness Audit
+The durable roadmap is not a larger WebMCP wrapper. It is an open conformance ecosystem:
 
-Inventory tool candidates, current/obsolete API usage, dangerous exposure, form auto-submit, browser constraints, and missing AIC contracts.
+- reusable behavior-contract packs for common business actions;
+- browser, MCP, API, and domain-test observation adapters;
+- signed and deployment-bound proofs;
+- CI policies and verifier compatibility suites;
+- a public conformance registry; and
+- hosted evidence collection that remains compatible with the open verifier.
 
-### WebMCP Implementation Sprint
-
-Implement task-level imperative or declarative tools, feature detection, shared domain execution, and the first browser verification flow.
-
-### Safety And Governance Hardening
-
-Add AIC authorization, entity scope, confirmation, side effects, completion verification, recovery, and audit behavior to existing WebMCP tools.
-
-### Compatibility And Regression Maintenance
-
-Track draft and browser changes, update the pinned compatibility baseline after review, and run regression/evaluation suites against supported browsers.
-
-These services focus on consequential business-flow assurance. Generic hooks, polyfills, inspectors, and baseline tool-call evaluation already have upstream and ecosystem implementations.
+This keeps AIC useful even if WebMCP absorbs richer schemas, confirmation, validation, lifecycle, or skill composition.

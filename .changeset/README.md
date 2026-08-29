@@ -9,3 +9,5 @@ Typical flow:
 3. Run `pnpm release:publish` from CI or a trusted maintainer environment with npm credentials.
 
 Examples and deferred packages remain private.
+
+Behavior-assurance changes normally require coordinated changesets for `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg/cli`; include `@aicorg/webmcp` only when its published package surface changes.

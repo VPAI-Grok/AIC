@@ -15,6 +15,7 @@ const requiredFiles = [
   "CLAUDE.md",
   "GEMINI.md",
   "docs/release-checklist.md",
+  "docs/behavior-assurance.md",
   "docs/coding-agents.md",
   "docs/npm-packages.md",
   "docs/supported-today.md",
@@ -25,6 +26,10 @@ const requiredFiles = [
   ".github/ISSUE_TEMPLATE/feature_request.md",
   ".github/pull_request_template.md",
   ".github/workflows/publish-packages.yml",
+  ".github/workflows/behavior-assurance.yml",
+  "schemas/behavior-contract.schema.json",
+  "schemas/behavior-observation-set.schema.json",
+  "schemas/behavior-proof.schema.json",
   "templates/agent-onboarding/AGENTS.md",
   "templates/agent-onboarding/CLAUDE.md",
   "templates/agent-onboarding/GEMINI.md",
@@ -41,10 +46,11 @@ test("public launch files exist and README points to the public entrypoints", as
   );
 
   const readme = await readFile(resolveFromRepo("README.md"), "utf8");
-  assert.match(readme, /Start Here/);
-  assert.match(readme, /Repo Status/);
+  assert.match(readme, /Quick start/i);
+  assert.match(readme, /Behavior Assurance/);
+  assert.match(readme, /Standards describe\. AIC proves\./);
+  assert.match(readme, /release-status\.md/);
   assert.match(readme, /supported-today\.md/);
-  assert.match(readme, /reference-consumer\.test\.mjs/);
   assert.match(readme, /coding-agents\.md/);
   assert.match(readme, /npm-packages\.md/);
   assert.doesNotMatch(readme, /\]\(\/mnt\//);

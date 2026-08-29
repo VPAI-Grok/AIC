@@ -171,7 +171,20 @@ npx @aicorg/cli@alpha apply authoring-plan ./aic-authoring-plan.json --project-r
 
 Use that flow when you want AI-suggested review bundles and guarded source edits, but keep authored metadata as the final source of truth.
 
-## 6. Connect An Agent
+## 6. Prove Consequential Multi-Surface Behavior
+
+If a critical operation is available through both the human UI and WebMCP, MCP, or an API, route those entrypoints to one domain operation and define an `aic.behavior/0.1` contract.
+
+```bash
+aic validate behavior ./aic-behavior-contract.json
+aic verify ./aic-behavior-contract.json \
+  --harness ./aic-verification-harness.mjs \
+  --out-file ./aic-proof.json
+```
+
+Cover success, denial, confirmation decline, declared failures, recovery, and required parity in proportion to the action's risk. See [Behavior Assurance](./behavior-assurance.md).
+
+## 7. Connect An Agent
 
 For MCP-compatible tools like Claude Desktop or Cursor:
 
@@ -193,14 +206,14 @@ Then the agent can read:
 - permissions
 - workflows
 
-If your app is already protected by an auth layer like Auth0, keep AIC auth-agnostic and let the authenticated app session protect access to manifests and APIs. See [Auth0 For AI Agents With AIC](/mnt/c/users/vatsa/agentinteractioncontrol/docs/auth0-ai-agents.md).
+If your app is already protected by an auth layer like Auth0, keep AIC auth-agnostic and let the authenticated app session protect access to manifests and APIs. See [Auth0 for AI Agents with AIC](./auth0-ai-agents.md).
 
 ## Copyable Starter Paths
 
-- Next.js starter: [examples/nextjs-checkout-demo](/mnt/c/users/vatsa/agentinteractioncontrol/examples/nextjs-checkout-demo)
-- Vite starter: [examples/react-basic](/mnt/c/users/vatsa/agentinteractioncontrol/examples/react-basic)
-- MCP setup: [docs/mcp-server.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/mcp-server.md)
-- Coding-agent onboarding: [docs/coding-agents.md](/mnt/c/users/vatsa/agentinteractioncontrol/docs/coding-agents.md)
+- Next.js starter: [examples/nextjs-checkout-demo](../examples/nextjs-checkout-demo)
+- Vite starter: [examples/react-basic](../examples/react-basic)
+- MCP setup: [docs/mcp-server.md](./mcp-server.md)
+- Coding-agent onboarding: [docs/coding-agents.md](./coding-agents.md)
 
 ## Done Criteria
 
@@ -211,9 +224,11 @@ You are done with the first slice when:
 - `doctor` has no errors
 - generated artifacts are current
 - an agent can resolve the slice through AIC instead of guessing from text or selectors
+- consequential multi-surface actions have passing behavior scenarios and required parity evidence
 
 Expected output after the first slice:
 - a valid `aic.project.json`
 - onboarding files for coding agents
 - current discovery/UI/actions/permissions/workflows artifacts
 - an MCP-readable contract for the workflow you instrumented
+- a reviewed behavior contract and proof when the workflow has multiple execution surfaces

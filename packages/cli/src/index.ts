@@ -3,6 +3,7 @@
 import { writeSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { format } from "node:util";
 import {
   analyzeProjectForAICAnnotations,
@@ -18,6 +19,7 @@ import {
   generateProjectArtifacts,
   initializeAICProject,
   scanSourceForAICAnnotations,
+  verifyAICBehavior,
   writeArtifactFiles,
   type AICAutomationManifestKind,
   type AICQAReadinessReport
@@ -40,10 +42,14 @@ import { AICRegistry } from "@aicorg/runtime";
 import {
   type AICAuthoringApplyResult,
   buildAICAuthoringPatchPlan,
+  type AICBehaviorContract,
+  type AICBehaviorObservationSet,
+  type AICBehaviorProof,
   MANIFEST_VERSION,
   SPEC_VERSION,
   renderAICAuthoringPatchPlanSummary,
   validateDiscoveryManifest,
+  validateAICBehaviorContract,
   validatePermissionsManifest,
   validateRuntimeUiManifest,
   validateSemanticActionsManifest,
@@ -127,7 +133,8 @@ Usage:
   aic scan <file-or-directory> [--webmcp]
   aic init [project-root] [--framework <nextjs|vite|react>] [--app-name <name>] [--view-id <id>] [--view-url <url>] [--dry-run] [--force]
   aic doctor [project-root] [--config <file>] [--report-file <file>] [--webmcp]
-  aic validate <discovery|ui|permissions|workflows|actions> <file>
+  aic validate <discovery|ui|permissions|workflows|actions|behavior> <file>
+  aic verify <behavior-contract-file> (--harness <module> | --observations <file>) [--out-file <file>] [--generated-at <iso>]
   aic bootstrap <url> [routes-csv] [--app-name <name>] [--captures-file <file>] [--suggestions-file <file>] [--provider-kind <http|openai>] [--provider-endpoint <url>] [--provider-model <name>] [--provider-header <k=v>] [--provider-selector <path>] [--provider-bearer-env <env>] [--provider-timeout-ms <ms>] [--provider-retries <n>] [--openai-api-key-env <env>] [--openai-base-url <url>] [--draft-file <file>] [--review-file <file>] [--report-file <file>] [--prompt-file <file>] [--min-confidence <0-1>] [--max-suggestions <n>] [--print-prompt]
   aic generate discovery <config-file>
   aic generate ui <elements-file> <url> <view-id>
@@ -214,6 +221,80 @@ async function validate(kind: ManifestKind, filePath: string): Promise<number> {
   printIssues(result.issues);
   console.log(`${kind} manifest is valid.`);
   return 0;
+}
+
+async function validateBehavior(filePath: string): Promise<number> {
+  const contract = await readJson<unknown>(filePath);
+  const result = validateAICBehaviorContract(contract);
+
+  printIssues(result.issues);
+  if (!result.ok) {
+    return 1;
+  }
+
+  console.log("behavior contract is valid.");
+  return 0;
+}
+
+interface AICBehaviorHarnessModule {
+  collectAICBehaviorObservations?: (context: {
+    contract: AICBehaviorContract;
+  }) => AICBehaviorObservationSet | Promise<AICBehaviorObservationSet> | unknown | Promise<unknown>;
+}
+
+async function verifyBehavior(contractFile: string, args: string[]): Promise<number> {
+  const harnessFile = readOptionValue(args, "--harness");
+  const observationsFile = readOptionValue(args, "--observations");
+  const outFile = readOptionValue(args, "--out-file");
+  const generatedAt = readOptionValue(args, "--generated-at");
+
+  if (Boolean(harnessFile) === Boolean(observationsFile)) {
+    console.error("Choose exactly one observation source: --harness <module> or --observations <file>.");
+    return 1;
+  }
+
+  const contractValue = await readJson<unknown>(contractFile);
+  const validation = validateAICBehaviorContract(contractValue);
+  printIssues(validation.issues);
+
+  if (!validation.ok) {
+    return 1;
+  }
+
+  const contract = validation.value;
+  let observations: unknown;
+
+  try {
+    if (observationsFile) {
+      observations = await readJson<unknown>(observationsFile);
+    } else {
+      const harnessUrl = pathToFileURL(resolve(process.cwd(), harnessFile as string)).href;
+      const harness = (await import(harnessUrl)) as AICBehaviorHarnessModule;
+      if (typeof harness.collectAICBehaviorObservations !== "function") {
+        console.error(
+          "Behavior harness must export collectAICBehaviorObservations({ contract })."
+        );
+        return 1;
+      }
+      observations = await harness.collectAICBehaviorObservations({ contract });
+    }
+  } catch (error) {
+    console.error(`Unable to collect behavior observations: ${String(error)}`);
+    return 1;
+  }
+
+  const proof = verifyAICBehavior({
+    contract,
+    generatedAt,
+    observations
+  });
+
+  if (outFile) {
+    await writeTextFile(outFile, `${JSON.stringify(proof, null, 2)}\n`);
+  }
+
+  printJson(proof);
+  return proof.status === "passed" ? 0 : 1;
 }
 
 async function generateDiscovery(filePath: string): Promise<number> {
@@ -953,6 +1034,21 @@ function isDoctorReport(value: unknown): value is AICDoctorReport {
   );
 }
 
+function isBehaviorProof(value: unknown): value is AICBehaviorProof {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  return (
+    record.artifact_type === "aic_behavior_proof" &&
+    Array.isArray(record.findings) &&
+    Array.isArray(record.scenarios) &&
+    typeof record.summary === "object" &&
+    record.summary !== null
+  );
+}
+
 function summarizeCodeCounts(values: Array<{ code: string }>, limit = 3): string | undefined {
   const counts = new Map<string, number>();
 
@@ -1215,6 +1311,16 @@ async function inspectQAReadiness(filePath: string, args: string[]): Promise<num
 
 async function inspect(filePath: string): Promise<number> {
   const value = await readJson<unknown>(filePath);
+  if (isBehaviorProof(value)) {
+    console.log(`AIC behavior proof for ${value.contract.id}`);
+    console.log(`Status: ${value.status}`);
+    console.log(`Evidence: ${value.evidence_level}`);
+    console.log(`Scenarios: ${value.summary.passed_scenarios}/${value.summary.scenarios} passed`);
+    console.log(`Observations: ${value.summary.observations}/${value.summary.required_observations}`);
+    console.log(`Findings: ${value.findings.length}`);
+    return 0;
+  }
+
   if (isInitResult(value)) {
     console.log("AIC init result");
     console.log(`Project root: ${value.project_root}`);
@@ -1456,6 +1562,16 @@ async function main(): Promise<void> {
     firstArg
   ) {
     process.exitCode = await validate(kind as ManifestKind, firstArg);
+    return;
+  }
+
+  if (command === "validate" && kind === "behavior" && firstArg) {
+    process.exitCode = await validateBehavior(firstArg);
+    return;
+  }
+
+  if (command === "verify" && kind) {
+    process.exitCode = await verifyBehavior(kind, args);
     return;
   }
 

@@ -3,8 +3,18 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const repoRoot = resolve(new URL("..", import.meta.url).pathname);
+const repoRoot = fileURLToPath(new URL("..", import.meta.url));
+const pnpmCliPath = process.env.npm_execpath;
+
+if (!pnpmCliPath || !pnpmCliPath.toLowerCase().includes("pnpm")) {
+  throw new Error("Run this smoke through pnpm so its CLI path is available.");
+}
+
+function runPnpm(args, options) {
+  return runCommand(process.execPath, [pnpmCliPath, ...args], options);
+}
 
 function parseJsonPayload(output) {
   const start = output.indexOf("{");
@@ -60,23 +70,23 @@ async function main() {
   const bootstrapPrompt = resolve(tempDir, "bootstrap-prompt.json");
 
   try {
-    const help = await runCommand("pnpm", ["aic", "--help"]);
+    const help = await runPnpm(["aic", "--help"]);
     assert.match(help.stdout, /\bAIC CLI\b[\s\S]*\bUsage:/i);
 
-    await runCommand("pnpm", ["--dir", "examples/nextjs-checkout-demo", "run", "aic:generate"]);
+    await runPnpm(["--dir", "examples/nextjs-checkout-demo", "run", "aic:generate"]);
 
-    const checkoutDoctor = await runCommand("pnpm", ["--dir", "examples/nextjs-checkout-demo", "run", "aic:doctor"]);
+    const checkoutDoctor = await runPnpm(["--dir", "examples/nextjs-checkout-demo", "run", "aic:doctor"]);
     const checkoutDoctorPayload = parseJsonPayload(checkoutDoctor.stdout);
     assert.equal(checkoutDoctorPayload.summary.errors, 0);
 
-    const checkoutInspect = await runCommand("pnpm", ["--dir", "examples/nextjs-checkout-demo", "run", "aic:inspect"]);
+    const checkoutInspect = await runPnpm(["--dir", "examples/nextjs-checkout-demo", "run", "aic:inspect"]);
     assert.match(checkoutInspect.stdout, /agent_onboarding|onboarding|report/i);
 
-    const reactDoctor = await runCommand("pnpm", ["--dir", "examples/react-basic", "run", "aic:doctor"]);
+    const reactDoctor = await runPnpm(["--dir", "examples/react-basic", "run", "aic:doctor"]);
     const reactDoctorPayload = parseJsonPayload(reactDoctor.stdout);
     assert.equal(reactDoctorPayload.summary.errors, 0);
 
-    const bootstrap = await runCommand("node", [
+    const bootstrap = await runCommand(process.execPath, [
       "packages/cli/dist/cli/src/index.js",
       "bootstrap",
       "https://demo.example",

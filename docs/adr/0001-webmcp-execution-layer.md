@@ -1,6 +1,6 @@
 # ADR 0001: Use WebMCP As A Browser Execution Layer
 
-- Status: Accepted
+- Status: Accepted; clarified by [ADR 0002](./0002-behavioral-assurance.md)
 - Date: 2026-08-28
 - Compatibility baseline: WebMCP draft `2026-08-26`, `document.modelContext`, `webmcp-types@0.1.5`
 
@@ -12,7 +12,7 @@ Building a second browser tool protocol would fragment adoption and duplicate st
 
 ## Decision
 
-Use WebMCP for native browser discovery and invocation when available. Use AIC as the contract, readiness, governance, verification, recovery, and audit layer around consequential WebMCP tools.
+Use WebMCP for native browser discovery and invocation when available. The current AIC adapter adds fail-closed compatibility and readiness gates around consequential tools. Per ADR 0002, native protocol controls take precedence and AIC's durable role is protocol-neutral behavioral assurance.
 
 Only explicitly authored action contracts marked `execution_ready` may be registered through the AIC adapter. Generated, inferred, and AI-suggested contracts remain review material.
 

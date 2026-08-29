@@ -8,10 +8,12 @@ globs:
   - "lib/**"
 alwaysApply: false
 ---
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 3 -->
 
 # AIC Cursor Rule
 
 For AIC work, follow [AGENTS.md](../../../AGENTS.md) as the canonical policy.
 
 Prefer explicit `agent*` annotations, stable IDs, and reviewed artifact generation over heuristics.
+
+Prefer native protocol capabilities and add protocol-neutral behavior contracts when surfaces must prove the same domain operation.

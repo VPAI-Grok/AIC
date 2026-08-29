@@ -10,18 +10,19 @@ That means teams can adopt it freely, including in commercial products and inter
 - implementation services for React, Next.js, and Vite apps
 - agent-readiness audits for risky workflows and production UI flows
 - custom MCP integrations for Claude, Cursor, Codex, and internal agent stacks
-- WebMCP readiness audits covering current APIs, tool candidates, browser constraints, and AIC safety gaps
-- WebMCP implementation sprints for imperative tools, declarative forms, and shared human/agent domain execution
-- WebMCP safety and governance hardening for authorization, confirmation, entity scope, verification, recovery, and audit
-- WebMCP compatibility and regression maintenance as the draft and browser implementations change
+- behavior-assurance sprints that define contracts for consequential operations and execute success, denial, confirmation, failure, and recovery scenarios
+- cross-surface parity work for human UI, WebMCP, MCP, and API entrypoints
+- CI proof gates, evidence adapters, regression suites, and proof-retention policy
+- WebMCP implementation and compatibility work that remains native-first and routes to shared domain operations
 - private support retainers and faster response channels
 - training, architecture reviews, and integration workshops
 
 ## Later Monetization Paths
 
-- hosted AIC dashboard and manifest review workflows
+- hosted evidence collection, proof history, and contract review workflows
 - managed bootstrap and review pipelines
-- team collaboration, governance, and observability features
+- signed and deployment-bound attestations, policy gates, and transparency services
+- reusable conformance packs and independent certification support
 - enterprise support, SLAs, and compliance packaging
 - premium integrations or managed cloud features
 
@@ -46,5 +47,7 @@ The recommended strategy for AIC at this stage is:
 
 - maximize adoption with Apache-2.0
 - monetize implementation, support, and hosted value
-- build the brand so the official AIC ecosystem remains the most trusted distribution
-- use WebMCP as the browser-native execution layer and sell AIC expertise around reliable, consequential business flows
+- keep contracts, schemas, the verifier, and local evidence collection open
+- build the official ecosystem around trustworthy runners, reusable conformance packs, and portable proof
+- use WebMCP as a native execution layer while AIC remains the protocol-neutral assurance layer
+- never imply that an unsigned local proof is a production or compliance attestation

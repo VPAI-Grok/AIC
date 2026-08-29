@@ -2,6 +2,8 @@
 
 This example runs the AIC bootstrap flow from a saved capture file and sends the prompt to the OpenAI Responses API through the built-in OpenAI adapter.
 
+Bootstrap proposes interaction metadata; it does not create execution authority or behavior proof. Review accepted suggestions, then independently define and execute behavior contracts for consequential multi-surface actions.
+
 The intended next step after review is:
 
 1. inspect `output/review.json`
@@ -46,3 +48,5 @@ To carry the review bundle into guarded source edits, use the repo-level flow:
 Then apply the reviewed plan with:
 
 `node ../../packages/cli/dist/cli/src/index.js apply authoring-plan ./aic-authoring-plan.json --project-root ../.. --write`
+
+After reviewed metadata is in source, follow [Behavior Assurance](../../docs/behavior-assurance.md) if the workflow also needs executable conformance or parity evidence.

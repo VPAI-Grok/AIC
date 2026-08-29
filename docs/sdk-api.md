@@ -32,6 +32,8 @@ The wrapped components and `useAICElement` hook currently revolve around explici
 
 These annotations feed both runtime registration and build-time extraction.
 
+Use AIC metadata where the application needs stable UI identity or semantics beyond a native protocol. Do not duplicate a native WebMCP field solely to preserve an AIC-shaped copy; map both surfaces to the same domain operation and verify its behavior independently.
+
 `agentContractRef` links an element action to an explicitly authored semantic action contract. The WebMCP adapter requires the bound action itself to be marked authored and `execution_ready`; setting this prop alone never makes an action executable.
 
 ## Declarative WebMCP Props
@@ -44,6 +46,8 @@ The wrapped React primitives also accept:
 - `webMCPParamDescription`
 
 They map to the current declarative WebMCP attributes. `webMCPToolAutoSubmit` is emitted only for low-risk elements that do not require confirmation. See [WebMCP With AIC](./webmcp.md) for the imperative adapter, readiness gates, and compatibility baseline.
+
+Behavior contracts are not React props. Define them as protocol-neutral artifacts and run them with `aic verify`; see [Behavior Assurance](./behavior-assurance.md).
 
 ## Wrapped Primitives
 
@@ -120,7 +124,7 @@ Dynamic expressions are skipped with diagnostics rather than inferred.
 
 ## Recommended Usage
 
-Use explicit `agent*` props on critical paths and high-risk actions. Let the runtime registry and plugin scan layer generate artifacts from those annotations. Use devtools and the authoring-plan/apply flow to review or backfill annotations instead of hand-editing generated JSON.
+Use explicit `agent*` props on critical paths and high-risk actions when native semantics do not already express the required identity. Let the runtime registry and plugin scan layer generate interaction artifacts. Use devtools and the authoring-plan/apply flow to review or backfill annotations instead of hand-editing generated JSON. Add a behavior contract when multiple surfaces must prove the same business rules.
 
 The example apps show the intended depth for v1-owned React apps:
 

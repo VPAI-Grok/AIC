@@ -50,10 +50,10 @@ pnpm smoke:mcp:stdio
 
 ## Where To Start
 
-- 🧩 Existing app guide: [Adopt AIC In An Existing App](/mnt/c/users/vatsa/agentinteractioncontrol/docs/adopt-existing-app.md)
-- 🔌 MCP setup: [MCP Server](/mnt/c/users/vatsa/agentinteractioncontrol/docs/mcp-server.md)
-- 🔐 Optional auth path: [Auth0 For AI Agents With AIC](/mnt/c/users/vatsa/agentinteractioncontrol/docs/auth0-ai-agents.md)
-- 📊 Proof: [AIC Case Studies](/mnt/c/users/vatsa/agentinteractioncontrol/docs/case-studies.md)
+- 🧩 Existing app guide: [Adopt AIC in an Existing App](./adopt-existing-app.md)
+- 🔌 MCP setup: [MCP Server](./mcp-server.md)
+- 🔐 Optional auth path: [Auth0 for AI Agents with AIC](./auth0-ai-agents.md)
+- 📊 Proof: [AIC Case Studies](./case-studies.md)
 
 ## Short Version
 
