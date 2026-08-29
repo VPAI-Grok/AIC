@@ -34,6 +34,7 @@ export interface AICMetadataProps {
   agentAction?: AICActionName;
   agentAliases?: string[];
   agentConfirmation?: Partial<AICConfirmationProtocol>;
+  agentContractRef?: string;
   agentDescription?: string;
   agentEffects?: string[];
   agentEntityId?: string;
@@ -52,6 +53,10 @@ export interface AICMetadataProps {
   agentValidation?: AICValidationMetadata;
   agentWorkflowStep?: string;
   state?: AICElementManifest["state"];
+  webMCPParamDescription?: string;
+  webMCPToolAutoSubmit?: boolean;
+  webMCPToolDescription?: string;
+  webMCPToolName?: string;
 }
 
 export interface AICElementHookOptions {
@@ -117,8 +122,9 @@ function buildElementManifest(
     actions: [
       {
         name: action,
+        contract_ref: props.agentContractRef,
         target: props.agentId,
-        type: "element_action"
+        type: props.agentContractRef ? "semantic_action" : "element_action"
       }
     ],
     aliases: props.agentAliases,
@@ -178,6 +184,43 @@ function warnInvalidMetadata(props: AICMetadataProps): void {
   if (/button_\d+/.test(props.agentId)) {
     console.warn(`[AIC] ${props.agentId} looks unstable. Prefer semantic, app-level IDs.`);
   }
+
+  if (
+    props.webMCPToolAutoSubmit &&
+    (props.agentRisk !== "low" || props.agentRequiresConfirmation === true)
+  ) {
+    console.warn(
+      `[AIC] ${props.agentId} requested WebMCP auto-submit, but AIC only emits toolautosubmit for low-risk actions without confirmation.`
+    );
+  }
+}
+
+function createWebMCPDeclarativeAttributes(
+  props: AICMetadataProps
+): Record<string, string> {
+  const attributes: Record<string, string> = {};
+
+  if (props.webMCPToolName) {
+    attributes.toolname = props.webMCPToolName;
+  }
+
+  if (props.webMCPToolDescription) {
+    attributes.tooldescription = props.webMCPToolDescription;
+  }
+
+  if (props.webMCPParamDescription) {
+    attributes.toolparamdescription = props.webMCPParamDescription;
+  }
+
+  if (
+    props.webMCPToolAutoSubmit &&
+    props.agentRisk === "low" &&
+    props.agentRequiresConfirmation !== true
+  ) {
+    attributes.toolautosubmit = "";
+  }
+
+  return attributes;
 }
 
 export function useAICElement(
@@ -214,6 +257,7 @@ export function useAICElement(
     element,
     props.agentAction,
     props.agentAliases,
+    props.agentContractRef,
     props.agentDescription,
     props.agentEntityId,
     props.agentEntityLabel,
@@ -256,6 +300,7 @@ export function createAICComponent<TDefault extends ElementType>(config: AICComp
       agentAction,
       agentAliases,
       agentConfirmation,
+      agentContractRef,
       agentDescription,
       agentEffects,
       agentEntityId,
@@ -274,6 +319,10 @@ export function createAICComponent<TDefault extends ElementType>(config: AICComp
       agentValidation,
       agentWorkflowStep,
       state,
+      webMCPParamDescription,
+      webMCPToolAutoSubmit,
+      webMCPToolDescription,
+      webMCPToolName,
       ...nativeProps
     } = props;
     const Component = (as ?? config.defaultAs) as ElementType;
@@ -282,6 +331,7 @@ export function createAICComponent<TDefault extends ElementType>(config: AICComp
         agentAction,
         agentAliases,
         agentConfirmation,
+        agentContractRef,
         agentDescription,
         agentEffects,
         agentEntityId,
@@ -300,7 +350,11 @@ export function createAICComponent<TDefault extends ElementType>(config: AICComp
         agentValidation,
         agentWorkflowStep,
         children,
-        state
+        state,
+        webMCPParamDescription,
+        webMCPToolAutoSubmit,
+        webMCPToolDescription,
+        webMCPToolName
       },
       {
         defaultAction: config.defaultAction,
@@ -312,7 +366,35 @@ export function createAICComponent<TDefault extends ElementType>(config: AICComp
       Component,
       {
         ...nativeProps,
-        ...attributes
+        ...attributes,
+        ...createWebMCPDeclarativeAttributes({
+          agentAction,
+          agentAliases,
+          agentConfirmation,
+          agentContractRef,
+          agentDescription,
+          agentEffects,
+          agentEntityId,
+          agentEntityLabel,
+          agentEntityType,
+          agentExamples,
+          agentExecution,
+          agentId,
+          agentLabel,
+          agentNotes,
+          agentPermissions,
+          agentRecovery,
+          agentRequiresConfirmation,
+          agentRisk,
+          agentRole,
+          agentValidation,
+          agentWorkflowStep,
+          state,
+          webMCPParamDescription,
+          webMCPToolAutoSubmit,
+          webMCPToolDescription,
+          webMCPToolName
+        })
       },
       children
     );

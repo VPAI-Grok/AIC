@@ -213,6 +213,14 @@ flowchart TD
     MCP_SERVER -->|structured results| AGENT
 ```
 
+## WebMCP — Browser-Native Execution
+
+`@aicorg/webmcp` is a separate, feature-detected execution adapter. WebMCP supplies browser-native tool discovery and invocation; AIC supplies the authored action-readiness gate and the validation, authorization, confirmation, entity, verification, recovery, and audit behavior around it.
+
+The adapter does not convert runtime elements or generated actions automatically. Only an explicit task-level binding backed by an authored `execution_ready` action contract can register. The human UI and tool path must call the same application/domain function.
+
+The read-only MCP server and AIC manifests remain available for headless discovery, unsupported browsers, and consumers that need the richer AIC contract surface.
+
 ---
 
 ## Bootstrap Pipeline (AI-Assisted Annotation)
@@ -255,11 +263,14 @@ flowchart TD
 |---|---|
 | `aic init [root]` | Scaffold `aic.project.json`, `AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, `.cursor/rules/aic.mdc` |
 | `aic scan <path>` | AST-scan for `agent*` props → JSON report of matches & diagnostics |
+| `aic scan <path> --webmcp` | Detect governed, direct, declarative, and obsolete WebMCP usage |
 | `aic doctor [root]` | Audit onboarding files, config, source annotations, and workflows |
+| `aic doctor [root] --webmcp` | Add WebMCP compatibility and governance readiness to doctor output |
 | `aic validate <kind> <file>` | Validate a manifest JSON against the spec schema |
 | `aic bootstrap <url>` | Crawl with Playwright → LLM suggestions → bootstrap draft & report |
 | `aic generate project <config>` | Full artifact generation from `aic.project.json` |
 | `aic generate authoring-plan` | Build a proposal list from a runtime snapshot + bootstrap review |
+| `aic generate webmcp-plan <path>` | Build a phased WebMCP migration and hardening plan |
 | `aic apply authoring-plan` | Patch JSX source files with `agent*` props from a plan |
 | `aic diff <kind> <before> <after>` | Diff two manifest versions (summary or detailed) |
 | `aic inspect <file>` | Pretty-print and describe a manifest file |

@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 # Claude Code Wrapper
 
 Read [AGENTS.md](./AGENTS.md) first and treat it as the source of truth.

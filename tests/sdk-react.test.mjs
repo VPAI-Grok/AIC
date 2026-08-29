@@ -66,6 +66,7 @@ test("AIC components register with the runtime registry and unregister on unmoun
                 prompt_template: "Archive this customer?",
                 type: "inline_modal"
               },
+              agentContractRef: "customer.archive.execute",
               agentDescription: "Archive customer",
               agentEntityId: "customer_42",
               agentEntityType: "customer",
@@ -91,6 +92,8 @@ test("AIC components register with the runtime registry and unregister on unmoun
   assert.ok(registered);
   assert.equal(registered.description, "Archive customer");
   assert.equal(registered.requires_confirmation, true);
+  assert.equal(registered.actions[0].contract_ref, "customer.archive.execute");
+  assert.equal(registered.actions[0].type, "semantic_action");
   assert.equal(registered.entity_ref?.entity_id, "customer_42");
 
   await withReactTestRendererWarningsSuppressed(async () => {
@@ -229,4 +232,77 @@ test("Agent compatibility aliases still work with mounted components and hooks",
       renderer.unmount();
     });
   });
+});
+
+test("AIC declarative WebMCP props emit current form attributes and fail closed on risky auto-submit", async () => {
+  const warnings = [];
+  const originalWarn = console.warn;
+  console.warn = (message) => warnings.push(String(message));
+  let renderer;
+
+  try {
+    await withReactTestRendererWarningsSuppressed(async () => {
+      await act(async () => {
+        renderer = TestRenderer.create(
+          React.createElement(
+            "div",
+            null,
+            React.createElement(
+              sdkReact.AIC.Form,
+              {
+                agentDescription: "Search the product catalog",
+                agentId: "catalog.search",
+                agentRisk: "low",
+                webMCPToolAutoSubmit: true,
+                webMCPToolDescription: "Search products by query",
+                webMCPToolName: "search_products"
+              },
+              React.createElement(sdkReact.AIC.Input, {
+                agentDescription: "Product search query",
+                agentId: "catalog.search.query",
+                agentRisk: "low",
+                webMCPParamDescription: "Words to search for"
+              })
+            ),
+            React.createElement(
+              sdkReact.AIC.Form,
+              {
+                agentConfirmation: {
+                  prompt_template: "Complete checkout?",
+                  type: "human_review"
+                },
+                agentDescription: "Complete checkout",
+                agentId: "checkout.complete",
+                agentRequiresConfirmation: true,
+                agentRisk: "critical",
+                webMCPToolAutoSubmit: true,
+                webMCPToolDescription: "Complete checkout",
+                webMCPToolName: "complete_checkout"
+              },
+              "Checkout"
+            )
+          )
+        );
+      });
+    });
+
+    const forms = renderer.root.findAllByType("form");
+    const input = renderer.root.findByType("input");
+    assert.equal(forms[0].props.toolname, "search_products");
+    assert.equal(forms[0].props.tooldescription, "Search products by query");
+    assert.equal(forms[0].props.toolautosubmit, "");
+    assert.equal(input.props.toolparamdescription, "Words to search for");
+    assert.equal(forms[1].props.toolname, "complete_checkout");
+    assert.equal(forms[1].props.toolautosubmit, undefined);
+    assert.ok(warnings.some((message) => message.includes("only emits toolautosubmit for low-risk")));
+  } finally {
+    console.warn = originalWarn;
+    if (renderer) {
+      await withReactTestRendererWarningsSuppressed(async () => {
+        await act(async () => {
+          renderer.unmount();
+        });
+      });
+    }
+  }
 });

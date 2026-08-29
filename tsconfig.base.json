@@ -9,6 +9,8 @@
       "@aicorg/automation-core": ["packages/automation-core/src/index.ts"],
       "@aicorg/spec": ["packages/spec/src/index.ts"],
       "@aicorg/runtime": ["packages/runtime/src/index.ts"],
+      "@aicorg/webmcp": ["packages/webmcp/src/index.ts"],
+      "@aicorg/webmcp/react": ["packages/webmcp/src/react.ts"],
       "@aicorg/sdk-react": ["packages/sdk-react/src/index.tsx"],
       "@aicorg/plugin-next": ["packages/plugin-next/src/index.ts"],
       "@aicorg/plugin-vite": ["packages/plugin-vite/src/index.ts"],

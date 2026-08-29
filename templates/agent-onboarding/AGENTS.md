@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 # AIC Agent Onboarding
 
 Use AIC when this repo needs to expose reliable interaction semantics for AI agents.
@@ -19,6 +19,15 @@ Use AIC when this repo needs to expose reliable interaction semantics for AI age
 - entity metadata on record-scoped actions
 - workflow, validation, execution, and recovery metadata where the app supports them
 - generated JSON stays generated
+
+## WebMCP Rules
+
+- treat WebMCP as the browser execution layer and AIC as its governance layer
+- use the current `document.modelContext` API through explicit, feature-detected integration
+- register only task-level tools backed by authored `execution_ready` action contracts
+- reuse the human UI's application/domain function
+- never expose inferred, AI-suggested, generated, or placeholder contracts as executable tools
+- run `aic scan <path> --webmcp` and `aic doctor <path> --webmcp`
 
 ## Verification
 

@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 # AIC Onboarding
 
 Use this skill when asked to make a React, Next.js, or Vite app AIC-ready.

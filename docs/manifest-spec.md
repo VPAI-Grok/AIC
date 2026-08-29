@@ -74,8 +74,11 @@ Each action contract currently requires:
 - `estimated_latency_ms`
 - `completion_signal`
 - `failure_modes`
+- `execution_readiness`
 
 Action contracts are the right place for dry-run, undo, preview, and batch metadata when the app exposes those semantics.
+
+`execution_readiness.status` is either `review_required` or `execution_ready`. Execution-ready contracts must be explicitly authored, have no unresolved blockers, and contain real completion and failure semantics. Generated contracts are marked inferred and review-required; consumers must not treat them as executable authority.
 
 ## Permissions
 

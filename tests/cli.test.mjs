@@ -34,6 +34,51 @@ const suggestionsFile = resolveFromRepo("tests/fixtures/bootstrap/suggestions.js
 const expectedActionsDetailed = await readJsonFile(
   resolveFromRepo("tests/fixtures/diffs/expected/actions-detailed.json")
 );
+
+test("CLI WebMCP scan and implementation plan distinguish governed, direct, and obsolete APIs", async (t) => {
+  const tempDir = await createTempDir("aic-webmcp-cli-");
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const governedFile = `${tempDir}/governed.ts`;
+  const legacyFile = `${tempDir}/legacy.ts`;
+  const planFile = `${tempDir}/webmcp-plan.json`;
+  await writeTextFile(
+    governedFile,
+    `import { registerAICWebMCPTool as registerTool } from "@aicorg/webmcp";\nvoid registerTool(binding);\n`
+  );
+  await writeTextFile(
+    legacyFile,
+    `document.modelContext.registerTool(nativeTool);\nnavigator.modelContext.provideContext({ tools: [] });\n`
+  );
+
+  const governedResult = await runCli(["scan", governedFile, "--webmcp"]);
+  const legacyResult = await runCli(["scan", legacyFile, "--webmcp"]);
+  const planResult = await runCli([
+    "generate",
+    "webmcp-plan",
+    legacyFile,
+    "--out-file",
+    planFile
+  ]);
+
+  assert.equal(governedResult.code, 0);
+  assert.equal(legacyResult.code, 1);
+  assert.equal(planResult.code, 1);
+
+  const governed = JSON.parse(governedResult.stdout);
+  const legacy = JSON.parse(legacyResult.stdout);
+  const plan = JSON.parse(planResult.stdout);
+  const writtenPlan = await readJsonFile(planFile);
+  assert.equal(governed.status, "ready");
+  assert.equal(governed.summary.governed_registrations, 1);
+  assert.equal(legacy.status, "blocked");
+  assert.equal(legacy.summary.direct_native_registrations, 1);
+  assert.equal(legacy.summary.obsolete_api_usages, 1);
+  assert.ok(plan.workstreams.some((workstream) => workstream.id === "migrate-current-api"));
+  assert.deepEqual(writtenPlan.acceptance_criteria, plan.acceptance_criteria);
+});
 const expectedActionsSummary = await readJsonFile(
   resolveFromRepo("tests/fixtures/diffs/expected/actions-summary.json")
 );
@@ -287,8 +332,8 @@ test("CLI generate project emits the full artifact set and writes generated file
   assert.equal(vitePayload.agent_onboarding.summary.missing, 5);
   assert.equal(vitePayload.agent_onboarding.summary.warnings, 5);
   assert.equal(vitePayload.generated_manifests.summary.invalid, 0);
-  assert.ok(vitePayload.outDir.endsWith(viteOutDir));
-  assert.ok(nextPayload.outDir.endsWith(nextOutDir));
+  assert.equal(vitePayload.outDir.replaceAll("\\", "/"), viteOutDir.replaceAll("\\", "/"));
+  assert.equal(nextPayload.outDir.replaceAll("\\", "/"), nextOutDir.replaceAll("\\", "/"));
   assert.deepEqual(viteFiles, expectedVite.files);
   assert.deepEqual(nextFiles, expectedNext.files);
 });
@@ -330,6 +375,53 @@ test("CLI project report and inspect summarize recommended onboarding files", as
     inspectResult.stdout,
     /1\. Review confirmation and risk metadata for high-risk actions: customer\.archive\./
   );
+});
+
+test("CLI inspect qa-readiness and generate qa-plan use generated project artifacts", async (t) => {
+  const tempDir = await createTempDir();
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+
+  const outDir = `${tempDir}/example-vite`;
+  const planFile = `${tempDir}/qa-plan.json`;
+  const generateResult = await runCli([
+    "generate",
+    "project",
+    exampleViteConfig,
+    "--out-dir",
+    outDir
+  ]);
+
+  assert.equal(generateResult.code, 0);
+
+  const readinessResult = await runCli(["inspect", "qa-readiness", `${outDir}/report.json`, "--json"]);
+  const planResult = await runCli([
+    "generate",
+    "qa-plan",
+    `${outDir}/report.json`,
+    "--out-file",
+    planFile
+  ]);
+
+  assert.equal(readinessResult.code, 0);
+  assert.equal(planResult.code, 0);
+
+  const readiness = JSON.parse(readinessResult.stdout);
+  const plan = JSON.parse(planResult.stdout);
+  const writtenPlan = await readJsonFile(planFile);
+
+  assert.equal(readiness.artifact_type, "aic_qa_readiness_report");
+  assert.equal(readiness.inputs.runtime_ui_manifest, true);
+  assert.equal(readiness.summary.high_or_critical_actions, 1);
+  assert.equal(readiness.coverage.confirmation.covered, 0);
+  assert.ok(
+    readiness.findings.some((finding) => finding.code === "high_risk_action_missing_confirmation")
+  );
+  assert.equal(plan.artifact_type, "aic_qa_test_plan");
+  assert.ok(plan.scenarios.some((scenario) => scenario.id === "customer.archive"));
+  assert.match(plan.playwright_skeleton, /customer\.archive/);
+  assert.deepEqual(writtenPlan.scenarios, plan.scenarios);
 });
 
 test("CLI inspect project report surfaces onboarding and extraction next actions", async (t) => {

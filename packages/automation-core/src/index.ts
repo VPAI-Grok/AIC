@@ -61,6 +61,7 @@ export interface AICExtractionDiagnostic {
 
 export interface AICSourceScanMatch {
   action?: string;
+  agentContractRef?: string;
   agentDescription?: string;
   agentId: string;
   column: number;
@@ -129,7 +130,155 @@ export type {
 
 export type AICProjectArtifactReport = AICAuthoringProjectReport;
 
-export const AIC_AGENT_ONBOARDING_TEMPLATE_VERSION = "1";
+export const AIC_AGENT_ONBOARDING_TEMPLATE_VERSION = "2";
+
+export type AICQAReadinessGrade = "pilot_ready" | "review_needed" | "not_ready";
+
+export interface AICQAReadinessFinding {
+  code:
+    | "critical_action_missing_confirmation"
+    | "extraction_diagnostics_present"
+    | "generated_manifest_invalid"
+    | "high_risk_action_missing_confirmation"
+    | "high_value_action_missing_entity"
+    | "missing_runtime_ui_manifest"
+    | "no_explicit_workflows"
+    | "workflow_ref_unresolved";
+  element_id?: string;
+  fix_hint: string;
+  message: string;
+  severity: "blocker" | "warning";
+}
+
+export interface AICQAReadinessCoverageSummary {
+  covered: number;
+  missing: number;
+  rate: number;
+  total: number;
+}
+
+export interface AICQAReadinessReport {
+  artifact_type: "aic_qa_readiness_report";
+  coverage: {
+    confirmation: AICQAReadinessCoverageSummary;
+    entity: AICQAReadinessCoverageSummary;
+    execution: AICQAReadinessCoverageSummary;
+    recovery: AICQAReadinessCoverageSummary;
+    stable_ids: AICQAReadinessCoverageSummary;
+    validation: AICQAReadinessCoverageSummary;
+    workflow: AICQAReadinessCoverageSummary;
+  };
+  findings: AICQAReadinessFinding[];
+  framework: string;
+  generated_at: string;
+  inputs: {
+    actions_manifest: boolean;
+    permissions_manifest: boolean;
+    project_report: boolean;
+    runtime_ui_manifest: boolean;
+    workflows_manifest: boolean;
+  };
+  next_actions: string[];
+  summary: {
+    blockers: number;
+    grade: AICQAReadinessGrade;
+    high_or_critical_actions: number;
+    score: number;
+    total_elements: number;
+    warnings: number;
+    workflows: number;
+  };
+}
+
+export interface AICQAReadinessInputs {
+  actions?: AICSemanticActionsManifest;
+  generatedAt?: string;
+  permissions?: AICPermissionsManifest;
+  projectReport: AICProjectArtifactReport;
+  ui?: AICRuntimeUiManifest;
+  workflows?: AICWorkflowManifest;
+}
+
+export interface AICQATestPlanStep {
+  action: string;
+  expected: string;
+  requires_confirmation: boolean;
+  target: string;
+}
+
+export interface AICQATestPlanScenario {
+  id: string;
+  max_risk: string;
+  safety_path: boolean;
+  steps: AICQATestPlanStep[];
+  title: string;
+}
+
+export interface AICQATestPlan {
+  artifact_type: "aic_qa_test_plan";
+  generated_at: string;
+  playwright_skeleton: string;
+  scenarios: AICQATestPlanScenario[];
+  source: "workflows" | "runtime_ui";
+}
+
+export interface AICQATestPlanInputs {
+  generatedAt?: string;
+  ui: AICRuntimeUiManifest;
+  workflows?: AICWorkflowManifest;
+}
+
+export type AICWebMCPSourceFindingCode =
+  | "declarative_autosubmit_requires_review"
+  | "direct_native_registration"
+  | "obsolete_webmcp_api"
+  | "webmcp_not_detected";
+
+export interface AICWebMCPSourceFinding {
+  code: AICWebMCPSourceFindingCode;
+  column?: number;
+  file?: string;
+  fix_hint: string;
+  line?: number;
+  message: string;
+  severity: "error" | "info" | "warning";
+}
+
+export interface AICWebMCPSourceReadinessReport {
+  artifact_type: "aic_webmcp_readiness_report";
+  baseline: {
+    api: "document.modelContext";
+    draft: "2026-08-26";
+    types: "0.1.5";
+  };
+  files: string[];
+  findings: AICWebMCPSourceFinding[];
+  generated_at: string;
+  next_actions: string[];
+  status: "blocked" | "not_detected" | "ready" | "review_needed";
+  summary: {
+    current_native_registrations: number;
+    declarative_tools: number;
+    direct_native_registrations: number;
+    files_scanned: number;
+    governed_registrations: number;
+    obsolete_api_usages: number;
+  };
+}
+
+export interface AICWebMCPImplementationPlan {
+  acceptance_criteria: string[];
+  artifact_type: "aic_webmcp_implementation_plan";
+  baseline: AICWebMCPSourceReadinessReport["baseline"];
+  generated_at: string;
+  source_status: AICWebMCPSourceReadinessReport["status"];
+  workstreams: Array<{
+    actions: string[];
+    id: string;
+    priority: "now" | "next";
+    title: string;
+  }>;
+}
 
 export type AICSupportedInitFramework = "nextjs" | "react" | "vite";
 
@@ -159,7 +308,7 @@ export interface AICDoctorOptions {
 
 export const AIC_AGENT_ONBOARDING_TEMPLATE_FILES: AICAgentOnboardingTemplateFile[] = [
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 # AIC Agent Onboarding
 
 Use AIC when this repo needs to expose reliable interaction semantics for AI agents.
@@ -181,6 +330,15 @@ Use AIC when this repo needs to expose reliable interaction semantics for AI age
 - workflow, validation, execution, and recovery metadata where the app supports them
 - generated JSON stays generated
 
+## WebMCP Rules
+
+- treat WebMCP as the browser execution layer and AIC as its governance layer
+- use the current \`document.modelContext\` API through explicit, feature-detected integration
+- register only task-level tools backed by authored \`execution_ready\` action contracts
+- reuse the human UI's application/domain function
+- never expose inferred, AI-suggested, generated, or placeholder contracts as executable tools
+- run \`aic scan <path> --webmcp\` and \`aic doctor <path> --webmcp\`
+
 ## Verification
 
 - \`aic scan <path>\`
@@ -194,7 +352,7 @@ Use AIC when this repo needs to expose reliable interaction semantics for AI age
     template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   },
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 # Claude Code Wrapper
 
 Read \`AGENTS.md\` first and treat it as the canonical AIC policy for this repo.
@@ -205,7 +363,7 @@ Read \`AGENTS.md\` first and treat it as the canonical AIC policy for this repo.
     template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   },
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 # Gemini Wrapper
 
 Read \`AGENTS.md\` first and follow it as the canonical AIC policy for this repo.
@@ -216,7 +374,7 @@ Read \`AGENTS.md\` first and follow it as the canonical AIC policy for this repo
     template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   },
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 # GitHub Copilot AIC Instructions
 
 Use \`AGENTS.md\` as the canonical AIC instruction file for this repo.
@@ -237,7 +395,7 @@ globs:
   - "lib/**"
 alwaysApply: false
 ---
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 
 # AIC Cursor Rule
 
@@ -249,7 +407,7 @@ Follow \`AGENTS.md\` as the canonical AIC policy.
     template_version: AIC_AGENT_ONBOARDING_TEMPLATE_VERSION
   },
   {
-    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+    contents: `<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 # AIC Onboarding
 
 Use this skill when asked to make a React, Next.js, or Vite app AIC-ready.
@@ -864,6 +1022,7 @@ export async function createAICDoctorReport(
 
 interface ParsedJsxElementRecord {
   action?: string;
+  agentContractRef?: string;
   agentDescription?: string;
   agentId?: string;
   attributes: Map<string, ts.JsxAttribute>;
@@ -983,6 +1142,7 @@ const IGNORED_DIRECTORIES = new Set([".git", ".next", "dist", "node_modules"]);
 const SOURCE_EXTENSIONS = new Set([".js", ".jsx", ".ts", ".tsx"]);
 const MUTABLE_STRING_AIC_PROP_NAMES = [
   "agentAction",
+  "agentContractRef",
   "agentDescription",
   "agentEntityId",
   "agentEntityLabel",
@@ -2177,8 +2337,9 @@ function createElements(records: ParsedJsxElementRecord[]): AICElementManifest[]
       actions: [
         {
           name: record.action ?? "click",
+          contract_ref: record.agentContractRef,
           target: record.agentId,
-          type: "element_action"
+          type: record.agentContractRef ? "semantic_action" : "element_action"
         }
       ],
       confirmation: record.confirmation,
@@ -2201,7 +2362,7 @@ function createElements(records: ParsedJsxElementRecord[]): AICElementManifest[]
 
 function createActionContracts(matches: AICSourceScanMatch[]): AICActionContract[] {
   return matches.map((match) => ({
-    name: match.agentId,
+    name: match.agentContractRef ?? match.agentId,
     title: match.agentDescription ?? match.agentId,
     target: match.agentId,
     preconditions: [],
@@ -2209,12 +2370,19 @@ function createActionContracts(matches: AICSourceScanMatch[]): AICActionContract
     side_effects: [],
     idempotent: false,
     undoable: false,
-    estimated_latency_ms: 1000,
-    completion_signal: {
-      type: "state_change",
-      value: `${match.agentId}.completed = true`
+    estimated_latency_ms: 0,
+    execution_readiness: {
+      blockers: [
+        "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+      ],
+      source: "inferred",
+      status: "review_required"
     },
-    failure_modes: ["unknown_failure"]
+    completion_signal: {
+      type: "custom",
+      value: "review_required"
+    },
+    failure_modes: ["review_required"]
   }));
 }
 
@@ -2281,6 +2449,15 @@ function parseSourceAnalysis(source: string, file: string): ParsedSourceAnalysis
         : undefined;
       const action = attributeMap.get("agentAction")
         ? readJsxAttributeValue(attributeMap.get("agentAction") as ts.JsxAttribute, sourceFile, file, staticResolver, diagnostics)
+        : undefined;
+      const agentContractRef = attributeMap.get("agentContractRef")
+        ? readJsxAttributeValue(
+            attributeMap.get("agentContractRef") as ts.JsxAttribute,
+            sourceFile,
+            file,
+            staticResolver,
+            diagnostics
+          )
         : undefined;
       const agentDescription = attributeMap.get("agentDescription")
         ? readJsxAttributeValue(
@@ -2459,6 +2636,7 @@ function parseSourceAnalysis(source: string, file: string): ParsedSourceAnalysis
       if (agentId || (label && isSourceInventoryCandidate(tagName, explicitRole))) {
         records.push({
           action,
+          agentContractRef,
           agentDescription,
           agentId,
           attributes: attributeMap,
@@ -2504,6 +2682,7 @@ function parseSourceAnalysis(source: string, file: string): ParsedSourceAnalysis
       .filter((record) => record.agentId)
       .map((record) => ({
         action: record.action,
+        ...(record.agentContractRef ? { agentContractRef: record.agentContractRef } : {}),
         agentDescription: record.agentDescription,
         agentId: record.agentId as string,
         column: record.column,
@@ -2664,6 +2843,358 @@ export async function analyzeProjectForAICAnnotations(projectRoot: string): Prom
   };
 }
 
+interface AICWebMCPFileScanResult {
+  currentNativeRegistrations: number;
+  declarativeTools: number;
+  directNativeRegistrations: number;
+  findings: AICWebMCPSourceFinding[];
+  governedRegistrations: number;
+  obsoleteApiUsages: number;
+}
+
+function sourceLocation(
+  sourceFile: ts.SourceFile,
+  node: ts.Node
+): { column: number; line: number } {
+  const location = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+  return {
+    column: location.character + 1,
+    line: location.line + 1
+  };
+}
+
+function createWebMCPSourceFinding(
+  sourceFile: ts.SourceFile,
+  file: string,
+  node: ts.Node,
+  finding: Omit<AICWebMCPSourceFinding, "column" | "file" | "line">
+): AICWebMCPSourceFinding {
+  return {
+    ...finding,
+    ...sourceLocation(sourceFile, node),
+    file
+  };
+}
+
+function scanSourceForWebMCP(source: string, file: string): AICWebMCPFileScanResult {
+  const sourceFile = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const governedFunctionNames = new Set<string>();
+  const governedNamespaceNames = new Set<string>();
+  const findings: AICWebMCPSourceFinding[] = [];
+  let currentNativeRegistrations = 0;
+  let declarativeTools = 0;
+  let directNativeRegistrations = 0;
+  let governedRegistrations = 0;
+  let obsoleteApiUsages = 0;
+
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) {
+      continue;
+    }
+
+    if (
+      statement.moduleSpecifier.text !== "@aicorg/webmcp" &&
+      statement.moduleSpecifier.text !== "@aicorg/webmcp/react"
+    ) {
+      continue;
+    }
+
+    const bindings = statement.importClause?.namedBindings;
+    if (bindings && ts.isNamespaceImport(bindings)) {
+      governedNamespaceNames.add(bindings.name.text);
+    }
+
+    if (bindings && ts.isNamedImports(bindings)) {
+      for (const specifier of bindings.elements) {
+        if (
+          ["registerAICWebMCPTool", "useAICWebMCPTool"].includes(
+            specifier.propertyName?.text ?? specifier.name.text
+          )
+        ) {
+          governedFunctionNames.add(specifier.name.text);
+        }
+      }
+    }
+  }
+
+  const visit = (node: ts.Node) => {
+    if (ts.isCallExpression(node)) {
+      const callPath = node.expression
+        .getText(sourceFile)
+        .replaceAll("?.", ".")
+        .replace(/\s+/g, "");
+      const governedDirect = ts.isIdentifier(node.expression) && governedFunctionNames.has(node.expression.text);
+      const governedNamespaced = Array.from(governedNamespaceNames).some(
+        (namespaceName) =>
+          callPath === `${namespaceName}.registerAICWebMCPTool` ||
+          callPath === `${namespaceName}.useAICWebMCPTool`
+      );
+
+      if (governedDirect || governedNamespaced) {
+        governedRegistrations += 1;
+      } else if (callPath === "document.modelContext.registerTool") {
+        currentNativeRegistrations += 1;
+        directNativeRegistrations += 1;
+        findings.push(
+          createWebMCPSourceFinding(sourceFile, file, node, {
+            code: "direct_native_registration",
+            fix_hint:
+              "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+            message:
+              "Native WebMCP registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+            severity: "warning"
+          })
+        );
+      } else if (
+        callPath === "navigator.modelContext.registerTool" ||
+        callPath === "navigator.modelContext.provideContext" ||
+        callPath === "document.modelContext.provideContext" ||
+        callPath.endsWith(".provideContext")
+      ) {
+        obsoleteApiUsages += 1;
+        findings.push(
+          createWebMCPSourceFinding(sourceFile, file, node, {
+            code: "obsolete_webmcp_api",
+            fix_hint:
+              "Migrate to document.modelContext.registerTool or the AIC registerAICWebMCPTool adapter.",
+            message: `Obsolete or non-current WebMCP API usage detected: ${callPath}.`,
+            severity: "error"
+          })
+        );
+      }
+    }
+
+    if (ts.isJsxAttribute(node)) {
+      const attributeName = node.name.getText(sourceFile);
+      if (attributeName === "toolname" || attributeName === "webMCPToolName") {
+        declarativeTools += 1;
+      }
+
+      if (attributeName === "toolautosubmit" || attributeName === "webMCPToolAutoSubmit") {
+        findings.push(
+          createWebMCPSourceFinding(sourceFile, file, node, {
+            code: "declarative_autosubmit_requires_review",
+            fix_hint:
+              "Keep auto-submit limited to low-risk, non-confirmed forms and verify the emitted runtime attributes.",
+            message: "Declarative WebMCP auto-submit requires an explicit AIC risk review.",
+            severity: "warning"
+          })
+        );
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  };
+
+  visit(sourceFile);
+  return {
+    currentNativeRegistrations,
+    declarativeTools,
+    directNativeRegistrations,
+    findings,
+    governedRegistrations,
+    obsoleteApiUsages
+  };
+}
+
+function createWebMCPNextActions(
+  findings: AICWebMCPSourceFinding[],
+  governedRegistrations: number
+): string[] {
+  const actions: string[] = [];
+
+  if (findings.some((finding) => finding.code === "obsolete_webmcp_api")) {
+    actions.push(
+      "Replace obsolete WebMCP APIs with the current document.modelContext contract before browser testing."
+    );
+  }
+
+  if (findings.some((finding) => finding.code === "direct_native_registration")) {
+    actions.push(
+      "Bind direct WebMCP tools to authored AIC action contracts through @aicorg/webmcp."
+    );
+  }
+
+  if (findings.some((finding) => finding.code === "declarative_autosubmit_requires_review")) {
+    actions.push(
+      "Review declarative auto-submit forms and remove auto-submit from any action above low risk."
+    );
+  }
+
+  if (governedRegistrations === 0) {
+    actions.push(
+      "Select one task-level tool and implement an explicit AIC-governed WebMCP binding as the pilot."
+    );
+  }
+
+  actions.push(
+    "Run browser tests with WebMCP enabled and verify that unsupported browsers degrade without changing the human flow."
+  );
+  return actions.slice(0, 5);
+}
+
+export async function analyzeProjectForWebMCPReadiness(
+  targetPath: string,
+  generatedAt = new Date().toISOString()
+): Promise<AICWebMCPSourceReadinessReport> {
+  const resolvedTarget = resolve(targetPath);
+  const targetStats = await stat(resolvedTarget);
+  const displayRoot = targetStats.isDirectory() ? resolvedTarget : dirname(resolvedTarget);
+  const files = await collectSourceFiles(resolvedTarget);
+  const results = await Promise.all(
+    files.map(async (file) => {
+      const displayFile = toPortablePath(relative(displayRoot, file) || basename(file));
+      return {
+        file: displayFile,
+        result: scanSourceForWebMCP(await readFile(file, "utf8"), displayFile)
+      };
+    })
+  );
+  const findings = results.flatMap(({ result }) => result.findings);
+  const currentNativeRegistrations = results.reduce(
+    (total, { result }) => total + result.currentNativeRegistrations,
+    0
+  );
+  const declarativeTools = results.reduce(
+    (total, { result }) => total + result.declarativeTools,
+    0
+  );
+  const directNativeRegistrations = results.reduce(
+    (total, { result }) => total + result.directNativeRegistrations,
+    0
+  );
+  const governedRegistrations = results.reduce(
+    (total, { result }) => total + result.governedRegistrations,
+    0
+  );
+  const obsoleteApiUsages = results.reduce(
+    (total, { result }) => total + result.obsoleteApiUsages,
+    0
+  );
+  const detected = governedRegistrations + currentNativeRegistrations + declarativeTools > 0;
+  let status: AICWebMCPSourceReadinessReport["status"];
+
+  if (obsoleteApiUsages > 0) {
+    status = "blocked";
+  } else if (!detected) {
+    status = "not_detected";
+    findings.push({
+      code: "webmcp_not_detected",
+      fix_hint:
+        "Start with one explicit, task-level @aicorg/webmcp binding instead of converting every UI control.",
+      message: "No current WebMCP integration was detected.",
+      severity: "info"
+    });
+  } else if (findings.some((finding) => finding.severity === "warning")) {
+    status = "review_needed";
+  } else {
+    status = "ready";
+  }
+
+  return {
+    artifact_type: "aic_webmcp_readiness_report",
+    baseline: {
+      api: "document.modelContext",
+      draft: "2026-08-26",
+      types: "0.1.5"
+    },
+    files: results.map(({ file }) => file),
+    findings,
+    generated_at: generatedAt,
+    next_actions: createWebMCPNextActions(findings, governedRegistrations),
+    status,
+    summary: {
+      current_native_registrations: currentNativeRegistrations,
+      declarative_tools: declarativeTools,
+      direct_native_registrations: directNativeRegistrations,
+      files_scanned: files.length,
+      governed_registrations: governedRegistrations,
+      obsolete_api_usages: obsoleteApiUsages
+    }
+  };
+}
+
+export function createWebMCPImplementationPlan(
+  report: AICWebMCPSourceReadinessReport,
+  generatedAt = new Date().toISOString()
+): AICWebMCPImplementationPlan {
+  const workstreams: AICWebMCPImplementationPlan["workstreams"] = [];
+
+  if (report.summary.obsolete_api_usages > 0) {
+    workstreams.push({
+      actions: [
+        "Replace navigator.modelContext and provideContext usage.",
+        "Pin implementation checks to document.modelContext and the recorded draft baseline."
+      ],
+      id: "migrate-current-api",
+      priority: "now",
+      title: "Migrate obsolete WebMCP APIs"
+    });
+  }
+
+  if (report.summary.direct_native_registrations > 0) {
+    workstreams.push({
+      actions: [
+        "Create authored execution-ready AIC action contracts for each task-level tool.",
+        "Replace direct registerTool calls with registerAICWebMCPTool."
+      ],
+      id: "add-aic-governance",
+      priority: "now",
+      title: "Add AIC governance to native tools"
+    });
+  }
+
+  if (report.summary.governed_registrations === 0) {
+    workstreams.push({
+      actions: [
+        "Choose one high-value task rather than exposing individual UI controls.",
+        "Author input validation, authorization, confirmation, execution, verification, and recovery behavior."
+      ],
+      id: "pilot-tool",
+      priority: "now",
+      title: "Implement the first governed WebMCP tool"
+    });
+  }
+
+  if (report.summary.declarative_tools > 0) {
+    workstreams.push({
+      actions: [
+        "Review form risk and confirmation semantics.",
+        "Use AIC declarative props and allow toolautosubmit only for low-risk non-confirmed flows."
+      ],
+      id: "review-declarative-forms",
+      priority: "next",
+      title: "Harden declarative WebMCP forms"
+    });
+  }
+
+  workstreams.push({
+    actions: [
+      "Test current Chromium support and the unsupported-browser path.",
+      "Verify identical domain behavior for human and WebMCP execution.",
+      "Re-run aic doctor --webmcp when the draft or webmcp-types baseline changes."
+    ],
+    id: "verify-and-maintain",
+    priority: "next",
+    title: "Verify browser behavior and draft compatibility"
+  });
+
+  return {
+    acceptance_criteria: [
+      "No obsolete WebMCP API usage remains.",
+      "Every mutating tool is backed by an authored execution-ready AIC action contract.",
+      "Critical tools enforce authorization, entity scope, structured confirmation, and post-execution verification.",
+      "Unsupported browsers preserve the human workflow without errors.",
+      "Browser tests cover success, denial, cancellation, verification failure, and lifecycle disposal."
+    ],
+    artifact_type: "aic_webmcp_implementation_plan",
+    baseline: report.baseline,
+    generated_at: generatedAt,
+    source_status: report.status,
+    workstreams
+  };
+}
+
 export async function generateProjectArtifacts(
   options: AICProjectArtifactsOptions
 ): Promise<AICProjectArtifacts> {
@@ -2806,6 +3337,357 @@ export function createProjectArtifactReport(
     },
     matches: artifacts.matches,
     source_inventory: artifacts.source_inventory
+  };
+}
+
+function createCoverageSummary(total: number, covered: number): AICQAReadinessCoverageSummary {
+  const safeCovered = Math.min(total, Math.max(0, covered));
+  const rate = total === 0 ? 1 : Number((safeCovered / total).toFixed(2));
+
+  return {
+    covered: safeCovered,
+    missing: Math.max(0, total - safeCovered),
+    rate,
+    total
+  };
+}
+
+function hasStructuredConfirmation(element: Pick<AICElementManifest, "confirmation" | "requires_confirmation">): boolean {
+  return element.requires_confirmation === true && Boolean(element.confirmation?.type);
+}
+
+function hasEntityMetadata(element: Pick<AICElementManifest, "entity_ref">): boolean {
+  return Boolean(
+    element.entity_ref?.entity_id &&
+      element.entity_ref.entity_type &&
+      element.entity_ref.entity_label
+  );
+}
+
+function isHighValueEntityCandidate(element: Pick<AICElementManifest, "actions" | "id" | "risk">): boolean {
+  const actionNames = element.actions.map((action) => action.name.toLowerCase());
+  const targetText = [element.id, ...actionNames].join(" ").toLowerCase();
+
+  return (
+    element.risk === "high" ||
+    element.risk === "critical" ||
+    /\b(archive|cancel|charge|checkout|create|delete|destroy|edit|remove|submit|update)\b/.test(targetText)
+  );
+}
+
+function uniqueWorkflowStepIds(workflows: AICWorkflowManifest | undefined): Set<string> {
+  const ids = new Set<string>();
+
+  for (const workflow of workflows?.workflows ?? []) {
+    ids.add(workflow.id);
+    for (const step of workflow.steps) {
+      ids.add(step.id);
+    }
+  }
+
+  return ids;
+}
+
+function createQAReadinessNextActions(findings: AICQAReadinessFinding[]): string[] {
+  const orderedCodes: AICQAReadinessFinding["code"][] = [
+    "missing_runtime_ui_manifest",
+    "generated_manifest_invalid",
+    "critical_action_missing_confirmation",
+    "high_risk_action_missing_confirmation",
+    "workflow_ref_unresolved",
+    "no_explicit_workflows",
+    "high_value_action_missing_entity",
+    "extraction_diagnostics_present"
+  ];
+  const actions: string[] = [];
+
+  for (const code of orderedCodes) {
+    const finding = findings.find((candidate) => candidate.code === code);
+    if (!finding || actions.includes(finding.fix_hint)) {
+      continue;
+    }
+
+    actions.push(finding.fix_hint);
+    if (actions.length >= 5) {
+      break;
+    }
+  }
+
+  return actions;
+}
+
+export function createQAReadinessReport(inputs: AICQAReadinessInputs): AICQAReadinessReport {
+  const generatedAt = inputs.generatedAt ?? new Date().toISOString();
+  const elements = inputs.ui?.elements ?? [];
+  const highOrCriticalElements = elements.filter(
+    (element) => element.risk === "high" || element.risk === "critical"
+  );
+  const highValueEntityCandidates = elements.filter(isHighValueEntityCandidate);
+  const workflowIds = uniqueWorkflowStepIds(inputs.workflows);
+  const findings: AICQAReadinessFinding[] = [];
+
+  if (!inputs.ui) {
+    findings.push({
+      code: "missing_runtime_ui_manifest",
+      fix_hint: "Regenerate project artifacts and keep the runtime UI manifest next to report.json before selling QA readiness.",
+      message: "No sibling runtime UI manifest was available, so rich element readiness could not be scored.",
+      severity: "blocker"
+    });
+  }
+
+  for (const finding of inputs.projectReport.generated_manifests?.findings ?? []) {
+    if (finding.issue_count <= 0) {
+      continue;
+    }
+
+    findings.push({
+      code: "generated_manifest_invalid",
+      fix_hint: "Fix generated manifest validation issues, then rerun `aic generate project` and `aic inspect qa-readiness`.",
+      message: `${finding.manifest_kind} manifest has ${finding.issue_count} validation issue(s).`,
+      severity: "blocker"
+    });
+  }
+
+  if (inputs.projectReport.diagnostics.length > 0) {
+    findings.push({
+      code: "extraction_diagnostics_present",
+      fix_hint: "Replace unsupported dynamic AIC props with deterministic metadata on pilot-critical controls.",
+      message: `${inputs.projectReport.diagnostics.length} extraction diagnostic(s) should be reviewed before a customer pilot.`,
+      severity: "warning"
+    });
+  }
+
+  for (const element of highOrCriticalElements) {
+    if (hasStructuredConfirmation(element)) {
+      continue;
+    }
+
+    findings.push({
+      code:
+        element.risk === "critical"
+          ? "critical_action_missing_confirmation"
+          : "high_risk_action_missing_confirmation",
+      element_id: element.id,
+      fix_hint: "Add `agentRequiresConfirmation` plus structured `agentConfirmation` metadata on high and critical actions.",
+      message: `${element.id} is ${element.risk} risk but does not expose structured confirmation metadata.`,
+      severity: element.risk === "critical" ? "blocker" : "warning"
+    });
+  }
+
+  for (const element of highValueEntityCandidates) {
+    if (hasEntityMetadata(element)) {
+      continue;
+    }
+
+    findings.push({
+      code: "high_value_action_missing_entity",
+      element_id: element.id,
+      fix_hint: "Add `agentEntityId`, `agentEntityType`, and `agentEntityLabel` on record-scoped pilot actions.",
+      message: `${element.id} looks like a high-value or record-scoped action but does not expose complete entity metadata.`,
+      severity: "warning"
+    });
+  }
+
+  if ((inputs.workflows?.workflows.length ?? 0) === 0) {
+    findings.push({
+      code: "no_explicit_workflows",
+      fix_hint: "Add at least one workflow definition for each paid-pilot regression flow.",
+      message: "No explicit workflows are available for QA agents to plan multi-step regression coverage.",
+      severity: "warning"
+    });
+  }
+
+  for (const element of elements) {
+    if (!element.workflow_ref || workflowIds.has(element.workflow_ref)) {
+      continue;
+    }
+
+    findings.push({
+      code: "workflow_ref_unresolved",
+      element_id: element.id,
+      fix_hint: "Align `agentWorkflowStep` values with generated workflow IDs or step IDs.",
+      message: `${element.id} references workflow step ${element.workflow_ref}, but no generated workflow or step matches it.`,
+      severity: "blocker"
+    });
+  }
+
+  const blockers = findings.filter((finding) => finding.severity === "blocker").length;
+  const warnings = findings.filter((finding) => finding.severity === "warning").length;
+  const stableIds = createCoverageSummary(elements.length, elements.filter((element) => Boolean(element.id)).length);
+  const confirmation = createCoverageSummary(
+    highOrCriticalElements.length,
+    highOrCriticalElements.filter(hasStructuredConfirmation).length
+  );
+  const entity = createCoverageSummary(
+    highValueEntityCandidates.length,
+    highValueEntityCandidates.filter(hasEntityMetadata).length
+  );
+  const workflow = createCoverageSummary(
+    elements.length,
+    elements.filter((element) => Boolean(element.workflow_ref) && workflowIds.has(element.workflow_ref ?? "")).length
+  );
+  const validation = createCoverageSummary(
+    elements.length,
+    elements.filter((element) => Boolean(element.validation)).length
+  );
+  const execution = createCoverageSummary(
+    elements.length,
+    elements.filter((element) => Boolean(element.execution)).length
+  );
+  const recovery = createCoverageSummary(
+    highOrCriticalElements.length,
+    highOrCriticalElements.filter((element) => Boolean(element.recovery)).length
+  );
+
+  const score = Math.max(
+    0,
+    Math.round(
+      100 -
+        blockers * 25 -
+        warnings * 5 -
+        inputs.projectReport.diagnostics.length * 3 -
+        (inputs.projectReport.generated_manifests?.summary.invalid ?? 0) * 15
+    )
+  );
+  const grade: AICQAReadinessGrade =
+    blockers > 0 || score < 60 ? "not_ready" : warnings > 0 || score < 85 ? "review_needed" : "pilot_ready";
+
+  return {
+    artifact_type: "aic_qa_readiness_report",
+    coverage: {
+      confirmation,
+      entity,
+      execution,
+      recovery,
+      stable_ids: stableIds,
+      validation,
+      workflow
+    },
+    findings,
+    framework: inputs.projectReport.framework,
+    generated_at: generatedAt,
+    inputs: {
+      actions_manifest: Boolean(inputs.actions),
+      permissions_manifest: Boolean(inputs.permissions),
+      project_report: true,
+      runtime_ui_manifest: Boolean(inputs.ui),
+      workflows_manifest: Boolean(inputs.workflows)
+    },
+    next_actions: createQAReadinessNextActions(findings),
+    summary: {
+      blockers,
+      grade,
+      high_or_critical_actions: highOrCriticalElements.length,
+      score,
+      total_elements: elements.length,
+      warnings,
+      workflows: inputs.workflows?.workflows.length ?? 0
+    }
+  };
+}
+
+function riskRank(risk: string): number {
+  return { critical: 3, high: 2, low: 0, medium: 1 }[risk] ?? 0;
+}
+
+function maxRiskForElements(elements: AICElementManifest[]): string {
+  return elements
+    .map((element) => element.risk)
+    .sort((left, right) => riskRank(right) - riskRank(left))[0] ?? "low";
+}
+
+function createPlanStep(
+  element: AICElementManifest,
+  actionName?: string,
+  requiresConfirmation?: boolean
+): AICQATestPlanStep {
+  return {
+    action: actionName ?? element.actions[0]?.name ?? "click",
+    expected: element.execution?.settled_when?.[0] ?? element.execution?.ready_when?.[0] ?? `${element.id}.completed = true`,
+    requires_confirmation: requiresConfirmation ?? hasStructuredConfirmation(element),
+    target: element.id
+  };
+}
+
+function renderPlaywrightSkeleton(pageUrl: string, scenarios: AICQATestPlanScenario[]): string {
+  const lines = [
+    "import { test, expect } from '@playwright/test';",
+    "",
+    "// Generated from AIC manifests. Resolve elements by AIC runtime IDs before falling back to selectors.",
+    "async function clickAic(page, id) {",
+    "  await page.locator(`[data-agent-id=\"${id}\"]`).click();",
+    "}",
+    ""
+  ];
+
+  for (const scenario of scenarios) {
+    lines.push(`test('${scenario.id}', async ({ page }) => {`);
+    lines.push(`  await page.goto('${pageUrl}');`);
+    for (const step of scenario.steps) {
+      lines.push(`  // ${step.action}: ${step.target}`);
+      lines.push(`  await clickAic(page, '${step.target}');`);
+      if (step.requires_confirmation) {
+        lines.push("  // Confirm or cancel according to the scenario's safety-path expectation.");
+      }
+    }
+    lines.push("  await expect(page).toBeTruthy();");
+    lines.push("});");
+    lines.push("");
+  }
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+export function createQAAgentTestPlan(inputs: AICQATestPlanInputs): AICQATestPlan {
+  const elementsById = new Map(inputs.ui.elements.map((element) => [element.id, element]));
+  const scenarios: AICQATestPlanScenario[] = [];
+
+  for (const workflow of inputs.workflows?.workflows ?? []) {
+    const stepElements = workflow.steps
+      .map((step) => {
+        const target = step.target ?? step.action ?? step.id;
+        const element = target ? elementsById.get(target) : undefined;
+        return element ? { element, step } : undefined;
+      })
+      .filter((value): value is { element: AICElementManifest; step: AICWorkflowManifest["workflows"][number]["steps"][number] } =>
+        Boolean(value)
+      );
+
+    if (stepElements.length === 0) {
+      continue;
+    }
+
+    const elements = stepElements.map(({ element }) => element);
+    scenarios.push({
+      id: workflow.id,
+      max_risk: maxRiskForElements(elements),
+      safety_path: stepElements.some(({ element, step }) => step.requires_confirmation === true || hasStructuredConfirmation(element)),
+      steps: stepElements.map(({ element, step }) =>
+        createPlanStep(element, step.action, step.requires_confirmation)
+      ),
+      title: workflow.title
+    });
+  }
+
+  if (scenarios.length === 0) {
+    const candidates = inputs.ui.elements.filter((element) => isHighValueEntityCandidate(element));
+    for (const element of candidates) {
+      scenarios.push({
+        id: `${element.id}.qa`,
+        max_risk: element.risk,
+        safety_path: hasStructuredConfirmation(element),
+        steps: [createPlanStep(element)],
+        title: element.label
+      });
+    }
+  }
+
+  return {
+    artifact_type: "aic_qa_test_plan",
+    generated_at: inputs.generatedAt ?? new Date().toISOString(),
+    playwright_skeleton: renderPlaywrightSkeleton(inputs.ui.page.url, scenarios),
+    scenarios,
+    source: (inputs.workflows?.workflows.length ?? 0) > 0 ? "workflows" : "runtime_ui"
   };
 }
 

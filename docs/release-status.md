@@ -25,6 +25,11 @@ This is not a toy repo anymore, but it is also not claiming GA maturity.
 - `@aicorg/mcp-server`
   - handler-level MCP validation
   - real stdio transport validation
+- source-ready `@aicorg/webmcp` next-alpha package
+  - authored-only execution readiness
+  - fail-closed imperative registration and React lifecycle cleanup
+  - declarative WebMCP props with risky auto-submit suppression
+  - CLI readiness scanning and implementation-plan generation
 - starter adoption paths for:
   - Next.js
   - Vite/React
@@ -76,6 +81,7 @@ Use [AIC Case Studies](/mnt/c/users/vatsa/agentinteractioncontrol/docs/case-stud
 ## What Is Still Intentionally Rough
 
 - npm surface is still alpha-tagged
+- WebMCP remains an experimental, date-pinned compatibility surface and is not claimed as published until the next npm alpha release succeeds
 - dynamic inference is intentionally conservative
 - write-back mutation remains guarded and limited
 - auth is documented as an integration path, not built into core packages

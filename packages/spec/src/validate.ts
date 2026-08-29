@@ -1,6 +1,8 @@
 import {
   AIC_ACTIONS,
+  AIC_ACTION_EXECUTION_STATUSES,
   AIC_CONFIRMATION_TYPES,
+  AIC_PROVENANCE_SOURCES,
   AIC_RISKS,
   AIC_ROLES,
   MANIFEST_VERSION,
@@ -211,6 +213,114 @@ function validateActionContract(
       "Expected at least one failure mode",
       "action_contract.failure_modes"
     );
+  }
+
+  if (value.execution_readiness === undefined) {
+    pushIssue(
+      issues,
+      "warning",
+      `${path}.execution_readiness`,
+      "Action contract has no explicit execution-readiness status and must not be exposed as an executable tool",
+      "action_contract.execution_readiness"
+    );
+  } else if (!isRecord(value.execution_readiness)) {
+    pushIssue(
+      issues,
+      "error",
+      `${path}.execution_readiness`,
+      "Expected an object",
+      "action_contract.execution_readiness"
+    );
+  } else {
+    const readiness = value.execution_readiness;
+
+    if (
+      typeof readiness.status !== "string" ||
+      !(AIC_ACTION_EXECUTION_STATUSES as readonly string[]).includes(readiness.status)
+    ) {
+      pushIssue(
+        issues,
+        "error",
+        `${path}.execution_readiness.status`,
+        "Expected review_required or execution_ready",
+        "action_contract.execution_readiness_status"
+      );
+    }
+
+    if (
+      typeof readiness.source !== "string" ||
+      !(AIC_PROVENANCE_SOURCES as readonly string[]).includes(readiness.source)
+    ) {
+      pushIssue(
+        issues,
+        "error",
+        `${path}.execution_readiness.source`,
+        "Expected an authored, inferred, or ai_suggested source",
+        "action_contract.execution_readiness_source"
+      );
+    }
+
+    if (readiness.blockers !== undefined && !isStringArray(readiness.blockers)) {
+      pushIssue(
+        issues,
+        "error",
+        `${path}.execution_readiness.blockers`,
+        "Expected an array of strings",
+        "action_contract.execution_readiness_blockers"
+      );
+    }
+
+    if (readiness.status === "execution_ready") {
+      if (readiness.source !== "authored") {
+        pushIssue(
+          issues,
+          "error",
+          `${path}.execution_readiness.source`,
+          "Execution-ready action contracts must be explicitly authored",
+          "action_contract.execution_ready_authored"
+        );
+      }
+
+      if (Array.isArray(readiness.blockers) && readiness.blockers.length > 0) {
+        pushIssue(
+          issues,
+          "error",
+          `${path}.execution_readiness.blockers`,
+          "Execution-ready action contracts cannot retain review blockers",
+          "action_contract.execution_ready_blockers"
+        );
+      }
+
+      if (
+        isRecord(value.completion_signal) &&
+        (value.completion_signal.value === "review_required" ||
+          (typeof value.completion_signal.value === "string" &&
+            value.completion_signal.value.endsWith(".completed = true")))
+      ) {
+        pushIssue(
+          issues,
+          "error",
+          `${path}.completion_signal`,
+          "Execution-ready actions require a real, app-verifiable completion signal",
+          "action_contract.execution_ready_completion"
+        );
+      }
+
+      if (
+        Array.isArray(value.failure_modes) &&
+        value.failure_modes.some((failureMode) =>
+          failureMode === "unknown_failure" || failureMode === "review_required"
+        )
+      ) {
+        pushIssue(
+          issues,
+          "error",
+          `${path}.failure_modes`,
+          "Execution-ready actions require explicit application failure modes",
+          "action_contract.execution_ready_failures"
+        );
+      }
+    }
   }
 
   if (value.batch !== undefined) {

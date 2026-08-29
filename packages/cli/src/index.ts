@@ -6,16 +6,21 @@ import { dirname, resolve } from "node:path";
 import { format } from "node:util";
 import {
   analyzeProjectForAICAnnotations,
+  analyzeProjectForWebMCPReadiness,
   applyAuthoringPatchPlan,
   createAICDoctorReport,
   createProjectArtifactReport,
+  createQAAgentTestPlan,
+  createQAReadinessReport,
+  createWebMCPImplementationPlan,
   diffManifestValues,
   diffManifestValuesDetailed,
   generateProjectArtifacts,
   initializeAICProject,
   scanSourceForAICAnnotations,
   writeArtifactFiles,
-  type AICAutomationManifestKind
+  type AICAutomationManifestKind,
+  type AICQAReadinessReport
 } from "@aicorg/automation-core";
 import {
   isAICBootstrapProviderError,
@@ -119,9 +124,9 @@ function printUsage(): void {
   console.log(`AIC CLI
 
 Usage:
-  aic scan <file-or-directory>
+  aic scan <file-or-directory> [--webmcp]
   aic init [project-root] [--framework <nextjs|vite|react>] [--app-name <name>] [--view-id <id>] [--view-url <url>] [--dry-run] [--force]
-  aic doctor [project-root] [--config <file>] [--report-file <file>]
+  aic doctor [project-root] [--config <file>] [--report-file <file>] [--webmcp]
   aic validate <discovery|ui|permissions|workflows|actions> <file>
   aic bootstrap <url> [routes-csv] [--app-name <name>] [--captures-file <file>] [--suggestions-file <file>] [--provider-kind <http|openai>] [--provider-endpoint <url>] [--provider-model <name>] [--provider-header <k=v>] [--provider-selector <path>] [--provider-bearer-env <env>] [--provider-timeout-ms <ms>] [--provider-retries <n>] [--openai-api-key-env <env>] [--openai-base-url <url>] [--draft-file <file>] [--review-file <file>] [--report-file <file>] [--prompt-file <file>] [--min-confidence <0-1>] [--max-suggestions <n>] [--print-prompt]
   aic generate discovery <config-file>
@@ -129,10 +134,13 @@ Usage:
   aic generate permissions <config-file>
   aic generate operate <config-file>
   aic generate project <config-file> [--out-dir <dir>]
+  aic generate webmcp-plan <file-or-directory> [--out-file <file>]
+  aic generate qa-plan <report.json> [--out-file <file>]
   aic generate authoring-plan <snapshot-file> [--dom-candidates <file>] [--report <file>] [--bootstrap-review <file>]
   aic apply authoring-plan <plan-file> [--project-root <dir>] [--write] [--report-file <file>]
   aic diff <discovery|ui|permissions|workflows|actions> <before-file> <after-file> [--format <summary|detailed>]
   aic inspect <file>
+  aic inspect qa-readiness <report.json> [--json]
 `);
 }
 
@@ -152,8 +160,15 @@ async function writeTextFile(filePath: string, contents: string): Promise<void> 
   await writeFile(resolvedPath, contents, "utf8");
 }
 
-async function scanPath(targetPath: string): Promise<number> {
+async function scanPath(targetPath: string, args: string[] = []): Promise<number> {
   const fullPath = resolve(process.cwd(), targetPath);
+
+  if (args.includes("--webmcp")) {
+    const report = await analyzeProjectForWebMCPReadiness(fullPath);
+    printJson(report);
+    return report.status === "blocked" ? 1 : 0;
+  }
+
   const result =
     targetPath.endsWith(".js") ||
     targetPath.endsWith(".jsx") ||
@@ -299,7 +314,7 @@ function readOptionValue(args: string[], optionName: string): string | undefined
 
 function readPositionalArgs(args: string[]): string[] {
   const positional: string[] = [];
-  const valueLessFlags = new Set(["--print-prompt", "--write"]);
+  const valueLessFlags = new Set(["--print-prompt", "--webmcp", "--write"]);
 
   for (let index = 0; index < args.length; index += 1) {
     const value = args[index];
@@ -426,13 +441,30 @@ async function doctorProject(args: string[]): Promise<number> {
     configFile,
     projectRoot
   });
+  const webmcp = hasFlag(args, "--webmcp")
+    ? await analyzeProjectForWebMCPReadiness(resolve(process.cwd(), projectRoot ?? "."))
+    : undefined;
+  const output = webmcp ? { ...result, webmcp } : result;
 
   if (reportFile) {
-    await writeTextFile(reportFile, `${JSON.stringify(result, null, 2)}\n`);
+    await writeTextFile(reportFile, `${JSON.stringify(output, null, 2)}\n`);
   }
 
-  printJson(result);
-  return result.summary.errors > 0 ? 1 : 0;
+  printJson(output);
+  return result.summary.errors > 0 || webmcp?.status === "blocked" ? 1 : 0;
+}
+
+async function generateWebMCPPlan(targetPath: string, args: string[]): Promise<number> {
+  const report = await analyzeProjectForWebMCPReadiness(resolve(process.cwd(), targetPath));
+  const plan = createWebMCPImplementationPlan(report);
+  const outFile = readOptionValue(args, "--out-file");
+
+  if (outFile) {
+    await writeTextFile(outFile, `${JSON.stringify(plan, null, 2)}\n`);
+  }
+
+  printJson(plan);
+  return report.status === "blocked" ? 1 : 0;
 }
 
 async function generateProject(filePath: string, args: string[]): Promise<number> {
@@ -501,6 +533,36 @@ async function generateProject(filePath: string, args: string[]): Promise<number
     ui: artifacts.ui,
     workflows: artifacts.workflows
   });
+  return 0;
+}
+
+async function generateQAPlan(filePath: string, args: string[]): Promise<number> {
+  const report = await readJson<unknown>(filePath);
+
+  if (!isProjectArtifactReport(report)) {
+    console.error("QA plan generation expects a generated AIC project report.json file.");
+    return 1;
+  }
+
+  const baseDir = dirname(resolve(process.cwd(), filePath));
+  const ui = await readOptionalGeneratedArtifact<AICRuntimeUiManifest>(baseDir, ".well-known/agent/ui");
+
+  if (!ui) {
+    console.error("Unable to find sibling runtime UI manifest at .well-known/agent/ui.");
+    return 1;
+  }
+
+  const plan = createQAAgentTestPlan({
+    ui,
+    workflows: await readOptionalGeneratedArtifact<AICWorkflowManifest>(baseDir, "agent-workflows.json")
+  });
+  const outFile = readOptionValue(args, "--out-file");
+
+  if (outFile) {
+    await writeTextFile(outFile, `${JSON.stringify(plan, null, 2)}\n`);
+  }
+
+  printJson(plan);
   return 0;
 }
 
@@ -847,7 +909,7 @@ function isBootstrapDraft(value: unknown): value is {
   return Array.isArray(record.ui) && Array.isArray(record.suggestions) && typeof record.discovery === "object";
 }
 
-function isProjectArtifactReport(value: unknown): value is AICAuthoringInputs["project_report"] {
+function isProjectArtifactReport(value: unknown): value is NonNullable<AICAuthoringInputs["project_report"]> {
   if (!value || typeof value !== "object") {
     return false;
   }
@@ -1083,6 +1145,74 @@ function summarizeProjectReportNextActions(
   return actions.slice(0, limit);
 }
 
+async function readOptionalGeneratedArtifact<T>(baseDir: string, relativePath: string): Promise<T | undefined> {
+  try {
+    return JSON.parse(await readFile(resolve(baseDir, relativePath), "utf8")) as T;
+  } catch {
+    return undefined;
+  }
+}
+
+function formatCoverageLine(label: string, summary: AICQAReadinessReport["coverage"]["stable_ids"]): string {
+  return `${label}: ${summary.covered}/${summary.total} (${Math.round(summary.rate * 100)}%)`;
+}
+
+async function inspectQAReadiness(filePath: string, args: string[]): Promise<number> {
+  const report = await readJson<unknown>(filePath);
+
+  if (!isProjectArtifactReport(report)) {
+    console.error("QA readiness inspection expects a generated AIC project report.json file.");
+    return 1;
+  }
+
+  const baseDir = dirname(resolve(process.cwd(), filePath));
+  const readiness = createQAReadinessReport({
+    actions: await readOptionalGeneratedArtifact<AICSemanticActionsManifest>(baseDir, ".well-known/agent/actions"),
+    permissions: await readOptionalGeneratedArtifact<AICPermissionsManifest>(baseDir, "agent-permissions.json"),
+    projectReport: report,
+    ui: await readOptionalGeneratedArtifact<AICRuntimeUiManifest>(baseDir, ".well-known/agent/ui"),
+    workflows: await readOptionalGeneratedArtifact<AICWorkflowManifest>(baseDir, "agent-workflows.json")
+  });
+
+  if (args.includes("--json")) {
+    printJson(readiness);
+    return readiness.summary.blockers > 0 ? 1 : 0;
+  }
+
+  console.log(`AIC QA readiness report for ${readiness.framework}`);
+  console.log(`Score: ${readiness.summary.score}/100`);
+  console.log(`Grade: ${readiness.summary.grade}`);
+  console.log(`Elements: ${readiness.summary.total_elements}`);
+  console.log(`High/critical actions: ${readiness.summary.high_or_critical_actions}`);
+  console.log(`Workflows: ${readiness.summary.workflows}`);
+  console.log(`Blockers: ${readiness.summary.blockers}`);
+  console.log(`Warnings: ${readiness.summary.warnings}`);
+  console.log("Coverage:");
+  console.log(`- ${formatCoverageLine("Stable IDs", readiness.coverage.stable_ids)}`);
+  console.log(`- ${formatCoverageLine("High/critical confirmation", readiness.coverage.confirmation)}`);
+  console.log(`- ${formatCoverageLine("Entity metadata", readiness.coverage.entity)}`);
+  console.log(`- ${formatCoverageLine("Workflow links", readiness.coverage.workflow)}`);
+  console.log(`- ${formatCoverageLine("Execution metadata", readiness.coverage.execution)}`);
+  console.log(`- ${formatCoverageLine("Validation metadata", readiness.coverage.validation)}`);
+  console.log(`- ${formatCoverageLine("Recovery metadata", readiness.coverage.recovery)}`);
+
+  if (readiness.findings.length > 0) {
+    console.log("Findings:");
+    readiness.findings.slice(0, 8).forEach((finding, index) => {
+      console.log(`${index + 1}. [${finding.severity}] ${finding.message}`);
+    });
+  }
+
+  if (readiness.next_actions.length > 0) {
+    console.log("Next actions:");
+    readiness.next_actions.forEach((action, index) => {
+      console.log(`${index + 1}. ${action}`);
+    });
+  }
+
+  return readiness.summary.blockers > 0 ? 1 : 0;
+}
+
 async function inspect(filePath: string): Promise<number> {
   const value = await readJson<unknown>(filePath);
   if (isInitResult(value)) {
@@ -1305,7 +1435,7 @@ async function main(): Promise<void> {
   }
 
   if (command === "scan" && kind) {
-    process.exitCode = await scanPath(kind);
+    process.exitCode = await scanPath(kind, args);
     return;
   }
 
@@ -1359,6 +1489,16 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (command === "generate" && kind === "webmcp-plan" && firstArg) {
+    process.exitCode = await generateWebMCPPlan(firstArg, args.slice(1));
+    return;
+  }
+
+  if (command === "generate" && kind === "qa-plan" && firstArg) {
+    process.exitCode = await generateQAPlan(firstArg, args);
+    return;
+  }
+
   if (command === "generate" && kind === "authoring-plan" && firstArg) {
     process.exitCode = await generateAuthoringPlan(firstArg, args);
     return;
@@ -1377,6 +1517,11 @@ async function main(): Promise<void> {
     secondArg
   ) {
     process.exitCode = await diffManifests(kind as ManifestKind, firstArg, secondArg, args.slice(2));
+    return;
+  }
+
+  if (command === "inspect" && kind === "qa-readiness" && firstArg) {
+    process.exitCode = await inspectQAReadiness(firstArg, args.slice(1));
     return;
   }
 

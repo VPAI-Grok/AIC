@@ -1,0 +1,61 @@
+{
+  "name": "@aicorg/webmcp",
+  "version": "0.1.0-alpha.1",
+  "type": "module",
+  "description": "Fail-closed WebMCP registration and React lifecycle helpers backed by explicit AIC contracts.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/AIC.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/AIC",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/AIC/issues"
+  },
+  "keywords": [
+    "aic",
+    "agents",
+    "webmcp",
+    "browser",
+    "governance"
+  ],
+  "main": "./dist/webmcp/src/index.js",
+  "types": "./dist/webmcp/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/webmcp/src/index.d.ts",
+      "import": "./dist/webmcp/src/index.js",
+      "default": "./dist/webmcp/src/index.js"
+    },
+    "./react": {
+      "types": "./dist/webmcp/src/react.d.ts",
+      "import": "./dist/webmcp/src/react.js",
+      "default": "./dist/webmcp/src/react.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@aicorg/runtime": "workspace:*",
+    "@aicorg/spec": "workspace:*"
+  },
+  "devDependencies": {
+    "webmcp-types": "0.1.5"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}

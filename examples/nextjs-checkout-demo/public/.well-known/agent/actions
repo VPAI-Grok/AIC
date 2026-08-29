@@ -12,13 +12,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "checkout.discount_form.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     },
     {
@@ -30,13 +37,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "checkout.coupon_code.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     },
     {
@@ -48,13 +62,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "checkout.apply_coupon.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     },
     {
@@ -66,17 +87,24 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "checkout.save_cart.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     },
     {
-      "name": "checkout.submit_order",
+      "name": "checkout.complete",
       "title": "Completes checkout and charges the selected payment method",
       "target": "checkout.submit_order",
       "preconditions": [],
@@ -84,13 +112,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "checkout.submit_order.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     },
     {
@@ -102,13 +137,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "checkout.order_line.remove.line_starter_kit.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     }
   ]

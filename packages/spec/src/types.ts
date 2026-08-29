@@ -59,6 +59,7 @@ export const AIC_CONFIRMATION_TYPES = [
   "secondary_approval"
 ] as const;
 export const AIC_PROVENANCE_SOURCES = ["authored", "inferred", "ai_suggested"] as const;
+export const AIC_ACTION_EXECUTION_STATUSES = ["review_required", "execution_ready"] as const;
 export const AIC_VALIDATION_SEVERITIES = ["info", "warning", "error", "fatal"] as const;
 
 export type JsonPrimitive = boolean | number | string | null;
@@ -73,6 +74,7 @@ export type AICActionName = (typeof AIC_ACTIONS)[number];
 export type AICRole = (typeof AIC_ROLES)[number];
 export type AICConfirmationType = (typeof AIC_CONFIRMATION_TYPES)[number];
 export type AICProvenanceSource = (typeof AIC_PROVENANCE_SOURCES)[number];
+export type AICActionExecutionStatus = (typeof AIC_ACTION_EXECUTION_STATUSES)[number];
 export type AICValidationSeverity = (typeof AIC_VALIDATION_SEVERITIES)[number];
 
 export interface AICCompatibility {
@@ -191,11 +193,20 @@ export interface AICBatchMetadata {
   supported: boolean;
 }
 
+export interface AICActionExecutionReadiness {
+  blockers?: string[];
+  reviewed_at?: string;
+  reviewed_by?: string;
+  source: AICProvenanceSource;
+  status: AICActionExecutionStatus;
+}
+
 export interface AICActionContract {
   batch?: AICBatchMetadata;
   completion_signal: AICCompletionSignal;
   dry_run_action?: string;
   estimated_latency_ms: number;
+  execution_readiness?: AICActionExecutionReadiness;
   failure_modes: string[];
   idempotent: boolean;
   name: string;

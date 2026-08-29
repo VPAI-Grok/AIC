@@ -6,6 +6,10 @@
     "aic:doctor": "node ../../packages/cli/dist/cli/src/index.js doctor .",
     "aic:generate": "node ../../packages/cli/dist/cli/src/index.js generate project aic.project.json --out-dir ./public",
     "aic:inspect": "node ../../packages/cli/dist/cli/src/index.js inspect ./public/report.json",
+    "aic:qa-plan": "node ../../packages/cli/dist/cli/src/index.js generate qa-plan ./public/report.json --out-file ./public/aic-qa-plan.json",
+    "aic:qa-readiness": "node ../../packages/cli/dist/cli/src/index.js inspect qa-readiness ./public/report.json",
+    "aic:webmcp": "node ../../packages/cli/dist/cli/src/index.js doctor . --webmcp",
+    "aic:webmcp-plan": "node ../../packages/cli/dist/cli/src/index.js generate webmcp-plan ./app --out-file ./webmcp-plan.json",
     "dev": "next dev",
     "build": "next build --webpack",
     "check": "tsc -p tsconfig.check.json --noEmit"
@@ -13,8 +17,13 @@
   "dependencies": {
     "@aicorg/devtools": "workspace:*",
     "@aicorg/sdk-react": "workspace:*",
+    "@aicorg/spec": "workspace:*",
+    "@aicorg/webmcp": "workspace:*",
     "next": "^16.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "webmcp-types": "0.1.5"
   }
 }

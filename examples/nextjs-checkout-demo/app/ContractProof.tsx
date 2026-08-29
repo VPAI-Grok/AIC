@@ -55,6 +55,7 @@ export function ContractProof() {
       </AICButton>
       <AICButton
         agentAction="submit"
+        agentContractRef="checkout.complete"
         agentConfirmation={{
           prompt_template: "Charge {{payment_method}} for {{order_total}} and submit order {{order_id}}?",
           summary_fields: ["order_total", "payment_method"],
@@ -71,6 +72,7 @@ export function ContractProof() {
         }}
         agentId="checkout.submit_order"
         agentLabel="Submit order"
+        agentPermissions={["checkout.submit_order"]}
         agentRequiresConfirmation
         agentRisk="critical"
         agentWorkflowStep="checkout.review.submit"

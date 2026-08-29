@@ -1,15 +1,186 @@
 "use client";
 
-import { AICButton, AICForm, AICInput } from "@aicorg/sdk-react/client";
+import { useCallback, useState } from "react";
+import {
+  AICButton,
+  AICForm,
+  AICInput,
+  useAICElement,
+  useAICRegistry
+} from "@aicorg/sdk-react/client";
+import { useAICWebMCPTool } from "@aicorg/webmcp/react";
 import {
   APPLY_COUPON_PROPS,
+  CHECKOUT_SUMMARY_ACTION,
+  CHECKOUT_SUMMARY_ELEMENT,
   COUPON_INPUT_PROPS,
   ORDER_LINES,
   SAVE_CART_PROPS,
+  SUBMIT_ORDER_ACTION,
+  SUBMIT_ORDER_ELEMENT,
   SUBMIT_ORDER_PROPS
 } from "./checkout-contract.mjs";
 
+interface CheckoutToolInput extends Record<string, unknown> {
+  order_id: string;
+  order_total: string;
+  payment_method: string;
+}
+
+interface CheckoutToolResult {
+  order_id: string;
+  payment_status: "charged";
+  status: "submitted";
+}
+
+interface CheckoutSummary {
+  currency: "USD";
+  item_count: 3;
+  order_id: "ord_100245";
+  order_total: "$177.00";
+  payment_method: "Visa ending 4242";
+  status: "draft" | "processing" | "submitted";
+}
+
 export function CheckoutDemoContent() {
+  const registry = useAICRegistry();
+  const [orderStatus, setOrderStatus] = useState<"draft" | "processing" | "submitted">("draft");
+  const { attributes: checkoutSummaryAttributes } = useAICElement(
+    {
+      agentAction: "read",
+      agentContractRef: CHECKOUT_SUMMARY_ACTION.name,
+      agentDescription: CHECKOUT_SUMMARY_ELEMENT.description,
+      agentId: CHECKOUT_SUMMARY_ELEMENT.id,
+      agentLabel: CHECKOUT_SUMMARY_ELEMENT.label,
+      agentRisk: CHECKOUT_SUMMARY_ELEMENT.risk,
+      agentWorkflowStep: CHECKOUT_SUMMARY_ELEMENT.workflow_ref,
+      state: {
+        value: orderStatus,
+        visible: true
+      }
+    },
+    { role: "generic" }
+  );
+
+  const getCheckoutSummary = useCallback((): CheckoutSummary => ({
+    currency: "USD",
+    item_count: 3,
+    order_id: "ord_100245",
+    order_total: "$177.00",
+    payment_method: "Visa ending 4242",
+    status: orderStatus
+  }), [orderStatus]);
+
+  const summaryWebMCP = useAICWebMCPTool<Record<string, never>, CheckoutSummary>(
+    () => ({
+      action: CHECKOUT_SUMMARY_ACTION,
+      element: CHECKOUT_SUMMARY_ELEMENT,
+      execute: async () => getCheckoutSummary(),
+      registry,
+      tool: {
+        annotations: {
+          readOnlyHint: true,
+          untrustedContentHint: false
+        },
+        description: "Read the currently displayed checkout summary without modifying the cart or order.",
+        inputSchema: {
+          additionalProperties: false,
+          type: "object"
+        },
+        name: "get_checkout_summary",
+        title: "Get checkout summary"
+      },
+      validate: async (input) => {
+        if (Object.keys(input).length > 0) {
+          throw new Error("get_checkout_summary does not accept input fields.");
+        }
+      }
+    }),
+    [getCheckoutSummary, registry]
+  );
+
+  const completeOrder = useCallback(async (input: CheckoutToolInput): Promise<CheckoutToolResult> => {
+    setOrderStatus("processing");
+    await Promise.resolve();
+    const result = {
+      order_id: input.order_id,
+      payment_status: "charged" as const,
+      status: "submitted" as const
+    };
+    setOrderStatus(result.status);
+    return result;
+  }, []);
+
+  const checkoutWebMCP = useAICWebMCPTool<CheckoutToolInput, CheckoutToolResult>(
+    () => ({
+      action: SUBMIT_ORDER_ACTION,
+      authorize: async (input) =>
+        input.order_id === SUBMIT_ORDER_ELEMENT.entity_ref?.entity_id && orderStatus === "draft",
+      confirm: async (request) => window.confirm(request.prompt),
+      element: SUBMIT_ORDER_ELEMENT,
+      execute: async (input) => completeOrder(input),
+      registry,
+      tool: {
+        annotations: {
+          readOnlyHint: false,
+          untrustedContentHint: false
+        },
+        description:
+          "Validate and complete the currently displayed checkout after application authorization and human confirmation.",
+        inputSchema: {
+          additionalProperties: false,
+          properties: {
+            order_id: {
+              const: "ord_100245",
+              description: "The displayed order ID.",
+              type: "string"
+            },
+            order_total: {
+              const: "$177.00",
+              description: "The displayed order total.",
+              type: "string"
+            },
+            payment_method: {
+              const: "Visa ending 4242",
+              description: "The displayed payment method.",
+              type: "string"
+            }
+          },
+          required: ["order_id", "order_total", "payment_method"],
+          type: "object"
+        },
+        name: "complete_checkout",
+        title: "Complete checkout"
+      },
+      validate: async (input) => {
+        if (
+          input.order_id !== "ord_100245" ||
+          input.order_total !== "$177.00" ||
+          input.payment_method !== "Visa ending 4242"
+        ) {
+          throw new Error("The requested checkout does not match the displayed order.");
+        }
+      },
+      verify: async (result) =>
+        result.order_id === "ord_100245" &&
+        result.payment_status === "charged" &&
+        result.status === "submitted"
+    }),
+    [completeOrder, orderStatus, registry]
+  );
+
+  const submitFromHumanUI = useCallback(async () => {
+    if (!window.confirm("Charge Visa ending 4242 for $177.00 and submit order ord_100245?")) {
+      return;
+    }
+
+    await completeOrder({
+      order_id: "ord_100245",
+      order_total: "$177.00",
+      payment_method: "Visa ending 4242"
+    });
+  }, [completeOrder]);
+
   return (
     <>
       <section style={{ display: "grid", gap: 10 }}>
@@ -141,6 +312,8 @@ export function CheckoutDemoContent() {
           </AICButton>
           <AICButton
             {...SUBMIT_ORDER_PROPS}
+            disabled={orderStatus !== "draft"}
+            onClick={() => void submitFromHumanUI()}
             style={{
               background: "#c2410c",
               border: 0,
@@ -155,6 +328,16 @@ export function CheckoutDemoContent() {
           >
             Submit order
           </AICButton>
+        </div>
+        <div
+          {...checkoutSummaryAttributes}
+          aria-live="polite"
+          style={{ color: "#57534e", display: "flex", flexWrap: "wrap", gap: 16, fontSize: 14 }}
+        >
+          <span>Order: {orderStatus}</span>
+          <span>
+            WebMCP: summary {summaryWebMCP.status}; checkout {checkoutWebMCP.status}
+          </span>
         </div>
       </section>
     </>

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { readFile, readdir, rm } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import test from "node:test";
 
@@ -18,6 +18,13 @@ const publishablePackages = [
     hasClientExport: false,
     name: "@aicorg/runtime",
     path: "packages/runtime"
+  },
+  {
+    hasBin: false,
+    hasClientExport: false,
+    hasReactExport: true,
+    name: "@aicorg/webmcp",
+    path: "packages/webmcp"
   },
   {
     hasBin: false,
@@ -139,14 +146,15 @@ function runCommand(command, args, options = {}) {
 
 async function packPackage(packagePath, outDir) {
   const cwd = resolveFromRepo(packagePath);
-  const command = process.platform === "win32" ? "corepack.cmd" : "corepack";
+  await mkdir(outDir, { recursive: true });
+
   const result = await runCommand(
-    command,
-    ["pnpm", "pack", "--pack-destination", outDir],
+    process.execPath,
+    [resolveFromRepo("node_modules/pnpm/bin/pnpm.cjs"), "pack", "--pack-destination", outDir],
     {
       cwd,
       env: {
-        COREPACK_HOME: "/tmp/corepack"
+        COREPACK_HOME: resolveFromRepo(".artifacts/corepack")
       }
     }
   );
@@ -189,6 +197,10 @@ test("publish wave package manifests are public and alpha-versioned", async () =
 
     if (pkg.hasClientExport) {
       assert.ok(packageJson.exports["./client"]);
+    }
+
+    if (pkg.hasReactExport) {
+      assert.ok(packageJson.exports["./react"]);
     }
 
     if (pkg.hasBin) {
@@ -244,6 +256,10 @@ test("packed npm tarballs rewrite workspace dependencies and only ship built fil
 
     if (pkg.hasExtensionAssets) {
       assert.ok(members.includes("package/dist/devtools/src/extension-assets.js"));
+    }
+
+    if (pkg.hasReactExport) {
+      assert.ok(members.includes("package/dist/webmcp/src/react.js"));
     }
 
     if (pkg.hasBin) {

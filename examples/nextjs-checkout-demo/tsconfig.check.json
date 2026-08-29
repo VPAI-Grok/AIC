@@ -2,13 +2,22 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "baseUrl": "../../",
+    "types": ["webmcp-types"],
     "paths": {
       "@aicorg/spec": ["packages/spec/src/index.ts"],
       "@aicorg/runtime": ["packages/runtime/src/index.ts"],
       "@aicorg/sdk-react": ["packages/sdk-react/src/index.tsx"],
       "@aicorg/sdk-react/client": ["packages/sdk-react/src/client.ts"],
+      "@aicorg/webmcp": ["packages/webmcp/src/index.ts"],
+      "@aicorg/webmcp/react": ["packages/webmcp/src/react.ts"],
       "@aicorg/devtools": ["packages/devtools/src/index.tsx"],
       "@aicorg/devtools/client": ["packages/devtools/src/client.ts"]
     }
-  }
+  },
+  "include": [
+    "next-env.d.ts",
+    "app/**/*.mjs",
+    "app/**/*.ts",
+    "app/**/*.tsx"
+  ]
 }

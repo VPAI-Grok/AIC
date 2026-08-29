@@ -22,7 +22,7 @@
         }
       ],
       "notes": [
-        "Extracted from app/CheckoutDemoContent.tsx:86"
+        "Extracted from app/CheckoutDemoContent.tsx:257"
       ],
       "risk": "low",
       "state": {
@@ -136,8 +136,9 @@
       "actions": [
         {
           "name": "submit",
+          "contract_ref": "checkout.complete",
           "target": "checkout.submit_order",
-          "type": "element_action"
+          "type": "semantic_action"
         }
       ],
       "confirmation": {
@@ -165,6 +166,9 @@
       },
       "notes": [
         "Extracted from app/ContractProof.tsx:56"
+      ],
+      "permissions": [
+        "checkout.submit_order"
       ],
       "requires_confirmation": true,
       "risk": "critical",
@@ -195,7 +199,7 @@
         "entity_type": "order_line"
       },
       "notes": [
-        "Extracted from app/ContractProof.tsx:80"
+        "Extracted from app/ContractProof.tsx:82"
       ],
       "risk": "medium",
       "state": {

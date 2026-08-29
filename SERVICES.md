@@ -10,6 +10,10 @@ That means teams can adopt it freely, including in commercial products and inter
 - implementation services for React, Next.js, and Vite apps
 - agent-readiness audits for risky workflows and production UI flows
 - custom MCP integrations for Claude, Cursor, Codex, and internal agent stacks
+- WebMCP readiness audits covering current APIs, tool candidates, browser constraints, and AIC safety gaps
+- WebMCP implementation sprints for imperative tools, declarative forms, and shared human/agent domain execution
+- WebMCP safety and governance hardening for authorization, confirmation, entity scope, verification, recovery, and audit
+- WebMCP compatibility and regression maintenance as the draft and browser implementations change
 - private support retainers and faster response channels
 - training, architecture reviews, and integration workshops
 
@@ -43,3 +47,4 @@ The recommended strategy for AIC at this stage is:
 - maximize adoption with Apache-2.0
 - monetize implementation, support, and hosted value
 - build the brand so the official AIC ecosystem remains the most trusted distribution
+- use WebMCP as the browser-native execution layer and sell AIC expertise around reliable, consequential business flows

@@ -26,10 +26,24 @@ The wrapped components and `useAICElement` hook currently revolve around explici
 - `agentId`
 - `agentDescription`
 - `agentAction`
+- `agentContractRef`
 - `agentRisk`
 - `agentRequiresConfirmation`
 
 These annotations feed both runtime registration and build-time extraction.
+
+`agentContractRef` links an element action to an explicitly authored semantic action contract. The WebMCP adapter requires the bound action itself to be marked authored and `execution_ready`; setting this prop alone never makes an action executable.
+
+## Declarative WebMCP Props
+
+The wrapped React primitives also accept:
+
+- `webMCPToolName`
+- `webMCPToolDescription`
+- `webMCPToolAutoSubmit`
+- `webMCPParamDescription`
+
+They map to the current declarative WebMCP attributes. `webMCPToolAutoSubmit` is emitted only for low-risk elements that do not require confirmation. See [WebMCP With AIC](./webmcp.md) for the imperative adapter, readiness gates, and compatibility baseline.
 
 ## Wrapped Primitives
 

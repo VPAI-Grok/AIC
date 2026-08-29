@@ -8,6 +8,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![Status](https://img.shields.io/badge/status-alpha-orange.svg)](./docs/implementation-phases.md)
 [![MCP Compatible](https://img.shields.io/badge/MCP-compatible-8b5cf6.svg)](./docs/mcp-server.md)
+[![WebMCP Ready](https://img.shields.io/badge/WebMCP-AIC%20governed-0f766e.svg)](./docs/webmcp.md)
 
 ---
 
@@ -98,6 +99,7 @@ Agent: ✅ Executes safely
 If you already have a React, Next.js, or Vite app, start here:
 
 - [Adopt AIC In An Existing App](./docs/adopt-existing-app.md)
+- [QA Agent Readiness](./docs/qa-agent-readiness.md)
 - [Auth0 For AI Agents With AIC](./docs/auth0-ai-agents.md)
 
 ### Connect any MCP-compatible AI agent (Claude Desktop, Cursor, etc.)
@@ -116,6 +118,20 @@ If you already have a React, Next.js, or Vite app, start here:
 That's it. Your agent now has **6 read-only tools** to discover app capabilities, inspect elements, filter by risk/role/entity, read permissions and workflows, and understand semantic action contracts.
 
 → [Full MCP setup guide](./docs/mcp-server.md)
+
+### Add governed WebMCP browser tools
+
+AIC uses WebMCP as the native browser execution layer while adding authored action readiness, validation, authorization, confirmation, entity scope, completion verification, recovery, and audit behavior.
+
+```bash
+pnpm add @aicorg/webmcp@workspace:*
+pnpm add -D webmcp-types@0.1.5
+pnpm aic scan ./src --webmcp
+```
+
+`@aicorg/webmcp` is source-ready for the next alpha wave; use the workspace package until that npm release is published.
+
+→ [WebMCP with AIC](./docs/webmcp.md)
 
 ### Instrument your React/Next/Vite app
 
@@ -154,6 +170,7 @@ const { attributes } = useAICElement({
 |---------|-------------|
 | 🏗️ `@aicorg/spec` | JSON schemas & manifest shapes — the contract |
 | 🧠 `@aicorg/runtime` | In-browser registry, live manifest serialization |
+| 🌉 `@aicorg/webmcp` | Fail-closed WebMCP adapter + React lifecycle helper |
 | ⚛️ `@aicorg/sdk-react` | React hooks & components for `agent*` props |
 | ⚙️ `@aicorg/cli` | `scan`, `generate`, `init`, `doctor`, `diff`, `apply` |
 | 🔌 `@aicorg/plugin-next` | Next.js artifact generation |
@@ -176,10 +193,12 @@ const { attributes } = useAICElement({
 | I want to… | Go here |
 |------------|---------|
 | 🧩 Adopt AIC in an existing app | [Adopt AIC In An Existing App](./docs/adopt-existing-app.md) |
+| 🧪 Sell a QA-agent readiness pilot | [QA Agent Readiness](./docs/qa-agent-readiness.md) |
 | 🔐 Add Auth0 to an agent-enabled app | [Auth0 For AI Agents With AIC](./docs/auth0-ai-agents.md) |
 | 🚀 Try AIC in 15 minutes | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
 | 🚀 Try AIC in 15 minutes with Vite | [Vite CRM Example](./examples/react-basic) |
 | 🤖 Connect Claude Desktop or Cursor | [MCP Server Setup](./docs/mcp-server.md) |
+| 🌉 Add or harden WebMCP tools | [WebMCP With AIC](./docs/webmcp.md) |
 | ⚛️ Instrument a React/Next.js app | [Next.js Checkout Example](./examples/nextjs-checkout-demo) |
 | ⚡ Instrument a Vite/React app | [Vite CRM Example](./examples/react-basic) |
 | 📊 Read case studies and benchmark proof | [AIC Case Studies](./docs/case-studies.md) |
@@ -329,6 +348,7 @@ Imagine hiring a new employee to use your software. Without documentation, they'
 | [manifest-spec.md](./docs/manifest-spec.md) | Full manifest shape reference |
 | [sdk-api.md](./docs/sdk-api.md) | React SDK hooks and props |
 | [mcp-server.md](./docs/mcp-server.md) | MCP server setup and tool reference |
+| [webmcp.md](./docs/webmcp.md) | WebMCP compatibility, safe registration, CLI readiness, and services |
 | [release-status.md](./docs/release-status.md) | What is ready to evaluate right now |
 | [release-checklist.md](./docs/release-checklist.md) | Verification and release gates |
 | [coding-agents.md](./docs/coding-agents.md) | Agent onboarding templates |
@@ -378,6 +398,7 @@ AIC is in **alpha**. Here's what isn't ready yet:
 - ❌ Stable npm GA — still `alpha` tagged; breaking changes are possible
 - ⚠️ Live Playwright capture depends on local browser/sandbox environment
 - ⚠️ Extraction is deterministic only — string literals, template literals, same-file const chains. Dynamic JSX expressions produce diagnostics, not guesses.
+- ⚠️ WebMCP support is pinned to an experimental draft and feature-detected; generated or inferred AIC actions are never exposed automatically.
 
 ---
 

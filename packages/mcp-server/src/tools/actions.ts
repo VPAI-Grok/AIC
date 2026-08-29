@@ -14,7 +14,8 @@ export const actionsToolDescription =
   "Semantic actions are app-level operations (like 'submit_order' or 'archive_customer') " +
   "with structured contracts including preconditions, postconditions, side effects, " +
   "failure modes, undo capabilities, idempotency guarantees, batch configuration, " +
-  "estimated latency, completion signals, and dry-run support. " +
+  "estimated latency, completion signals, execution readiness, and dry-run support. " +
+  "Review-required actions are descriptive contracts and must not be treated as executable authority. " +
   "These are safer abstractions than replaying raw UI clicks. " +
   "Optionally filter to a single action by name.";
 
@@ -84,6 +85,11 @@ export async function handleActions(args: {
       undo_action: a.undo_action ?? null,
       undo_window_seconds: a.undo_window_seconds ?? null,
       estimated_latency_ms: a.estimated_latency_ms,
+      execution_readiness: a.execution_readiness ?? {
+        status: "review_required",
+        source: "inferred",
+        blockers: ["Legacy action contract has no explicit execution-readiness declaration."]
+      },
       completion_signal: a.completion_signal,
       supports_dry_run: a.supports_dry_run ?? false,
       dry_run_action: a.dry_run_action ?? null,

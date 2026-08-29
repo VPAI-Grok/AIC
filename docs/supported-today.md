@@ -12,6 +12,10 @@ This project currently targets **owned React/Next/Vite apps** where the team can
 - CLI-only repo mutation through guarded authoring-plan apply
 - bootstrap review bundles from saved captures with authoring-plan handoff and human-reviewed outputs
 - coding-agent onboarding through `AGENTS.md`-style templates, `aic init`, and `aic doctor`
+- experimental WebMCP support pinned to the `2026-08-26` draft through `@aicorg/webmcp`
+- fail-closed imperative registration for explicitly authored execution-ready AIC action contracts
+- declarative WebMCP React props with risky auto-submit suppression
+- `aic scan --webmcp`, `aic doctor --webmcp`, and WebMCP implementation-plan generation
 
 ## Not Guaranteed Yet
 
@@ -20,6 +24,8 @@ This project currently targets **owned React/Next/Vite apps** where the team can
 - heuristic or ambiguous repo mutation
 - full production coverage for non-React ecosystems
 - claims that agents can reliably operate an app without the app team owning the contract quality
+- automatic conversion of inferred elements or generated review-only actions into executable WebMCP tools
+- stable WebMCP browser coverage while the proposal and implementations remain experimental
 
 ## How To Read Current Claims
 

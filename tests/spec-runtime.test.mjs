@@ -97,6 +97,65 @@ test("validateRuntimeUiManifest warns when row-scoped actions omit entity identi
   );
 });
 
+test("semantic action validation distinguishes review-only generation from execution-ready contracts", () => {
+  const reviewOnly = spec.validateSemanticActionsManifest({
+    actions: [
+      {
+        completion_signal: { type: "custom", value: "review_required" },
+        estimated_latency_ms: 0,
+        execution_readiness: {
+          blockers: ["author behavior"],
+          source: "inferred",
+          status: "review_required"
+        },
+        failure_modes: ["review_required"],
+        idempotent: false,
+        name: "customer.archive",
+        postconditions: [],
+        preconditions: [],
+        side_effects: [],
+        target: "customer.archive",
+        title: "Archive customer",
+        undoable: false
+      }
+    ],
+    generated_at: "2026-08-28T00:00:00.000Z",
+    spec: spec.SPEC_VERSION
+  });
+  const unsafeReady = spec.validateSemanticActionsManifest({
+    actions: [
+      {
+        completion_signal: { type: "custom", value: "review_required" },
+        estimated_latency_ms: 0,
+        execution_readiness: {
+          source: "inferred",
+          status: "execution_ready"
+        },
+        failure_modes: ["unknown_failure"],
+        idempotent: false,
+        name: "customer.archive",
+        postconditions: [],
+        preconditions: [],
+        side_effects: ["customer.status=archived"],
+        target: "customer.archive",
+        title: "Archive customer",
+        undoable: false
+      }
+    ],
+    generated_at: "2026-08-28T00:00:00.000Z",
+    spec: spec.SPEC_VERSION
+  });
+
+  assert.equal(reviewOnly.ok, true);
+  assert.equal(unsafeReady.ok, false);
+  assert.ok(
+    unsafeReady.issues.some((issue) => issue.rule === "action_contract.execution_ready_authored")
+  );
+  assert.ok(
+    unsafeReady.issues.some((issue) => issue.rule === "action_contract.execution_ready_completion")
+  );
+});
+
 test("validateDiscoveryManifest enforces endpoint and capability consistency", () => {
   const manifest = {
     spec: spec.SPEC_VERSION,

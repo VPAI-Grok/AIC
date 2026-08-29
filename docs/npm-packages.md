@@ -26,6 +26,10 @@ The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 - `examples/*`
   Stay private as demos, proof surfaces, and test fixtures.
 
+## Next Alpha Wave
+
+`@aicorg/webmcp` is source-ready and covered by the package/build/contract tests, but it is not claimed as published until the next npm alpha release completes.
+
 ## Install Targets
 
 ### Most Common: Existing App Adoption
@@ -48,6 +52,19 @@ pnpm add @aicorg/plugin-vite @aicorg/plugin-next
 ```bash
 pnpm add @aicorg/spec @aicorg/runtime @aicorg/sdk-react
 ```
+
+### WebMCP Browser Tools
+
+```bash
+# Inside this monorepo
+pnpm add @aicorg/webmcp@workspace:*
+
+# After the next npm alpha release
+pnpm add @aicorg/webmcp@alpha
+pnpm add -D webmcp-types@0.1.5
+```
+
+Use this only for explicit task-level tools. Generated and inferred AIC contracts remain review-only and cannot be registered by the adapter.
 
 ### CLI-Driven Onboarding And Artifact Generation
 

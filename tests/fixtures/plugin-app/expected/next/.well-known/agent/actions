@@ -12,13 +12,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "customer.actions.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     },
     {
@@ -30,13 +37,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "customer.actions.menu.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     },
     {
@@ -48,13 +62,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "customer.archive.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     },
     {
@@ -66,13 +87,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "customer.archive.dialog.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     },
     {
@@ -84,13 +112,20 @@
       "side_effects": [],
       "idempotent": false,
       "undoable": false,
-      "estimated_latency_ms": 1000,
+      "estimated_latency_ms": 0,
+      "execution_readiness": {
+        "blockers": [
+          "Author and review preconditions, postconditions, side effects, completion signals, and failure modes before executable exposure."
+        ],
+        "source": "inferred",
+        "status": "review_required"
+      },
       "completion_signal": {
-        "type": "state_change",
-        "value": "customer.view.completed = true"
+        "type": "custom",
+        "value": "review_required"
       },
       "failure_modes": [
-        "unknown_failure"
+        "review_required"
       ]
     }
   ]

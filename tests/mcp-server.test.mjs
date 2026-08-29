@@ -559,6 +559,7 @@ test("get_aic_actions filters by action_name", async (t) => {
   assert.equal(result.success, true);
   assert.equal(result.action_count, 1);
   assert.equal(result.actions[0].name, "submit_order");
+  assert.equal(result.actions[0].execution_readiness.status, "review_required");
 });
 
 // ── fetchManifest error shaping ────────────────────────────────────────

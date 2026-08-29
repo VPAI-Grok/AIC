@@ -1,4 +1,4 @@
-<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 1 -->
+<!-- AIC_AGENT_ONBOARDING_TEMPLATE_VERSION: 2 -->
 # AIC Agent Onboarding
 
 Use AIC when a repo owner wants a web app to be reliably operable by AI agents.
@@ -35,12 +35,25 @@ Use AIC when a repo owner wants a web app to be reliably operable by AI agents.
 - Do not treat DOM selectors or visible text as the primary contract.
 - Do not use bootstrap suggestions without review.
 
+## WebMCP Policy
+
+- Treat WebMCP as the browser-native execution layer and AIC as its safety, governance, verification, and recovery layer.
+- Use the current `document.modelContext` API and the compatibility baseline recorded in `docs/webmcp.md`.
+- Prefer `@aicorg/webmcp` for imperative tools and the explicit React WebMCP props for declarative forms.
+- Register task-level tools only from authored AIC action contracts marked `execution_ready`.
+- Reuse the same application/domain function for human UI and WebMCP execution.
+- Feature-detect WebMCP and preserve the human flow in unsupported browsers.
+- Classify WebMCP requests as Support, Enhance, or Prepare; do not build a competing protocol or generic polyfill inside AIC.
+- Never expose generated, inferred, AI-suggested, or placeholder action contracts as executable WebMCP tools.
+
 ## Verification
 
 - `aic scan <path>`
 - `aic generate project <config-file> --out-dir <dir>`
 - `aic inspect <dir>/report.json`
 - `aic validate <kind> <file>`
+- `aic scan <path> --webmcp`
+- `aic doctor <path> --webmcp`
 
 ## Done Criteria
 

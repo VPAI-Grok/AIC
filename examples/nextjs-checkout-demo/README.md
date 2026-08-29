@@ -8,6 +8,8 @@ This example proves that an AI agent using the standard MCP protocol can autonom
 
 Here is the repo's canonical Next.js AIC starter. It demonstrates generated manifests, MCP discovery, and a critical-action contract with structured confirmation.
 
+It also contains the canonical AIC-governed WebMCP example. `get_checkout_summary` proves read-only browser execution, while the critical `complete_checkout` tool and the human Submit order button call the same domain function. The critical tool adds strict input validation, order-entity authorization, human confirmation, completion verification, runtime events, and automatic lifecycle cleanup.
+
 If you are adopting AIC into an existing app instead of exploring this starter, use [Adopt AIC In An Existing App](/mnt/c/users/vatsa/agentinteractioncontrol/docs/adopt-existing-app.md).
 
 ## Getting Started
@@ -25,6 +27,7 @@ If you are adopting AIC into an existing app instead of exploring this starter, 
 3. Audit the example:
    ```bash
    pnpm run aic:doctor
+   pnpm run aic:webmcp
    ```
 
 4. Start the Next.js development server:
@@ -33,6 +36,14 @@ If you are adopting AIC into an existing app instead of exploring this starter, 
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+In a browser without `document.modelContext`, the page reports WebMCP as `unsupported` and the human checkout remains fully usable. In an enabled browser, it reports `registered` after the guarded tool is installed.
+
+Generate a reviewable WebMCP implementation plan with:
+
+```bash
+pnpm run aic:webmcp-plan
+```
 
 ## Simulating MCP Tool Usage
 
