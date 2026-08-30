@@ -35,6 +35,32 @@
       }
     },
     {
+      "id": "canonical-prototype-named-properties",
+      "operation": "canonicalize",
+      "input": {
+        "value": {
+          "constructor": { "name": "safe" },
+          "__proto__": { "approved": true }
+        }
+      },
+      "expected": {
+        "canonical_json": "{\"__proto__\":{\"approved\":true},\"constructor\":{\"name\":\"safe\"}}"
+      }
+    },
+    {
+      "id": "digest-prototype-named-property-value",
+      "operation": "digest",
+      "input": {
+        "value": {
+          "constructor": { "name": "safe" },
+          "__proto__": { "approved": false }
+        }
+      },
+      "expected": {
+        "digest": "sha256:ba4c134d417f00060b65dde2a84f80345245fac0325301ee5ac3c2493c08099b"
+      }
+    },
+    {
       "id": "valid-origin-revision-contract-proof-binding",
       "operation": "verify_attestation",
       "input": {

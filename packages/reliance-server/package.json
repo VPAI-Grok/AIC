@@ -1,0 +1,46 @@
+{
+  "name": "@aicorg/reliance-server",
+  "version": "0.1.0-alpha.1",
+  "type": "module",
+  "description": "Mirrorable, read-only discovery and local reliance evaluation service for AIC assurance artifacts.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/AIC.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/AIC",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/AIC/issues"
+  },
+  "keywords": [
+    "aic",
+    "agents",
+    "assurance",
+    "reliance",
+    "resolver",
+    "serverless"
+  ],
+  "main": "./dist/reliance-server/src/index.js",
+  "types": "./dist/reliance-server/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/reliance-server/src/index.d.ts",
+      "import": "./dist/reliance-server/src/index.js",
+      "default": "./dist/reliance-server/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aicorg/spec": "workspace:*",
+    "@aicorg/verify-core": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

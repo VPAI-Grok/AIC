@@ -8,4 +8,7 @@ export * from "./transparency.js";
 export * from "./key-transition.js";
 export * from "./conformance.js";
 export * from "./evidence.js";
+export * from "./reliance.js";
+export * from "./strict-json.js";
+export * from "./date-time.js";
 export * from "./validate.js";

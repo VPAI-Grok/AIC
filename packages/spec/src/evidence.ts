@@ -12,6 +12,7 @@ import type {
   JsonValue,
   ValidationResult
 } from "./types.js";
+import { isAICRfc3339DateTime as isIsoDateTime } from "./date-time.js";
 
 export const AIC_EVIDENCE_SPEC = "aic.evidence/0.1";
 export const AIC_REMOTE_SPEC = "aic.remote/0.1";
@@ -271,14 +272,6 @@ function isJsonValue(value: unknown): value is JsonValue {
   }
   if (Array.isArray(value)) return value.every((item) => isJsonValue(item));
   return isRecord(value) && Object.values(value).every((item) => isJsonValue(item));
-}
-
-function isIsoDateTime(value: unknown): value is string {
-  return (
-    isNonEmptyString(value) &&
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) &&
-    !Number.isNaN(Date.parse(value))
-  );
 }
 
 function isDigest(value: unknown): value is string {

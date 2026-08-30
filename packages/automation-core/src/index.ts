@@ -332,6 +332,7 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 7. Run \`aic verify\` before claiming behavioral parity.
 8. Use rendered/native evidence and a deployment-bound signed claim before asking other systems to rely on the proof.
 9. Bind consequential operations to an open conformance pack and enforce the applicable assurance policy in CI.
+10. Immediately before consequential execution, produce a fresh canonical reliance decision from the consumer's own policy, pinned trust stores, trusted clock, and exact target bindings. Proceed only on \`allow\`.
 
 ## Rules
 
@@ -348,6 +349,9 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 - remote mutation evidence requires separate operator capability and exact canary scope
 - transparency indexes are locally signed append-only evidence, not automatic global transparency
 - key transitions must be verified against the pinned prior trust store before application
+- reliance decisions are short-lived and exact-request-bound; recompute locally when practical and reject stale, future, expired, or mismatched decisions
+- resolver and registry records are untrusted discovery, not universal trust roots
+- consumer policy, trust stores, identity pins, trusted current time, and final disposition belong to the relying party
 - generated JSON stays generated
 
 ## WebMCP Rules
@@ -372,8 +376,20 @@ Use AIC when this repo needs reliable interaction semantics and behavioral assur
 - \`aic registry verify <registry-file> --trust-store <file>\`
 - \`aic conformance verify <pack-id-or-file> <binding> <contract> --proof <proof-file>\`
 - \`aic policy evaluate <policy> <contract> <proof> --observations <file>\`
+- \`aic rely evaluate <policy> <contract> <proof> --observations <file> --attestation <file> --trust-store <file> --origin <origin> --operation-id <id> --deployment-id <id> --expect-revision <revision> --environment <environment>\`
 - \`aic interop verify <suite>\`
 - \`aic evidence verify <bundle> --runner-public-key <file> --runner-key-id <id>\`
+
+## Reliance Rules
+
+- use \`@aicorg/rely\` or \`aic rely evaluate\` immediately before WebMCP, MCP, HTTP, browser, or release execution
+- require valid artifacts, exact bindings, a trusted signed attestation, regenerated proof, and every matching fail-closed policy rule before \`allow\`
+- route \`confirm\` to a real confirmation flow; stop on \`deny\` or \`indeterminate\`
+- use the caller's trusted current clock and a short replay window; do not trust an artifact-supplied timestamp for production preflight
+- keep protocol-native authorization and application idempotency; a time-bounded decision is not a single-use nonce
+- when policy requires transparency, verify the signed index with a separately pinned log trust store and exact attestation inclusion
+- external receipt references remain unchecked until a provider-specific verifier succeeds
+- mirror resolver snapshots freely, but reproduce the decision with consumer-owned trust and policy
 `,
     kind: "canonical",
     path: "AGENTS.md",

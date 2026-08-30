@@ -25,7 +25,8 @@ Use AIC when a repo owner wants a web app to be reliably operable by AI agents.
 9. For a covered consequential operation, select a versioned conformance pack, author and review its application mapping, and verify the digest-bound binding.
 10. For evidence others will rely on, use the appropriate browser, HTTP/OpenAPI, or MCP adapter. If collection is remote, use a data-only job, exact deployment identity, and explicit mutation grants.
 11. Regenerate the proof from the collected observations and verify the applicable conformance binding.
-12. Bind a passed proof to the exact origin/deployment/revision, sign it, verify it with a separately pinned trust store, and apply every matching assurance-policy rule before relying on the result.
+12. Bind a passed proof to the exact origin/deployment/revision, sign it, and verify it with a separately pinned trust store.
+13. Immediately before a consequential operation, use the relying party's own fail-closed policy and trusted current clock to produce a canonical reliance decision for that exact target. Proceed only on `allow`.
 
 ## Required AIC Habits
 
@@ -41,6 +42,7 @@ Use AIC when a repo owner wants a web app to be reliably operable by AI agents.
 - Treat conformance mappings as reviewed application assertions, not generated semantic truth.
 - Treat assurance policy as cumulative and fail closed when no rule matches.
 - Pin issuer IDs, key IDs, runner IDs, origins, and revisions whenever the relying party needs those identities rather than a self-declared provenance label.
+- Treat a reliance decision as short-lived and request-bound. Recompute locally when practical; otherwise authenticate its producer and enforce replay, expiry, and exact-binding checks.
 
 ## Do Not
 
@@ -54,6 +56,8 @@ Use AIC when a repo owner wants a web app to be reliably operable by AI agents.
 - Do not treat the open remote-runner software as evidence that a separate operator ran it.
 - Do not treat an external transparency receipt reference as verified unless its provider-specific verifier has checked it.
 - Do not use scheduled key rotation as an automated response to a suspected key compromise.
+- Do not treat a resolver record, registry entry, schema-valid decision, or AIC-operated service as an implicit trust root.
+- Do not treat `confirm` as `allow`; route it to a real confirmation flow. Stop execution on `deny` or `indeterminate`.
 
 ## WebMCP Policy
 
@@ -89,6 +93,17 @@ Use AIC when a repo owner wants a web app to be reliably operable by AI agents.
 - Treat the signed linear transparency index as an offline/reference history format, not a global public transparency protocol. External receipt references are hash-bound metadata and remain `not_checked` until a provider verifier validates them.
 - Rotate keys only through a dual-signed transition that binds the prior and next trust stores, retains the retiring key through `valid_until`, and does not broaden origin scope. Use revocation and an out-of-band recovery process for suspected compromise.
 
+## Trust Fabric Reliance Policy
+
+- Prefer `@aicorg/rely` or `aic rely evaluate` as the protocol-neutral preflight immediately before WebMCP, MCP, HTTP, browser, or release execution.
+- Make the relying party own the assurance policy, issuer/runner/log pins, trust stores, exact target bindings, trusted current clock, and final disposition.
+- Require exact origin, stable `operation_id`, deployment ID, full source revision, environment, issuer ID, key ID, and runner ID for consequential production use.
+- Let `allow` pass only after valid artifacts, exact bindings, trusted signed attestation, regenerated proof, and every matching fail-closed policy rule pass.
+- Use `assertAICRelianceAllowed` for untrusted portable decisions with the complete consumer-owned evaluation input. Require exact local reproduction of the canonical result, then enforce the exclusive `valid_until`, a shorter replay window where needed, future-skew bound, and current attestation expiry.
+- If policy requires transparency, supply the signed index and a separately pinned transparency trust store and restrict allowed log/key identities. External receipt references remain `not_checked` until their provider verifier succeeds.
+- Treat `@aicorg/reliance-server` and other registries as untrusted, read-only discovery. Prefer portable snapshots and local reproduction of the decision.
+- In GitHub enforcement, pin `actions/aic-rely` to a full commit SHA, protect the consumer policy and trust-store digests, and do not use `continue-on-error`.
+
 ## Verification
 
 - `aic scan <path>`
@@ -106,6 +121,7 @@ Use AIC when a repo owner wants a web app to be reliably operable by AI agents.
 - `aic evidence run-remote <job> --runner-id <id> --runner-revision <sha> --out-file <file>`
 - `aic evidence verify <bundle> --runner-public-key <file> --runner-key-id <sha256:id> --out-file <file>`
 - `aic policy evaluate <policy> <contract> <proof> --observations <file> --out-file <file>`
+- `aic rely evaluate <policy> <contract> <proof> --observations <file> --attestation <file> --trust-store <file> --origin <origin> --operation-id <id> --deployment-id <id> --expect-revision <revision> --environment <environment> --out-file <file>`
 - `aic interop verify <suite> --out-file <file>`
 - `aic trust verify <attestation-file> --trust-store <trust-store-file> --contract <contract-file> --proof <proof-file> --expect-origin <origin> --expect-revision <revision>`
 - `aic transparency verify <index-file> --trust-store <trust-store-file>`
@@ -127,3 +143,4 @@ Use AIC when a repo owner wants a web app to be reliably operable by AI agents.
 - Every applicable assurance-policy rule passes; unmatched evaluations fail.
 - Any externally relied-on signed claim verifies against a pinned issuer key and the expected origin, deployment context, source revision, contract, and proof.
 - Transparency and scheduled rotation artifacts are verified when the relying policy requires them, without overstating unverified external receipts or operator independence.
+- Every covered consequential execution is guarded by a fresh canonical reliance decision for the exact target, owned by the consumer, and only `allow` can proceed.

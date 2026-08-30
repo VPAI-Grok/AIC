@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { sign } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import test from "node:test";
@@ -11,6 +12,7 @@ import {
   runCli,
   writeJsonFile
 } from "./helpers.mjs";
+import { createForeignSigningKey } from "./crypto-fixtures.mjs";
 
 const spec = await importWorkspaceModule("packages/spec/dist/index.js");
 const automation = await importWorkspaceModule(
@@ -73,6 +75,69 @@ test("AIC signs a passed proof and verifies every supplied binding", () => {
   assert.equal(result.assurance_class, "local_signed_claim");
   assert.deepEqual(result.findings, []);
   assert.ok(Object.values(result.checks).every((check) => check === "passed"));
+});
+
+test("proof binding rejects signed subject metadata that contradicts the exact proof", () => {
+  const { attestation, keys } = createFixture();
+
+  for (const mutate of [
+    (statement) => {
+      statement.subject.generated_at = "2026-08-28T00:00:01.000Z";
+    },
+    (statement) => {
+      statement.subject.evidence_level = "imported";
+    }
+  ]) {
+    const statement = structuredClone(attestation.statement);
+    mutate(statement);
+    const contradictory = automation.signAICTrustStatement({
+      privateKeyPem: keys.private_key_pem,
+      statement
+    });
+    const result = automation.verifyAICSignedAttestation({
+      attestation: contradictory,
+      proof,
+      trustStore: keys.trust_store,
+      verifiedAt: ISSUED_AT
+    });
+    assert.equal(result.status, "untrusted");
+    assert.equal(result.checks.proof_binding, "failed");
+    assert.ok(
+      result.findings.some((finding) => finding.code === "proof_binding_mismatch")
+    );
+  }
+});
+
+test("attestation verification rejects RSA and P-256 keys mislabeled as Ed25519", () => {
+  const { attestation, keys } = createFixture();
+
+  for (const kind of ["rsa", "ec"]) {
+    const foreign = createForeignSigningKey(kind);
+    const forged = structuredClone(attestation);
+    forged.signature.key_id = foreign.key_id;
+    forged.signature.value = sign(
+      null,
+      Buffer.from(automation.createAICCanonicalJson(forged.statement)),
+      foreign.private_key
+    ).toString("base64");
+    const trustStore = structuredClone(keys.trust_store);
+    trustStore.keys[0].key_id = foreign.key_id;
+    trustStore.keys[0].public_key_pem = foreign.public_key_pem;
+
+    const result = automation.verifyAICSignedAttestation({
+      attestation: forged,
+      proof,
+      trustStore,
+      verifiedAt: ISSUED_AT
+    });
+    assert.equal(result.status, "untrusted", kind);
+    assert.equal(result.checks.issuer_trust, "failed", kind);
+    assert.equal(result.checks.signature, "failed", kind);
+    assert.ok(
+      result.findings.some((finding) => finding.code === "key_type_mismatch"),
+      kind
+    );
+  }
 });
 
 test("independent runner revision is bound separately from the deployed app revision", () => {

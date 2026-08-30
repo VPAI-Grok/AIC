@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/reliance-record.schema.json",
+  "$comment": "Structural interchange screening only. Canonical origins, inline digest equality, recognized artifact validity, and record binding are enforced by validateAICRelianceRecord with an AIC canonical digest implementation. Schema acceptance never establishes trust or permission to execute.",
+  "title": "AIC Reliance Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "spec", "id", "indexed_at", "binding", "artifacts"],
+  "properties": {
+    "artifact_type": { "const": "aic_reliance_record" },
+    "spec": { "const": "aic.reliance-record/0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "indexed_at": { "type": "string", "format": "date-time" },
+    "binding": { "$ref": "#/$defs/binding" },
+    "artifacts": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+      "additionalProperties": { "$ref": "#/$defs/locator" }
+    }
+  },
+  "$defs": {
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "operation_id", "deployment_id", "source_revision"],
+      "properties": {
+        "origin": {
+          "type": "string",
+          "pattern": "^https?://(?:[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?|\\[[0-9a-f:.]+\\])(?::[1-9][0-9]{0,4})?$"
+        },
+        "operation_id": { "type": "string", "minLength": 1 },
+        "deployment_id": { "type": "string", "minLength": 1 },
+        "source_revision": { "type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$" }
+      }
+    },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest"],
+      "anyOf": [
+        { "required": ["inline"] },
+        { "required": ["uri"] }
+      ],
+      "properties": {
+        "digest": { "$ref": "#/$defs/digest" },
+        "inline": {
+          "$comment": "Runtime validation recomputes digest from AIC canonical JSON and validates recognized typed artifacts.",
+          "type": ["array", "boolean", "null", "number", "object", "string"]
+        },
+        "media_type": { "type": "string", "minLength": 1 },
+        "uri": {
+          "type": "string",
+          "pattern": "^(?:\\./|\\.\\./|/|https?://|ipfs:|urn:).+"
+        }
+      }
+    }
+  }
+}

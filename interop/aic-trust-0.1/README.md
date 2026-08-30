@@ -6,4 +6,4 @@ These fixtures freeze the canonical JSON bytes, SHA-256 digests, Ed25519 key ID,
 
 Implementations should compare stable statuses, check states, finding codes, canonical bytes, and digests. Human-readable finding messages are not compatibility guarantees.
 
-The canonicalization profile is recursive UTF-16 key ordering followed by ECMAScript `JSON.stringify` and UTF-8 encoding. It performs no Unicode normalization. The vectors deliberately cover nested ordering, Unicode, escapes, and negative zero.
+The canonicalization profile is recursive UTF-16 key ordering followed by ECMAScript `JSON.stringify` and UTF-8 encoding. It performs no Unicode normalization. The vectors deliberately cover nested ordering, Unicode, escapes, negative zero, and own properties named `__proto__` or `constructor`; implementations must preserve those properties without prototype mutation or digest collisions.

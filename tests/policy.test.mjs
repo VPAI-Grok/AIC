@@ -158,3 +158,37 @@ test("checked-in critical policy validates", async () => {
   const value = await readJsonFile(resolveFromRepo("policies/critical-assurance.json"));
   assert.equal(spec.validateAICAssurancePolicy(value).ok, true);
 });
+
+test("required transparency policy includes an explicit rollback defense", () => {
+  const unsafe = policy({ transparency: { required: true } });
+  const invalid = spec.validateAICAssurancePolicy(unsafe);
+  assert.equal(invalid.ok, false);
+  assert.ok(
+    invalid.issues.some(
+      (issue) => issue.rule === "policy.transparency_rollback_defense"
+    )
+  );
+  unsafe.rules[0].require.transparency.maximum_checkpoint_age_seconds = 300;
+  assert.equal(spec.validateAICAssurancePolicy(unsafe).ok, true);
+
+  const zeroMinimum = policy({
+    transparency: { maximum_checkpoint_age_seconds: 300, minimum_size: 0, required: true }
+  });
+  const zeroMinimumResult = spec.validateAICAssurancePolicy(zeroMinimum);
+  assert.equal(zeroMinimumResult.ok, false);
+  assert.ok(
+    zeroMinimumResult.issues.some(
+      (issue) =>
+        issue.path.endsWith(".minimum_size") && issue.rule === "policy.positive_integer"
+    )
+  );
+
+  const sizeOnly = policy({ transparency: { minimum_size: 42, required: true } });
+  const sizeOnlyResult = spec.validateAICAssurancePolicy(sizeOnly);
+  assert.equal(sizeOnlyResult.ok, false);
+  assert.ok(
+    sizeOnlyResult.issues.some(
+      (issue) => issue.rule === "policy.transparency_rollback_defense"
+    )
+  );
+});

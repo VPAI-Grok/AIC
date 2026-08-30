@@ -10,6 +10,7 @@
 - `pnpm smoke:adoption`
 - `pnpm smoke:mcp`
 - `pnpm smoke:mcp:stdio`
+- `npm --prefix actions/aic-rely run check:bundle`
 
 ## Behavior-assurance gates
 
@@ -52,6 +53,22 @@
 - Rotation is documented as scheduled maintenance, not automated compromise recovery; revocation and out-of-band recovery remain separate operations.
 - The public adopter registry stays empty unless a genuine external submission passes the documented evidence-first checks.
 
+## Trust Fabric gates
+
+- The reliance JSON Schemas screen structural interchange shape and clearly state that acceptance is not permission; normative runtime validators additionally reject digest, equality, binding, ordering, expiry, and other semantic contradictions that JSON Schema cannot express.
+- Canonical JSON and digest regression vectors distinguish dangerous property names such as `__proto__` and `constructor` instead of dropping or aliasing them.
+- `@aicorg/rely` performs no implicit network, resolver, registry, filesystem, or environment discovery.
+- An `allow` requires valid supplied artifacts, exact origin/operation/deployment/revision bindings, trusted non-expired and non-revoked attestation, regenerated proof, at least one passed matching rule, and every applicable policy rule to pass.
+- Missing or malformed artifacts yield `indeterminate` by default; valid but stale, wrongly bound, untrusted, revoked, expired, unmatched, or policy-failing inputs do not become `allow`.
+- Disposition settings can route results to `confirm` but cannot upgrade a failed or indeterminate result to `allow`.
+- `assertAICRelianceAllowed` snapshots the complete consumer-owned input before the raw decision, returns a detached locally reproduced decision, and samples trusted time after reproduction. It rejects schema-invalid, stateful, or fabricated decisions, non-`allow` verdicts, insufficient residual validity, decisions outside the caller-trusted replay/future-skew window, decisions at their exclusive policy-derived `valid_until`, attestations expired since evaluation, and every input or request mismatch.
+- Production preflight and the GitHub action use a trusted current clock. Any reproducible timestamp override remains a test/debug facility and is not exposed by the enforcement action.
+- When any matching policy rule requires transparency, the signed reference index, separately pinned log trust store, allowed log/key identities, and exact attestation inclusion all verify. External receipt references remain `not_checked` without a provider-specific verifier.
+- `aic rely evaluate` writes a canonical decision and returns zero only for `allow`; CLI and schema tests validate generated decisions against the public contract.
+- The bundled action is reproducible, has no runtime package imports or verifier download, rejects symlinked/out-of-workspace/unbounded inputs and unsafe output paths, pins consumer policy and trust-store bytes plus expected identities, requires bounded residual `valid_until` lifetime before publishing `allowed=true`, clears the deadline on failure, and fails the job for `confirm`, `deny`, `indeterminate`, or malformed output.
+- The reference resolver remains read-only, never fetches artifact locators or executes publisher content, labels discovery untrusted, returns non-cacheable evaluations/errors, requires a limiter when evaluation is enabled, and exports a portable snapshot another operator can mirror.
+- Resolver-produced decisions never bypass local canonical validation, exact response/request binding checks, trusted-current-clock/replay checks, or consumer trust policy.
+
 ## Clean-workspace gate
 
 - verification creates no unexpected tracked diffs;
@@ -70,17 +87,21 @@
 
 - license, contribution, security, conduct, changelog, and service files are current;
 - root and example READMEs show the current behavior-assurance workflow;
+- Trust Fabric, architecture, supported-boundary, threat-model, package, service, and onboarding docs match the canonical SDK/CLI/action/resolver behavior;
 - CI, MCP stdio, and behavior-assurance workflows are enabled; and
 - package descriptions and changesets match the release contents.
 
 ## npm alpha gates
 
+- the external [`npm-alpha` protected environment and per-package npm Trusted Publisher bindings](./npm-trusted-publishing.md) are configured before dispatch;
+- the protected publish job receives only the exact immutable artifact from the no-OIDC verification job, uses npm 11.5.1 or newer, and has no checkout, dependency install, repository-script execution, or static npm token;
 - package manifests remain public and include publish metadata;
 - tarball smoke tests pass;
 - package matrix docs match the exact publish wave;
-- `@aicorg/webmcp`, the evidence packages, `@aicorg/runner-remote`, `@aicorg/conformance-packs`, and the extended behavior/trust tooling are not called published before registry verification; and
-- the manual publish workflow completes its configured checks before publishing.
+- `@aicorg/webmcp`, the evidence packages, `@aicorg/runner-remote`, `@aicorg/conformance-packs`, `@aicorg/verify-core`, `@aicorg/rely`, `@aicorg/reliance-server`, `aic rely evaluate`, and the extended behavior/trust tooling are not called published before registry verification; and
+- every publish-workflow action remains pinned to its reviewed full commit SHA; and
+- the manual publish workflow completes its configured checks before publishing verified tarballs with provenance and lifecycle scripts disabled.
 
 ## Not a release claim
 
-Passing these gates does not provide GA stability, non-React support, an external adopter, an independently operated hosted runner, independent proof of production reachability, a globally witnessed transparency service, provider verification of external receipt metadata, or independent certification.
+Passing these gates does not provide GA stability, non-React support, an external adopter or enforcing agent consumer, an independently operated hosted runner, independent proof of production reachability, a public hosted resolver or independent mirror, durable public history, a globally witnessed transparency service, provider verification of external receipt metadata, or independent certification.

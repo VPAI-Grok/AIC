@@ -6,6 +6,7 @@ import type {
   JsonValue,
   ValidationResult
 } from "./types.js";
+import { isAICRfc3339DateTime as isIsoDateTime } from "./date-time.js";
 
 export const AIC_BEHAVIOR_SPEC = "aic.behavior/0.1";
 export const AIC_BEHAVIOR_PROOF_VERSION = "0.1";
@@ -214,10 +215,6 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => isNonEmptyString(item));
-}
-
-function isIsoDateTime(value: unknown): value is string {
-  return isNonEmptyString(value) && !Number.isNaN(Date.parse(value));
 }
 
 function findDuplicateStrings(values: string[]): string[] {

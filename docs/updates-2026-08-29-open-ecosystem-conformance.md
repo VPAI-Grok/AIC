@@ -27,7 +27,7 @@ Repository code cannot create independent adoption or independent operation by i
 - the reference transparency index is not a global public log or a replacement for standardized transparency services; and
 - no hosted history service, dashboard, or certification program is claimed.
 
-Those are the next market and operations gates. The [adopter submission process](./adopter-submission.md) defines how evidence can enter the ecosystem without lowering the trust boundary.
+Those were the external gates identified at the Open Ecosystem Conformance milestone. The repository has since added the [Trust Fabric](./trust-fabric.md): a canonical consumer preflight, bundled enforcement action, and mirrorable resolver format. Real adopters and runner operators still matter, and completion now also requires external enforcing agent/gateway consumers, an independent verifier, a public resolver plus independent mirror with durable history, and provider-verified transparency receipts. The [adopter submission process](./adopter-submission.md) defines how evidence can enter the ecosystem without lowering the trust boundary.
 
 ## Why this survives protocol evolution
 

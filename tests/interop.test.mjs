@@ -10,7 +10,7 @@ test("public trust fixtures freeze canonical JSON, digests, signatures, and stab
   const suite = await automation.loadAICInteropSuite(manifestPath);
   const result = automation.verifyAICInteropSuite(suite);
   assert.equal(result.status, "passed");
-  assert.equal(result.passed, 4);
+  assert.equal(result.passed, 6);
   assert.equal(result.failed, 0);
 });
 

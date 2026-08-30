@@ -1,0 +1,65 @@
+{
+  "name": "@aicorg/verify-core",
+  "version": "0.1.0-alpha.1",
+  "type": "module",
+  "description": "Minimal deterministic cryptographic and policy verification primitives for AIC reliance gates.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VPAI-Grok/AIC.git"
+  },
+  "homepage": "https://github.com/VPAI-Grok/AIC",
+  "bugs": {
+    "url": "https://github.com/VPAI-Grok/AIC/issues"
+  },
+  "keywords": [
+    "aic",
+    "agents",
+    "assurance",
+    "policy",
+    "trust",
+    "verification"
+  ],
+  "main": "./dist/verify-core/src/index.js",
+  "types": "./dist/verify-core/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/verify-core/src/index.d.ts",
+      "import": "./dist/verify-core/src/index.js",
+      "default": "./dist/verify-core/src/index.js"
+    },
+    "./assurance": {
+      "types": "./dist/verify-core/src/assurance.d.ts",
+      "import": "./dist/verify-core/src/assurance.js",
+      "default": "./dist/verify-core/src/assurance.js"
+    },
+    "./policy": {
+      "types": "./dist/verify-core/src/policy.d.ts",
+      "import": "./dist/verify-core/src/policy.js",
+      "default": "./dist/verify-core/src/policy.js"
+    },
+    "./transparency": {
+      "types": "./dist/verify-core/src/transparency.d.ts",
+      "import": "./dist/verify-core/src/transparency.js",
+      "default": "./dist/verify-core/src/transparency.js"
+    },
+    "./trust": {
+      "types": "./dist/verify-core/src/trust.d.ts",
+      "import": "./dist/verify-core/src/trust.js",
+      "default": "./dist/verify-core/src/trust.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@aicorg/spec": "workspace:*"
+  }
+}

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
+import { sign } from "node:crypto";
 import test from "node:test";
 
+import { createForeignSigningKey } from "./crypto-fixtures.mjs";
 import { importWorkspaceModule, readJsonFile, resolveFromRepo } from "./helpers.mjs";
 
 const automation = await importWorkspaceModule("packages/automation-core/dist/automation-core/src/index.js");
@@ -77,12 +79,59 @@ test("consistency accepts an append-only prefix and detects valid split historie
   assert.equal(automation.verifyAICTransparencyIndex({ index: branchB, logTrustStore: value.log.trust_store, verifiedAt: LOGGED_AT }).status, "trusted");
 });
 
+test("consistency rejects a multi-entry extension with a regressed checkpoint time", () => {
+  const value = fixture();
+  const first = automation.appendAICTransparencyEntry({ artifact: value.attestation, expectedHead: null, expectedSize: 0, index: value.empty, kind: "attestation", loggedAt: "2026-08-29T17:40:00.000Z", logTrustStore: value.log.trust_store, privateKeyPem: value.log.private_key_pem });
+  const second = automation.appendAICTransparencyEntry({ artifact: value.attestation, expectedHead: first.entries[0].entry_digest, expectedSize: 1, index: first, kind: "attestation", loggedAt: "2026-08-29T17:41:00.000Z", logTrustStore: value.log.trust_store, privateKeyPem: value.log.private_key_pem });
+  const laterPrior = automation.createAICTransparencyIndex({ issuedAt: "2026-08-29T17:59:00.000Z", logId: "aic.reference.log", privateKeyPem: value.log.private_key_pem });
+
+  assert.equal(automation.verifyAICTransparencyIndex({ index: laterPrior, logTrustStore: value.log.trust_store, verifiedAt: LOGGED_AT }).status, "trusted");
+  assert.equal(automation.verifyAICTransparencyIndex({ index: second, logTrustStore: value.log.trust_store, verifiedAt: LOGGED_AT }).status, "trusted");
+  const consistency = automation.verifyAICTransparencyConsistency({ from: laterPrior, logTrustStore: value.log.trust_store, to: second, verifiedAt: LOGGED_AT });
+  assert.equal(consistency.status, "inconsistent");
+  assert.ok(consistency.findings.some((finding) => finding.code === "time_order_invalid"));
+});
+
 test("checkpoint signer must be separately pinned", () => {
   const value = fixture();
   const otherLog = automation.generateAICTrustKeyPair({ generatedAt: "2026-08-29T17:00:00.000Z", issuerId: "other.log" });
   const result = automation.verifyAICTransparencyIndex({ index: value.empty, logTrustStore: otherLog.trust_store, verifiedAt: LOGGED_AT });
   assert.equal(result.status, "untrusted");
   assert.ok(result.findings.some((finding) => finding.code === "checkpoint_signer_untrusted"));
+});
+
+test("checkpoint verification rejects RSA and P-256 keys mislabeled as Ed25519", () => {
+  const value = fixture();
+
+  for (const kind of ["rsa", "ec"]) {
+    const foreign = createForeignSigningKey(kind);
+    const index = structuredClone(value.empty);
+    index.checkpoint.signature.key_id = foreign.key_id;
+    index.checkpoint.signature.value = sign(
+      null,
+      Buffer.from(
+        `aic-transparency-checkpoint-v1\0${automation.createAICCanonicalJson(index.checkpoint.statement)}`,
+        "utf8"
+      ),
+      foreign.private_key
+    ).toString("base64");
+    const trustStore = structuredClone(value.log.trust_store);
+    trustStore.keys[0].key_id = foreign.key_id;
+    trustStore.keys[0].public_key_pem = foreign.public_key_pem;
+
+    const result = automation.verifyAICTransparencyIndex({
+      index,
+      logTrustStore: trustStore,
+      verifiedAt: LOGGED_AT
+    });
+    assert.equal(result.status, "untrusted", kind);
+    assert.ok(
+      result.findings.some(
+        (finding) => finding.code === "checkpoint_signer_untrusted"
+      ),
+      kind
+    );
+  }
 });
 
 test("runtime validation rejects empty external receipt arrays like the public schema", () => {

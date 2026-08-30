@@ -1,0 +1,346 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/reliance-decision.schema.json",
+  "$comment": "Structural interchange screening only. Cross-field time, request, policy-context, subject-digest, transparency-pair, expiry, and validity-deadline invariants are enforced by validateAICRelianceDecision. Schema acceptance never authorizes execution.",
+  "title": "AIC Reliance Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "spec",
+    "verdict",
+    "evaluated_at",
+    "request",
+    "reason_codes",
+    "artifact_digests",
+    "evidence_freshness",
+    "checks"
+  ],
+  "properties": {
+    "artifact_type": { "const": "aic_reliance_decision" },
+    "spec": { "const": "aic.reliance/0.1" },
+    "verdict": { "enum": ["allow", "confirm", "deny", "indeterminate"] },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "valid_until": { "type": "string", "format": "date-time" },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "operation_id", "expected_deployment_id", "expected_revision"],
+      "properties": {
+        "origin": { "type": "string" },
+        "operation_id": { "type": "string" },
+        "expected_deployment_id": { "type": "string" },
+        "expected_revision": { "type": "string" },
+        "environment": { "enum": ["production", "staging", "test", "development"] }
+      }
+    },
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "requirements_satisfied",
+          "confirmation_required",
+          "request_origin_invalid",
+          "request_operation_id_invalid",
+          "request_deployment_id_invalid",
+          "request_revision_invalid",
+          "request_environment_invalid",
+          "artifacts_invalid",
+          "binding_origin_mismatch",
+          "binding_operation_mismatch",
+          "binding_deployment_mismatch",
+          "binding_revision_mismatch",
+          "trust_invalid",
+          "trust_untrusted",
+          "policy_failed",
+          "policy_indeterminate",
+          "policy_not_fail_closed",
+          "policy_rule_unmatched",
+          "evidence_stale",
+          "evidence_future",
+          "evidence_freshness_not_checked",
+          "transparency_invalid",
+          "transparency_untrusted",
+          "transparency_attestation_missing",
+          "transparency_checkpoint_stale",
+          "transparency_checkpoint_mismatch",
+          "transparency_consistency_required",
+          "transparency_inconsistent",
+          "transparency_required",
+          "transparency_size_below_minimum",
+          "transparency_log_disallowed",
+          "transparency_prior_checkpoint_mismatch",
+          "transparency_key_disallowed",
+          "transparency_external_receipt_not_checked"
+        ]
+      }
+    },
+    "artifact_digests": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attestation": { "$ref": "#/$defs/digest" },
+        "contract": { "$ref": "#/$defs/digest" },
+        "observations": { "$ref": "#/$defs/digest" },
+        "policy": { "$ref": "#/$defs/digest" },
+        "proof": { "$ref": "#/$defs/digest" },
+        "transparency_index": { "$ref": "#/$defs/digest" },
+        "transparency_prior_index": { "$ref": "#/$defs/digest" },
+        "transparency_trust_store": { "$ref": "#/$defs/digest" },
+        "trust_store": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "evidence_freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["fresh", "stale", "future", "not_checked", "invalid"] },
+        "proof_age_seconds": { "type": "number" },
+        "oldest_observation_age_seconds": { "type": "number" },
+        "attestation_age_seconds": { "type": "number" },
+        "attestation_expires_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifacts", "request_binding", "trust", "policy", "transparency"],
+      "properties": {
+        "artifacts": { "$ref": "#/$defs/check" },
+        "request_binding": { "$ref": "#/$defs/check" },
+        "trust": { "$ref": "#/$defs/check" },
+        "policy": { "$ref": "#/$defs/check" },
+        "transparency": { "$ref": "#/$defs/check" }
+      }
+    },
+    "policy_evaluation": { "$ref": "https://aic.dev/schemas/policy-evaluation.schema.json" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["verdict"],
+        "properties": { "verdict": { "const": "allow" } }
+      },
+      "then": {
+        "required": ["policy_evaluation", "valid_until"],
+        "properties": {
+          "request": {
+            "required": ["environment"],
+            "properties": {
+              "origin": {
+                "type": "string",
+                "pattern": "^https?://(?:[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?|\\[[0-9a-f:.]+\\])(?::[1-9][0-9]{0,4})?$"
+              },
+              "expected_revision": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
+              },
+              "operation_id": { "type": "string", "minLength": 1 },
+              "expected_deployment_id": { "type": "string", "minLength": 1 }
+            }
+          },
+          "reason_codes": {
+            "contains": { "const": "requirements_satisfied" },
+            "items": {
+              "enum": [
+                "requirements_satisfied",
+                "evidence_freshness_not_checked",
+                "transparency_external_receipt_not_checked"
+              ]
+            }
+          },
+          "artifact_digests": {
+            "required": ["attestation", "contract", "observations", "policy", "proof", "trust_store"]
+          },
+          "evidence_freshness": {
+            "properties": {
+              "status": { "enum": ["fresh", "not_checked"] },
+              "proof_age_seconds": { "type": "number", "minimum": 0 },
+              "oldest_observation_age_seconds": { "type": "number", "minimum": 0 },
+              "attestation_age_seconds": { "type": "number", "minimum": 0 }
+            }
+          },
+          "checks": {
+            "properties": {
+              "artifacts": { "const": "passed" },
+              "policy": { "const": "passed" },
+              "request_binding": { "const": "passed" },
+              "transparency": { "enum": ["passed", "not_checked"] },
+              "trust": { "const": "passed" }
+            }
+          },
+          "policy_evaluation": {
+            "properties": {
+              "context": { "required": ["environment"] },
+              "decision": { "const": "passed" },
+              "rules": {
+                "contains": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": { "status": { "const": "passed" } }
+                }
+              },
+              "subjects": {
+                "required": ["attestation_digest", "contract_digest", "observations_digest", "proof_digest"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["verdict", "evidence_freshness"],
+        "properties": {
+          "verdict": { "const": "allow" },
+          "evidence_freshness": {
+            "required": ["status"],
+            "properties": { "status": { "const": "not_checked" } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason_codes": { "contains": { "const": "evidence_freshness_not_checked" } }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["verdict", "evidence_freshness"],
+        "properties": {
+          "verdict": { "const": "allow" },
+          "evidence_freshness": {
+            "required": ["status"],
+            "properties": { "status": { "const": "fresh" } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason_codes": {
+            "not": { "contains": { "const": "evidence_freshness_not_checked" } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["checks"],
+        "properties": {
+          "checks": {
+            "required": ["transparency"],
+            "properties": { "transparency": { "const": "passed" } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "artifact_digests": {
+            "required": ["transparency_index", "transparency_trust_store"]
+          },
+          "policy_evaluation": {
+            "properties": {
+              "subjects": {
+                "required": [
+                  "transparency_index_digest",
+                  "transparency_trust_store_digest"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["reason_codes"],
+        "properties": {
+          "reason_codes": {
+            "contains": { "const": "transparency_external_receipt_not_checked" }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "checks": {
+            "properties": { "transparency": { "const": "passed" } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["verdict"],
+        "properties": { "verdict": { "const": "confirm" } }
+      },
+      "then": {
+        "properties": {
+          "reason_codes": { "contains": { "const": "confirmation_required" } }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["verdict"],
+        "properties": { "verdict": { "enum": ["allow", "deny", "indeterminate"] } }
+      },
+      "then": {
+        "properties": {
+          "reason_codes": { "not": { "contains": { "const": "confirmation_required" } } }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["verdict"],
+        "properties": { "verdict": { "enum": ["deny", "indeterminate"] } }
+      },
+      "then": {
+        "properties": {
+          "reason_codes": { "not": { "contains": { "const": "requirements_satisfied" } } }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["checks"],
+        "properties": {
+          "checks": {
+            "required": ["policy"],
+            "properties": { "policy": { "const": "passed" } }
+          }
+        }
+      },
+      "then": {
+        "required": ["policy_evaluation"],
+        "properties": {
+          "policy_evaluation": { "properties": { "decision": { "const": "passed" } } }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["policy_evaluation"],
+        "properties": {
+          "policy_evaluation": {
+            "required": ["decision"],
+            "properties": { "decision": { "enum": ["failed", "indeterminate"] } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "checks": { "properties": { "policy": { "const": "failed" } } }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "check": { "enum": ["passed", "failed", "not_checked"] },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

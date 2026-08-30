@@ -3,6 +3,7 @@ import type {
   AICValidationSeverity,
   ValidationResult
 } from "./types.js";
+import { isAICRfc3339DateTime as isIsoDateTime } from "./date-time.js";
 
 export const AIC_TRUST_SPEC = "aic.trust/0.1";
 export const AIC_TRUST_PAYLOAD_TYPE = "application/vnd.aic.trust-statement+json";
@@ -138,14 +139,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
-}
-
-function isIsoDateTime(value: unknown): value is string {
-  return (
-    isNonEmptyString(value) &&
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) &&
-    !Number.isNaN(Date.parse(value))
-  );
 }
 
 function isSha256Digest(value: unknown): value is string {

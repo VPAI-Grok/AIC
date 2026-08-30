@@ -22,7 +22,7 @@
     "@aicorg/sdk-react": "workspace:*",
     "@aicorg/spec": "workspace:*",
     "@aicorg/webmcp": "workspace:*",
-    "next": "^16.2.2",
+    "next": "16.2.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

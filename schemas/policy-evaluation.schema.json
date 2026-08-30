@@ -18,7 +18,10 @@
         "contract_digest": { "$ref": "#/$defs/digest" },
         "observations_digest": { "$ref": "#/$defs/digest" },
         "proof_digest": { "$ref": "#/$defs/digest" },
-        "attestation_digest": { "$ref": "#/$defs/digest" }
+        "attestation_digest": { "$ref": "#/$defs/digest" },
+        "transparency_index_digest": { "$ref": "#/$defs/digest" },
+        "transparency_prior_index_digest": { "$ref": "#/$defs/digest" },
+        "transparency_trust_store_digest": { "$ref": "#/$defs/digest" }
       }
     },
     "context": {

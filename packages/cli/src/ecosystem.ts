@@ -1,10 +1,11 @@
 import { createHash, createPrivateKey, createPublicKey, sign } from "node:crypto";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir, rename, rm } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import {
   appendAICTransparencyEntry,
   applyAICScheduledKeyTransition,
   createAICConformanceBinding,
+  createAICDigest,
   createAICTransparencyIndex,
   evaluateAICAssurancePolicy,
   loadAICInteropSuite,
@@ -23,12 +24,19 @@ import { verifyAICEvidenceBundle, type AICEvidenceAdapter } from "@aicorg/eviden
 import { createAICHttpEvidenceAdapter } from "@aicorg/evidence-http";
 import { createAICMcpEvidenceAdapter } from "@aicorg/evidence-mcp";
 import {
+  assertAICRelianceAllowed,
+  evaluateAICReliance,
+  type EvaluateAICRelianceInput,
+  type AICRelianceDisposition
+} from "@aicorg/rely";
+import {
   AIC_REMOTE_RUNNER_VERSION,
   runAICRemoteObservation,
   verifyAICRemoteReceiptSignature,
   type AICRemoteOperatorCapabilities
 } from "@aicorg/runner-remote";
 import {
+  parseAICStrictJson,
   type AICConformancePack,
   type AICTransparencyEntryKind,
   validateAICAssurancePolicy,
@@ -40,11 +48,15 @@ import {
   validateAICEvidencePlan,
   validateAICSignedKeyTransition,
   validateAICPolicyEvaluation,
+  validateAICRelianceDecision,
+  validateAICRelianceRecord,
+  validateAICRelianceSnapshot,
   validateAICRemoteObservationJob,
   validateAICSignedTransparencyCheckpoint,
   validateAICTransparencyIndex,
   type AICValidationIssue
 } from "@aicorg/spec";
+import { readAICUtf8File } from "./utf8.js";
 
 type EcosystemValidator = (value: unknown) => {
   issues: AICValidationIssue[];
@@ -61,23 +73,45 @@ const validators: Record<string, EcosystemValidator> = {
   "evidence-plan": validateAICEvidencePlan,
   "key-transition": validateAICSignedKeyTransition,
   "policy-evaluation": validateAICPolicyEvaluation,
+  "reliance-decision": validateAICRelianceDecision,
+  "reliance-record": (value) =>
+    validateAICRelianceRecord(value, { createDigest: createAICDigest }),
+  "reliance-snapshot": (value) =>
+    validateAICRelianceSnapshot(value, { createDigest: createAICDigest }),
   "remote-job": validateAICRemoteObservationJob,
   "transparency-checkpoint": validateAICSignedTransparencyCheckpoint,
   "transparency-index": validateAICTransparencyIndex
 };
 
 async function readJson<T = unknown>(filePath: string): Promise<T> {
-  return JSON.parse(await readFile(resolve(process.cwd(), filePath), "utf8")) as T;
+  return parseAICStrictJson<T>(
+    await readAICUtf8File(resolve(process.cwd(), filePath))
+  );
 }
 
 async function readText(filePath: string): Promise<string> {
-  return readFile(resolve(process.cwd(), filePath), "utf8");
+  return readAICUtf8File(resolve(process.cwd(), filePath));
 }
 
 async function writeJson(filePath: string, value: unknown): Promise<void> {
   const resolved = resolve(process.cwd(), filePath);
   await mkdir(dirname(resolved), { recursive: true });
   await writeFile(resolved, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+}
+
+async function writeJsonAtomic(filePath: string, value: unknown): Promise<void> {
+  const resolved = resolve(process.cwd(), filePath);
+  const temporary = `${resolved}.tmp-${process.pid}-${Date.now()}`;
+  await mkdir(dirname(resolved), { recursive: true });
+  try {
+    await writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, {
+      encoding: "utf8",
+      flag: "wx"
+    });
+    await rename(temporary, resolved);
+  } finally {
+    await rm(temporary, { force: true });
+  }
 }
 
 function printJson(value: unknown): void {
@@ -138,9 +172,90 @@ function requiredInteger(args: string[], name: string): number {
   return value;
 }
 
+function boundedDecimalIntegerOption(
+  args: string[],
+  name: string,
+  defaultValue: number,
+  maximum: number
+): number {
+  const raw = option(args, name);
+  if (raw === undefined) return defaultValue;
+  if (!/^(?:0|[1-9]\d*)$/.test(raw)) {
+    throw new Error(`${name} must be a decimal integer from 0 through ${maximum}.`);
+  }
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value) || value < 0 || value > maximum) {
+    throw new Error(`${name} must be a decimal integer from 0 through ${maximum}.`);
+  }
+  return value;
+}
+
 async function maybeWrite(args: string[], value: unknown): Promise<void> {
   const outFile = option(args, "--out-file");
   if (outFile) await writeJson(outFile, value);
+}
+
+async function maybeWriteAtomic(args: string[], value: unknown): Promise<void> {
+  const outFile = option(args, "--out-file");
+  if (outFile) await writeJsonAtomic(outFile, value);
+}
+
+async function invalidateOptionalOutput(
+  args: string[],
+  protectedFiles: readonly string[]
+): Promise<void> {
+  const outFile = option(args, "--out-file");
+  if (!outFile) return;
+  const outputPath = resolve(process.cwd(), outFile);
+  if (
+    protectedFiles.some(
+      (file) => resolve(process.cwd(), file) === outputPath
+    )
+  ) {
+    throw new Error("--out-file must not overwrite a reliance input artifact.");
+  }
+  await rm(outputPath, { force: true });
+}
+
+export async function finalizeAICRelianceAllowPublication({
+  clock = () => new Date(),
+  decision,
+  input,
+  invalidate,
+  minimumValiditySeconds,
+  publish
+}: {
+  clock?: () => Date | string;
+  decision: ReturnType<typeof evaluateAICReliance>;
+  input: EvaluateAICRelianceInput;
+  invalidate: () => Promise<void>;
+  minimumValiditySeconds: number;
+  publish: () => Promise<void>;
+}): Promise<{ ok: true } | { message: string; ok: false }> {
+  const assertCurrent = (): void => {
+    assertAICRelianceAllowed(decision, {
+      clock,
+      input,
+      max_future_skew_seconds: 0,
+      minimum_validity_seconds: minimumValiditySeconds
+    });
+  };
+
+  try {
+    assertCurrent();
+    await publish();
+    // This is the final operation before success. The SDK samples trusted time
+    // only after full reproduction, so hashing cannot consume an unseen part of
+    // the required residual lifetime.
+    assertCurrent();
+    return { ok: true };
+  } catch (error) {
+    await invalidate();
+    return {
+      message: error instanceof Error ? error.message : String(error),
+      ok: false
+    };
+  }
 }
 
 async function loadPack(source: string): Promise<AICConformancePack> {
@@ -237,6 +352,15 @@ async function runPolicy(kind: string | undefined, args: string[]): Promise<numb
   if (Boolean(attestationFile) !== Boolean(trustStoreFile)) {
     throw new Error("--attestation and --trust-store must be supplied together.");
   }
+  const transparencyIndexFile = option(args, "--transparency-index");
+  const transparencyPriorIndexFile = option(args, "--transparency-prior-index");
+  const transparencyTrustStoreFile = option(args, "--transparency-trust-store");
+  if (Boolean(transparencyIndexFile) !== Boolean(transparencyTrustStoreFile)) {
+    throw new Error("--transparency-index and --transparency-trust-store must be supplied together.");
+  }
+  if (transparencyPriorIndexFile && !transparencyIndexFile) {
+    throw new Error("--transparency-prior-index requires the current transparency index and trust store.");
+  }
   const environment = option(args, "--environment");
   if (environment && !["development", "production", "staging", "test"].includes(environment)) {
     throw new Error("--environment must be development, production, staging, or test.");
@@ -251,11 +375,159 @@ async function runPolicy(kind: string | undefined, args: string[]): Promise<numb
     observations: await readJson(observationsFile),
     policy: await readJson(policyFile),
     proof: await readJson(proofFile),
+    ...(transparencyIndexFile && transparencyTrustStoreFile
+      ? {
+          transparency: {
+            index: await readJson(transparencyIndexFile),
+            ...(transparencyPriorIndexFile
+              ? { priorIndex: await readJson(transparencyPriorIndexFile) }
+              : {}),
+            trustStore: await readJson(transparencyTrustStoreFile)
+          }
+        }
+      : {}),
     ...(trustStoreFile ? { trustStore: await readJson(trustStoreFile) } : {})
   });
   await maybeWrite(args, evaluation);
   printJson(evaluation);
   return evaluation.decision === "passed" ? 0 : 1;
+}
+
+function dispositionOption<T extends string>(
+  args: string[],
+  name: string,
+  allowed: readonly T[]
+): T | undefined {
+  const value = option(args, name);
+  if (value === undefined) return undefined;
+  if (!allowed.includes(value as T)) {
+    throw new Error(`${name} must be one of: ${allowed.join(", ")}.`);
+  }
+  return value as T;
+}
+
+async function runReliance(kind: string | undefined, args: string[]): Promise<number> {
+  if (kind !== "evaluate") throw new Error("rely expects evaluate.");
+  const [policyFile, contractFile, proofFile] = positional(args);
+  if (!policyFile || !contractFile || !proofFile) {
+    throw new Error("rely evaluate expects <policy> <contract> <proof>.");
+  }
+
+  const environment = requiredOption(args, "--environment");
+  if (!["development", "production", "staging", "test"].includes(environment)) {
+    throw new Error("--environment must be development, production, staging, or test.");
+  }
+  const transparencyIndexFile = option(args, "--transparency-index");
+  const transparencyPriorIndexFile = option(args, "--transparency-prior-index");
+  const transparencyTrustStoreFile = option(args, "--transparency-trust-store");
+  if (Boolean(transparencyIndexFile) !== Boolean(transparencyTrustStoreFile)) {
+    throw new Error("--transparency-index and --transparency-trust-store must be supplied together.");
+  }
+  if (transparencyPriorIndexFile && !transparencyIndexFile) {
+    throw new Error("--transparency-prior-index requires the current transparency index and trust store.");
+  }
+
+  const disposition: AICRelianceDisposition = {
+    ...(dispositionOption(args, "--on-passed", ["allow", "confirm"] as const)
+      ? { on_passed: dispositionOption(args, "--on-passed", ["allow", "confirm"] as const) }
+      : {}),
+    ...(dispositionOption(args, "--on-failed", ["deny", "confirm"] as const)
+      ? { on_failed: dispositionOption(args, "--on-failed", ["deny", "confirm"] as const) }
+      : {}),
+    ...(dispositionOption(args, "--on-indeterminate", ["deny", "confirm", "indeterminate"] as const)
+      ? { on_indeterminate: dispositionOption(args, "--on-indeterminate", ["deny", "confirm", "indeterminate"] as const) }
+      : {})
+  };
+
+  const evaluationTime = option(args, "--evaluated-at");
+  const minimumValiditySeconds = boundedDecimalIntegerOption(
+    args,
+    "--minimum-validity-seconds",
+    30,
+    60
+  );
+  const expectedDeploymentId = requiredOption(args, "--deployment-id");
+  const expectedRevision = requiredOption(args, "--expect-revision");
+  const operationId = requiredOption(args, "--operation-id");
+  const origin = requiredOption(args, "--origin");
+  const attestationFile = requiredOption(args, "--attestation");
+  const observationsFile = requiredOption(args, "--observations");
+  const trustStoreFile = requiredOption(args, "--trust-store");
+  const relianceInputFiles = [
+    attestationFile,
+    contractFile,
+    observationsFile,
+    policyFile,
+    proofFile,
+    trustStoreFile,
+    ...(transparencyIndexFile ? [transparencyIndexFile] : []),
+    ...(transparencyPriorIndexFile ? [transparencyPriorIndexFile] : []),
+    ...(transparencyTrustStoreFile ? [transparencyTrustStoreFile] : [])
+  ];
+  if (evaluationTime === undefined) {
+    // An actionable run owns this output path. Remove any earlier decision
+    // before loading artifacts so no later failure can leave a stale allow.
+    await invalidateOptionalOutput(
+      args,
+      relianceInputFiles
+    );
+  }
+  const relianceInput: EvaluateAICRelianceInput = {
+    attestation: await readJson(attestationFile),
+    contract: await readJson(contractFile),
+    ...(Object.keys(disposition).length > 0 ? { disposition } : {}),
+    environment: environment as "development" | "production" | "staging" | "test",
+    ...(evaluationTime === undefined ? {} : { evaluated_at: evaluationTime }),
+    expected_deployment_id: expectedDeploymentId,
+    expected_revision: expectedRevision,
+    observations: await readJson(observationsFile),
+    operation_id: operationId,
+    origin,
+    policy: await readJson(policyFile),
+    proof: await readJson(proofFile),
+    ...(transparencyIndexFile && transparencyTrustStoreFile
+      ? {
+          transparency: {
+            index: await readJson(transparencyIndexFile),
+            ...(transparencyPriorIndexFile
+              ? { prior_index: await readJson(transparencyPriorIndexFile) }
+              : {}),
+            trust_store: await readJson(transparencyTrustStoreFile)
+          }
+        }
+      : {}),
+    trust_store: await readJson(trustStoreFile)
+  };
+  const decision = evaluateAICReliance(relianceInput);
+  if (evaluationTime !== undefined) {
+    await maybeWrite(args, decision);
+    printJson(decision);
+    console.error(
+      "--evaluated-at is audit-only; historical decisions never produce an actionable success exit code."
+    );
+    return decision.verdict === "allow" ? 2 : 1;
+  }
+  if (decision.verdict !== "allow") {
+    await maybeWrite(args, decision);
+    printJson(decision);
+    return 1;
+  }
+
+  const finalization = await finalizeAICRelianceAllowPublication({
+    decision,
+    input: relianceInput,
+    invalidate: () => invalidateOptionalOutput(args, relianceInputFiles),
+    minimumValiditySeconds,
+    publish: () => maybeWriteAtomic(args, decision)
+  });
+  if (!finalization.ok) {
+    console.error(
+      `AIC reliance allow was not published: ${finalization.message}`
+    );
+    return 1;
+  }
+  printJson(decision);
+  return 0;
 }
 
 async function runInterop(kind: string | undefined, args: string[]): Promise<number> {
@@ -532,6 +804,7 @@ export async function runAICEcosystemCommand(argv: string[]): Promise<number | u
     if (command === "validate" && kind && validators[kind]) return validateArtifact(kind, args);
     if (command === "conformance") return runConformance(kind, args);
     if (command === "policy") return runPolicy(kind, args);
+    if (command === "rely") return runReliance(kind, args);
     if (command === "interop") return runInterop(kind, args);
     if (command === "evidence") return runEvidence(kind, args);
     if (command === "transparency") return runTransparency(kind, args);

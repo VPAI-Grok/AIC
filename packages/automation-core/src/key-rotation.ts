@@ -3,6 +3,7 @@ import {
   createPrivateKey,
   createPublicKey,
   sign,
+  type KeyObject,
   verify
 } from "node:crypto";
 import {
@@ -12,6 +13,7 @@ import {
   type AICTrustSignature,
   type AICTrustStore,
   type AICTrustStoreKey,
+  isAICRfc3339DateTime,
   validateAICSignedKeyTransition,
   validateAICTrustStore
 } from "@aicorg/spec";
@@ -40,9 +42,13 @@ export interface AICKeyTransitionVerificationResult {
   status: "invalid" | "trusted" | "untrusted";
 }
 
-function keyId(publicKeyPem: string): string {
-  const der = createPublicKey(publicKeyPem).export({ format: "der", type: "spki" });
+function keyIdFromKey(publicKey: KeyObject): string {
+  const der = publicKey.export({ format: "der", type: "spki" });
   return `sha256:${createHash("sha256").update(der).digest("hex")}`;
+}
+
+function keyId(publicKeyPem: string): string {
+  return keyIdFromKey(createPublicKey(publicKeyPem));
 }
 
 function transitionBytes(statement: unknown): Buffer {
@@ -50,7 +56,7 @@ function transitionBytes(statement: unknown): Buffer {
 }
 
 function assertDate(value: string, field: string): void {
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) || Number.isNaN(Date.parse(value))) throw new Error(`${field} must be an ISO date-time.`);
+  if (!isAICRfc3339DateTime(value)) throw new Error(`${field} must be an ISO date-time.`);
 }
 
 function publicKeyFor(privateKeyPem: string): { id: string; pem: string } {
@@ -189,8 +195,8 @@ export function verifyAICScheduledKeyTransition(input: {
     if (!retiringNext.valid_until || Date.parse(retiringNext.valid_until) < Date.parse(statement.effective_at) || successor.valid_from !== statement.effective_at) findings.push({ code: "key_policy_invalid", message: "Retiring and successor validity windows do not implement the signed cutover." });
     if (retiringPrior.valid_until && retiringNext.valid_until && Date.parse(retiringNext.valid_until) > Date.parse(retiringPrior.valid_until)) findings.push({ code: "key_policy_invalid", message: "Rotation cannot extend an existing retiring-key validity limit." });
     if (!originsAreSubset(successor.allowed_origins, retiringPrior.allowed_origins)) findings.push({ code: "origin_broadening", message: "Successor key broadens the retiring key's allowed origins." });
-    const priorRetiringPolicy = { ...retiringPrior, valid_until: undefined };
-    const nextRetiringPolicy = { ...retiringNext, valid_until: undefined };
+    const { valid_until: _priorValidUntil, ...priorRetiringPolicy } = retiringPrior;
+    const { valid_until: _nextValidUntil, ...nextRetiringPolicy } = retiringNext;
     if (createAICCanonicalJson(priorRetiringPolicy) !== createAICCanonicalJson(nextRetiringPolicy)) findings.push({ code: "key_policy_invalid", message: "Retiring key policy changed beyond valid_until." });
     const priorWithoutRetiring = prior.keys.filter((key) => key.key_id !== statement.retiring_key_id);
     for (const key of priorWithoutRetiring) {
@@ -210,7 +216,19 @@ export function verifyAICScheduledKeyTransition(input: {
       continue;
     }
     try {
-      if (keyId(key.public_key_pem) !== key.key_id || !verify(null, transitionBytes(statement), createPublicKey(key.public_key_pem), Buffer.from(signed.value, "base64"))) findings.push({ code: "signature_invalid", message: `${role} signature is invalid.` });
+      const publicKey = createPublicKey(key.public_key_pem);
+      if (
+        publicKey.asymmetricKeyType !== "ed25519" ||
+        keyIdFromKey(publicKey) !== key.key_id ||
+        !verify(
+          null,
+          transitionBytes(statement),
+          publicKey,
+          Buffer.from(signed.value, "base64")
+        )
+      ) {
+        findings.push({ code: "signature_invalid", message: `${role} signature is invalid or is not backed by an Ed25519 key.` });
+      }
     } catch {
       findings.push({ code: "signature_invalid", message: `${role} signature could not be verified.` });
     }

@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "packageManager": "pnpm@10.8.1",
+  "packageManager": "pnpm@10.28.2",
   "scripts": {
     "aic": "node ./packages/cli/dist/cli/src/index.js",
     "benchmark:summary:adoption": "node scripts/summarize-adoption-benchmark.mjs",
@@ -26,6 +26,7 @@
     "dev": "pnpm -r --if-present --parallel dev",
     "lint": "pnpm -r --if-present lint",
     "release:alpha": "pnpm version:packages && pnpm release:publish",
+    "release:pack": "node ./scripts/pack-alpha-packages.mjs",
     "release:publish": "changeset publish --tag alpha",
     "version:packages": "changeset version",
     "smoke:adoption": "node scripts/smoke-adoption.mjs",
@@ -36,23 +37,36 @@
     "test:contracts": "node --test tests/*.test.mjs",
     "test:goldens": "pnpm build && node tests/goldens.mjs verify",
     "test:packaging": "pnpm build && node --test tests/npm-packaging.test.mjs",
-    "test:update-goldens": "pnpm build && node tests/goldens.mjs update"
+    "test:update-goldens": "pnpm build && node tests/goldens.mjs update",
+    "verify:action-bundle": "npm --prefix actions/aic-rely run check:bundle"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
     "@types/node": "^22.14.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "pnpm": "10.8.1",
+    "ajv": "8.18.0",
+    "pnpm": "10.28.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-test-renderer": "^19.0.0",
-    "turbo": "^2.5.0",
+    "turbo": "2.9.14",
     "typescript": "^5.8.2"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.60.0",
     "lightningcss-linux-x64-gnu": "1.32.0",
     "lightningcss-win32-x64-msvc": "1.32.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@hono/node-server": "1.19.13",
+      "@babel/plugin-transform-modules-systemjs": "7.29.4",
+      "brace-expansion": "5.0.6",
+      "fast-uri": "3.1.2",
+      "hono": "4.12.18",
+      "ip-address": "10.1.1",
+      "postcss": "8.5.10"
+    }
   }
 }

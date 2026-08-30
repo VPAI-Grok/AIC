@@ -9,6 +9,7 @@ import {
   type AICConformanceProfile,
   type AICConformanceResult,
   type AICConformanceSurfaceRole,
+  isAICRfc3339DateTime,
   validateAICBehaviorContract,
   validateAICBehaviorProof,
   validateAICConformanceBinding,
@@ -35,10 +36,7 @@ export interface VerifyAICConformanceInput {
 }
 
 function assertIsoDateTime(value: string, field: string): void {
-  if (
-    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) ||
-    Number.isNaN(Date.parse(value))
-  ) {
+  if (!isAICRfc3339DateTime(value)) {
     throw new Error(`${field} must be an ISO date-time string.`);
   }
 }

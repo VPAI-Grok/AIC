@@ -18,12 +18,14 @@ function sortJsonValue(value: JsonValue | undefined): JsonValue | undefined {
   }
 
   if (value && typeof value === "object") {
-    return Object.keys(value)
-      .sort()
-      .reduce<Record<string, JsonValue | undefined>>((result, key) => {
-        result[key] = sortJsonValue((value as Record<string, JsonValue | undefined>)[key]);
-        return result;
-      }, {}) as JsonValue;
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [
+          key,
+          sortJsonValue((value as Record<string, JsonValue | undefined>)[key])
+        ])
+    ) as JsonValue;
   }
 
   return value;

@@ -58,23 +58,40 @@ The repository now includes:
 8. Dual-signed scheduled key transitions that keep historical claims verifiable while distinguishing compromise revocation.
 9. An evidence-first external adopter submission kit and ecosystem-conformance gates in the existing Behavior Assurance CI workflow.
 
-This completes every repository-achievable technical prerequisite from the milestone. The contracts, schemas, verifier, signing format, adapters, packs, policy, runner kit, and compatibility vectors remain open. Hosted capabilities should add convenience and independently operated trust, not lock users out of their evidence.
+This completed the conformance foundation required for a relying-party preflight. The contracts, schemas, verifier, signing format, adapters, packs, policy, runner kit, and compatibility vectors remain open. Hosted capabilities should add convenience and independently operated trust, not lock users out of their evidence.
 
-## Next market and operations gate
+## Completed: Trust Fabric repository milestone
+
+The repository now includes:
+
+1. Canonical `aic_reliance_decision`, `aic_reliance_record`, and `aic_reliance_snapshot` types, validators, and JSON Schemas.
+2. `@aicorg/rely`, a local-only consumer SDK that evaluates exact operation/deployment bindings, regenerates proof, verifies a signed attestation against a separately pinned trust store, and applies every matching fail-closed policy rule.
+3. Distinct `allow`, `confirm`, `deny`, and `indeterminate` verdicts with stable reason codes and bound artifact digests.
+4. Trusted-current-clock preflight and assertion helpers that reject stale, future-dated, expired, request-mismatched, or out-of-window decisions.
+5. Optional policy-required verification of the signed AIC reference transparency index, including exact attestation inclusion and pinned log/key identities. External receipt references remain `not_checked` until a provider-specific verifier checks them.
+6. `aic rely evaluate`, which writes the portable decision and exits successfully only for `allow`.
+7. A bundled, offline `actions/aic-rely` GitHub action that pins consumer policy, trust-store digests, and expected issuer, key, runner, origin, environment, deployment, operation, and revision identities.
+8. `@aicorg/reliance-server`, a read-only reference resolver with exact lookup, history, exportable snapshots, and optional locally configured evaluation. Discovery records remain untrusted and mirrorable.
+
+This is an in-repository technical milestone. The new packages and CLI surface are not claimed as published until npm release and registry verification complete. The reference server is not a hosted public resolver, and repository fixtures do not establish external use or operator independence.
+
+## Next Trust Fabric adoption and operations gate
 
 The following outcomes require real external actors or operated infrastructure and are not manufactured by repository fixtures:
 
 1. Three real external applications publishing independently verifiable claims.
-2. At least one remote runner operated independently from both the application owner and the AIC project.
-3. A hosted evidence-history and policy-dashboard service compatible with the open verifier.
-4. External verifier implementations passing the compatibility vectors.
-5. Standardized or independently operated public transparency receipts for production claims.
+2. Two separately controlled runner operators, including at least one independent from both AIC and the observed application.
+3. Two external agent or gateway consumers enforcing AIC in their normal pre-execution path and failing closed on invalid, stale, revoked, or wrongly bound claims.
+4. One independently maintained verifier passing the compatibility vectors.
+5. A public resolver and an independently hosted mirror exposing at least 30 days of portable history without making network availability necessary for cached local verification.
+6. Provider-verified standardized or independently operated transparency receipts for production claims.
 
-The canonical adopter list and registry stay empty until genuine submissions pass review.
+The canonical adopter list and registry stay empty until genuine submissions pass review. A hosted dashboard can be useful, but it is not a Trust Fabric completion gate and must not become the only verifier or evidence-history format.
 
 ## Ongoing stabilization
 
 - keep package docs and release claims aligned with the published npm wave;
+- keep reliance decision validators, SDK, CLI, action bundle, and resolver compatibility tests aligned;
 - keep WebMCP support date-pinned and native-first;
 - preserve deterministic extraction and guarded write-back;
 - expand React component coverage based on real adoption evidence; and
@@ -85,5 +102,6 @@ The canonical adopter list and registry stay empty until genuine submissions pas
 - replacing WebMCP, MCP, OpenAPI, or browser automation;
 - silently promoting inferred actions to execution-ready status;
 - claiming production reachability or independent certification from a local or CI-signed claim;
+- making an AIC resolver, hosted service, registry entry, or decision producer a universal trust root;
 - broad heuristic repo mutation; and
 - expanding framework breadth before the assurance core is stable.

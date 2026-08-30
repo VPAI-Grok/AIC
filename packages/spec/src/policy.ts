@@ -10,6 +10,7 @@ import type {
   AICTrustEnvironment,
   AICTrustRunnerKind
 } from "./trust.js";
+import { isAICRfc3339DateTime } from "./date-time.js";
 
 export const AIC_POLICY_SPEC = "aic.policy/0.1";
 
@@ -35,6 +36,17 @@ export interface AICPolicyAttestationRequirements {
   required: boolean;
 }
 
+export interface AICPolicyTransparencyRequirements {
+  allowed_key_ids?: string[];
+  allowed_log_ids?: string[];
+  expected_checkpoint_digest?: string;
+  expected_prior_checkpoint_digest?: string;
+  maximum_checkpoint_age_seconds?: number;
+  minimum_size?: number;
+  require_consistency?: boolean;
+  required: boolean;
+}
+
 export interface AICPolicyRequirements {
   allowed_evidence_levels?: AICPolicyEvidenceLevel[];
   attestation?: AICPolicyAttestationRequirements;
@@ -45,6 +57,7 @@ export interface AICPolicyRequirements {
   proof_status?: "passed";
   required_scenario_ids?: string[];
   required_surface_kinds?: AICBehaviorSurfaceKind[];
+  transparency?: AICPolicyTransparencyRequirements;
 }
 
 export interface AICAssurancePolicyRule {
@@ -83,8 +96,21 @@ export type AICPolicyFindingCode =
   | "proof_age_exceeded"
   | "proof_regeneration_mismatch"
   | "proof_status_required"
+  | "policy_not_fail_closed"
   | "scenario_required"
   | "surface_kind_required"
+  | "transparency_attestation_missing"
+  | "transparency_checkpoint_age_exceeded"
+  | "transparency_checkpoint_mismatch"
+  | "transparency_consistency_required"
+  | "transparency_inconsistent"
+  | "transparency_invalid"
+  | "transparency_key_disallowed"
+  | "transparency_log_disallowed"
+  | "transparency_prior_checkpoint_mismatch"
+  | "transparency_required"
+  | "transparency_size_below_minimum"
+  | "transparency_untrusted"
   | "unmatched_policy";
 
 export const AIC_POLICY_FINDING_CODES: readonly AICPolicyFindingCode[] = [
@@ -109,8 +135,21 @@ export const AIC_POLICY_FINDING_CODES: readonly AICPolicyFindingCode[] = [
   "proof_age_exceeded",
   "proof_regeneration_mismatch",
   "proof_status_required",
+  "policy_not_fail_closed",
   "scenario_required",
   "surface_kind_required",
+  "transparency_attestation_missing",
+  "transparency_checkpoint_age_exceeded",
+  "transparency_checkpoint_mismatch",
+  "transparency_consistency_required",
+  "transparency_inconsistent",
+  "transparency_invalid",
+  "transparency_key_disallowed",
+  "transparency_log_disallowed",
+  "transparency_prior_checkpoint_mismatch",
+  "transparency_required",
+  "transparency_size_below_minimum",
+  "transparency_untrusted",
   "unmatched_policy"
 ];
 
@@ -147,6 +186,9 @@ export interface AICPolicyEvaluation {
     contract_digest?: string;
     observations_digest?: string;
     proof_digest?: string;
+    transparency_index_digest?: string;
+    transparency_prior_index_digest?: string;
+    transparency_trust_store_digest?: string;
   };
 }
 
@@ -202,6 +244,12 @@ function positiveInteger(value: unknown, path: string, issues: AICValidationIssu
   }
 }
 
+function nonNegativeInteger(value: unknown, path: string, issues: AICValidationIssue[]): void {
+  if (!Number.isSafeInteger(value) || Number(value) < 0) {
+    add(issues, path, "Expected a non-negative safe integer", "policy.non_negative_integer");
+  }
+}
+
 export function validateAICAssurancePolicy(value: unknown): ValidationResult<AICAssurancePolicy> {
   const issues: AICValidationIssue[] = [];
   if (!isRecord(value)) {
@@ -240,7 +288,7 @@ export function validateAICAssurancePolicy(value: unknown): ValidationResult<AIC
       continue;
     }
     const req = ruleValue.require;
-    allowed(req, ["allowed_evidence_levels", "attestation", "maximum_observation_age_seconds", "maximum_proof_age_seconds", "observations_required", "parity", "proof_status", "required_scenario_ids", "required_surface_kinds"], `${path}.require`, issues);
+    allowed(req, ["allowed_evidence_levels", "attestation", "maximum_observation_age_seconds", "maximum_proof_age_seconds", "observations_required", "parity", "proof_status", "required_scenario_ids", "required_surface_kinds", "transparency"], `${path}.require`, issues);
     if (req.allowed_evidence_levels !== undefined) stringArray(req.allowed_evidence_levels, `${path}.require.allowed_evidence_levels`, issues, ["executed", "imported", "mixed", "none"]);
     if (req.maximum_observation_age_seconds !== undefined) positiveInteger(req.maximum_observation_age_seconds, `${path}.require.maximum_observation_age_seconds`, issues);
     if (req.maximum_proof_age_seconds !== undefined) positiveInteger(req.maximum_proof_age_seconds, `${path}.require.maximum_proof_age_seconds`, issues);
@@ -249,6 +297,82 @@ export function validateAICAssurancePolicy(value: unknown): ValidationResult<AIC
     if (req.proof_status !== undefined && req.proof_status !== "passed") add(issues, `${path}.require.proof_status`, "Expected passed", "policy.proof_status");
     if (req.required_scenario_ids !== undefined) stringArray(req.required_scenario_ids, `${path}.require.required_scenario_ids`, issues);
     if (req.required_surface_kinds !== undefined) stringArray(req.required_surface_kinds, `${path}.require.required_surface_kinds`, issues, ["human_ui", "webmcp", "mcp", "openapi", "custom"]);
+    if (req.transparency !== undefined) {
+      if (!isRecord(req.transparency)) add(issues, `${path}.require.transparency`, "Expected an object", "policy.transparency");
+      else {
+        const transparency = req.transparency;
+        allowed(transparency, ["allowed_key_ids", "allowed_log_ids", "expected_checkpoint_digest", "expected_prior_checkpoint_digest", "maximum_checkpoint_age_seconds", "minimum_size", "require_consistency", "required"], `${path}.require.transparency`, issues);
+        if (typeof transparency.required !== "boolean") add(issues, `${path}.require.transparency.required`, "Expected a boolean", "policy.transparency_required");
+        if (transparency.allowed_log_ids !== undefined) stringArray(transparency.allowed_log_ids, `${path}.require.transparency.allowed_log_ids`, issues);
+        if (transparency.allowed_key_ids !== undefined) {
+          stringArray(transparency.allowed_key_ids, `${path}.require.transparency.allowed_key_ids`, issues);
+          (Array.isArray(transparency.allowed_key_ids) ? transparency.allowed_key_ids : []).forEach((keyId, keyIndex) => {
+            if (typeof keyId !== "string" || !/^sha256:[0-9a-f]{64}$/.test(keyId)) add(issues, `${path}.require.transparency.allowed_key_ids[${keyIndex}]`, "Expected a SHA-256 key id", "policy.key_id");
+          });
+        }
+        if (transparency.expected_checkpoint_digest !== undefined && !/^sha256:[0-9a-f]{64}$/.test(String(transparency.expected_checkpoint_digest))) {
+          add(issues, `${path}.require.transparency.expected_checkpoint_digest`, "Expected a SHA-256 checkpoint digest", "policy.digest");
+        }
+        if (transparency.expected_prior_checkpoint_digest !== undefined && !/^sha256:[0-9a-f]{64}$/.test(String(transparency.expected_prior_checkpoint_digest))) {
+          add(issues, `${path}.require.transparency.expected_prior_checkpoint_digest`, "Expected a SHA-256 prior checkpoint digest", "policy.digest");
+        }
+        if (transparency.maximum_checkpoint_age_seconds !== undefined) positiveInteger(transparency.maximum_checkpoint_age_seconds, `${path}.require.transparency.maximum_checkpoint_age_seconds`, issues);
+        if (transparency.minimum_size !== undefined) positiveInteger(transparency.minimum_size, `${path}.require.transparency.minimum_size`, issues);
+        if (transparency.require_consistency !== undefined && typeof transparency.require_consistency !== "boolean") {
+          add(issues, `${path}.require.transparency.require_consistency`, "Expected a boolean", "policy.boolean");
+        }
+        const rollbackFields = [
+          "allowed_log_ids",
+          "allowed_key_ids",
+          "expected_checkpoint_digest",
+          "expected_prior_checkpoint_digest",
+          "maximum_checkpoint_age_seconds",
+          "minimum_size",
+          "require_consistency"
+        ];
+        if (transparency.required === false && rollbackFields.some((field) => transparency[field] !== undefined)) {
+          add(issues, `${path}.require.transparency.required`, "Transparency pins require required=true", "policy.transparency_consistency");
+        }
+        if (
+          transparency.required === true &&
+          transparency.expected_checkpoint_digest === undefined &&
+          transparency.maximum_checkpoint_age_seconds === undefined &&
+          !(
+            transparency.require_consistency === true &&
+            transparency.expected_prior_checkpoint_digest !== undefined
+          )
+        ) {
+          add(
+            issues,
+            `${path}.require.transparency`,
+            "Required transparency needs checkpoint freshness, an exact checkpoint digest, or consumer-pinned prior consistency; minimum_size alone is not a rollback defense",
+            "policy.transparency_rollback_defense"
+          );
+        }
+        if (
+          transparency.require_consistency === true &&
+          transparency.expected_prior_checkpoint_digest === undefined
+        ) {
+          add(
+            issues,
+            `${path}.require.transparency.expected_prior_checkpoint_digest`,
+            "Consistency requires a consumer-pinned prior checkpoint digest",
+            "policy.transparency_prior_pin"
+          );
+        }
+        if (
+          transparency.expected_prior_checkpoint_digest !== undefined &&
+          transparency.require_consistency !== true
+        ) {
+          add(
+            issues,
+            `${path}.require.transparency.require_consistency`,
+            "A prior checkpoint digest requires require_consistency=true",
+            "policy.transparency_prior_pin"
+          );
+        }
+      }
+    }
     if (req.attestation !== undefined) {
       if (!isRecord(req.attestation)) add(issues, `${path}.require.attestation`, "Expected an object", "policy.attestation");
       else {
@@ -283,7 +407,7 @@ export function validateAICPolicyEvaluation(value: unknown): ValidationResult<AI
   allowed(value, ["artifact_type", "context", "decision", "evaluated_at", "findings", "policy", "rules", "spec", "subjects"], "$", issues);
   if (value.artifact_type !== "aic_policy_evaluation") add(issues, "$.artifact_type", "Expected aic_policy_evaluation", "policy_evaluation.artifact_type");
   if (value.spec !== AIC_POLICY_SPEC) add(issues, "$.spec", `Expected ${AIC_POLICY_SPEC}`, "policy_evaluation.spec");
-  if (!isString(value.evaluated_at) || Number.isNaN(Date.parse(value.evaluated_at))) add(issues, "$.evaluated_at", "Expected an ISO date-time", "policy_evaluation.time");
+  if (!isAICRfc3339DateTime(value.evaluated_at)) add(issues, "$.evaluated_at", "Expected an ISO date-time", "policy_evaluation.time");
   if (!["passed", "failed", "indeterminate"].includes(String(value.decision))) add(issues, "$.decision", "Expected passed, failed, or indeterminate", "policy_evaluation.decision");
   if (!isRecord(value.policy)) add(issues, "$.policy", "Expected an object", "policy_evaluation.policy");
   else {
@@ -300,7 +424,7 @@ export function validateAICPolicyEvaluation(value: unknown): ValidationResult<AI
   }
   if (!isRecord(value.subjects)) add(issues, "$.subjects", "Expected an object", "policy_evaluation.subjects");
   else {
-    allowed(value.subjects, ["attestation_digest", "contract_digest", "observations_digest", "proof_digest"], "$.subjects", issues);
+    allowed(value.subjects, ["attestation_digest", "contract_digest", "observations_digest", "proof_digest", "transparency_index_digest", "transparency_prior_index_digest", "transparency_trust_store_digest"], "$.subjects", issues);
     Object.entries(value.subjects).forEach(([field, digest]) => {
       if (!/^sha256:[0-9a-f]{64}$/.test(String(digest))) add(issues, `$.subjects.${field}`, "Expected a SHA-256 digest", "policy_evaluation.subject_digest");
     });

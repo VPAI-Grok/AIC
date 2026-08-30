@@ -39,8 +39,11 @@ The following package surfaces are implemented and tested in this repository, bu
 | `@aicorg/evidence-playwright` | Rendered human-UI and native WebMCP browser evidence |
 | `@aicorg/runner-remote` | Self-hostable, data-only remote evidence execution with exact mutation grants |
 | `@aicorg/conformance-packs` | Versioned checkout, billing mutation, account deletion, admin mutation, and record CRUD profiles |
+| `@aicorg/verify-core` | Minimal trust, proof, policy, and transparency verification without scanner/compiler runtime dependencies |
+| `@aicorg/rely` | Local consumer-owned assurance evaluation with mandatory exact artifact/request assertions and policy-derived deadlines |
+| `@aicorg/reliance-server` | Read-only, exportable, mirrorable assurance-record discovery with optional local evaluation |
 
-The same release extends `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg/cli` with behavior and trust artifacts, cumulative assurance policy, compatibility vectors, signed reference transparency checkpoints, scheduled dual-signed key transitions, and their CLI commands. The open remote-runner package can be operated by a separate party, but AIC does not currently operate or claim an independent hosted runner.
+The same release extends `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg/cli` with behavior and trust artifacts, cumulative assurance policy, compatibility vectors, signed reference transparency checkpoints, scheduled dual-signed key transitions, canonical reliance decisions and resolver records, and `aic rely evaluate`. The open remote-runner and resolver packages can be operated by separate parties, but AIC does not currently operate or claim an independent hosted runner, public resolver, or resolver mirror.
 
 ## Install Targets
 
@@ -128,16 +131,60 @@ The runner accepts only validated data-only jobs, revalidates public-network tar
 
 ### Assurance, Interoperability, Transparency, And Rotation
 
-The validators, open verifier, assurance-policy evaluator, compatibility-suite verifier, reference transparency implementation, and key-transition operations live in `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg/cli` rather than separate service-only packages.
+The validators live in `@aicorg/spec`. The minimal trust, proof-regeneration, assurance-policy, and transparency verifier lives in `@aicorg/verify-core`, so reliance consumers do not load or install the scanner/compiler toolchain. Compatibility-suite, key-transition, scanning, and authoring operations remain available through `@aicorg/automation-core` and `@aicorg/cli`.
 
 ```bash
 # Inside this monorepo
-pnpm add @aicorg/spec@workspace:* @aicorg/automation-core@workspace:*
+pnpm add @aicorg/spec@workspace:* @aicorg/verify-core@workspace:* @aicorg/automation-core@workspace:*
 
 # After the next npm alpha release
-pnpm add @aicorg/spec@alpha @aicorg/automation-core@alpha
+pnpm add @aicorg/spec@alpha @aicorg/verify-core@alpha @aicorg/automation-core@alpha
 pnpm add -D @aicorg/cli@alpha
 ```
+
+### Local Agent Reliance
+
+`@aicorg/rely` consumes caller-supplied evidence and pinned trust data only. It performs no implicit registry, resolver, network, filesystem, or environment discovery. Its preflight helper uses a caller-trusted current clock, binds the exact operation and deployment request, and rejects non-`allow`, stale, future-dated, expired, request-mismatched, or out-of-window decisions.
+
+```bash
+# Inside this monorepo
+pnpm add @aicorg/rely@workspace:*
+
+# After the next npm alpha release and registry verification
+pnpm add @aicorg/rely@alpha
+```
+
+The matching CLI is also repository-only until that release:
+
+```bash
+pnpm aic rely evaluate <policy> <contract> <proof> \
+  --observations <file> \
+  --attestation <file> \
+  --trust-store <file> \
+  --origin <origin> \
+  --operation-id <id> \
+  --deployment-id <id> \
+  --expect-revision <full-sha> \
+  --environment <development|test|staging|production>
+```
+
+Optional transparency inputs verify the signed reference index and exact attestation inclusion only when both its index and separately pinned trust store are supplied. A matching consumer policy can require that verification and restrict log and key identities. External receipt references still need their provider-specific verifier.
+
+### Self-Hosted Reliance Resolver
+
+```bash
+# Inside this monorepo
+pnpm add @aicorg/reliance-server@workspace:*
+
+# After the next npm alpha release and registry verification
+pnpm add @aicorg/reliance-server@alpha
+```
+
+The reference server exposes a Fetch API handler for exact assurance lookup, history, and portable snapshot export. It does not fetch artifact references or execute submitted code. Resolver results are untrusted discovery; clients choose their own trust stores and policy and can reproduce decisions locally with `@aicorg/rely`. Installing this package does not create a hosted public resolver or independent mirror.
+
+### Bundled GitHub Reliance Gate
+
+[`actions/aic-rely`](../actions/aic-rely) is a repository action, not an npm package. Its checked-in Node.js bundle evaluates regular JSON inputs without downloading a verifier at runtime. Pin the action to a full commit SHA, pin the consumer policy and trust-store file digests, and provide exact issuer, key, runner, origin, environment, deployment, operation, and revision expectations. It fails the workflow for `confirm`, `deny`, and `indeterminate` as well as malformed output.
 
 ### CLI-Driven Onboarding And Artifact Generation
 
@@ -174,8 +221,9 @@ pnpm add @aicorg/ai-bootstrap @aicorg/ai-bootstrap-http @aicorg/ai-bootstrap-ope
 ## Release Notes
 
 - The current npm release uses the `alpha` tag.
-- The implemented next-wave packages remain repository-only until the next publish workflow succeeds; use `workspace:*` only inside this monorepo.
+- Alpha publication uses a [no-OIDC verification and immutable-packaging job followed by a protected, OIDC-only publishing job](./npm-trusted-publishing.md). The GitHub `npm-alpha` environment and npm Trusted Publisher bindings are external prerequisites; the workflow does not accept a static npm token.
+- The implemented next-wave packages and `aic rely evaluate` remain repository-only until the next publish workflow succeeds and npm registry contents are verified; use `workspace:*` only inside this monorepo.
 - Workspace examples remain private demos, proof surfaces, and test fixtures.
 - Package tarballs are validated with local smoke tests before any publish step runs in CI.
 - `@aicorg/devtools` is part of the publishable alpha package surface.
-- Package availability does not demonstrate an external adopter, an independently operated runner, provider-verified external receipts, or certification.
+- Package or action availability does not demonstrate an external adopter or enforcing agent consumer, an independently operated runner, a public resolver or independent mirror, provider-verified external receipts, or certification.

@@ -1,5 +1,6 @@
 import type { AICValidationIssue, ValidationResult } from "./types.js";
 import type { AICTrustSignature } from "./trust.js";
+import { isAICRfc3339DateTime as date } from "./date-time.js";
 
 export const AIC_KEY_TRANSITION_SPEC = "aic.key-transition/0.1";
 
@@ -34,7 +35,6 @@ function record(value: unknown): value is Record<string, unknown> {
 }
 function string(value: unknown): value is string { return typeof value === "string" && value.trim().length > 0; }
 function digest(value: unknown): value is string { return typeof value === "string" && /^sha256:[0-9a-f]{64}$/.test(value); }
-function date(value: unknown): value is string { return string(value) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) && !Number.isNaN(Date.parse(value)); }
 function add(issues: AICValidationIssue[], path: string, message: string, rule: string): void { issues.push({ message, path, rule, severity: "error" }); }
 function allowed(value: Record<string, unknown>, keys: string[], path: string, issues: AICValidationIssue[]): void {
   const set = new Set(keys); Object.keys(value).forEach((key) => { if (!set.has(key)) add(issues, `${path}.${key}`, `Unknown field: ${key}`, "key_transition.unknown_field"); });

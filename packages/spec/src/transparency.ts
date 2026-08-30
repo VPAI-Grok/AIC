@@ -1,5 +1,6 @@
 import type { AICValidationIssue, JsonValue, ValidationResult } from "./types.js";
 import type { AICTrustSignature } from "./trust.js";
+import { isAICRfc3339DateTime as isDate } from "./date-time.js";
 
 export const AIC_TRANSPARENCY_SPEC = "aic.transparency/0.1";
 
@@ -58,10 +59,6 @@ function isString(value: unknown): value is string {
 
 function isDigest(value: unknown): value is string {
   return typeof value === "string" && /^sha256:[0-9a-f]{64}$/.test(value);
-}
-
-function isDate(value: unknown): value is string {
-  return isString(value) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) && !Number.isNaN(Date.parse(value));
 }
 
 function isJson(value: unknown): value is JsonValue {

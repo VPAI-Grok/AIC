@@ -18,6 +18,7 @@ import {
   type AICProtectedSignature,
   type AICRemoteRunnerIdentity,
   type JsonValue,
+  isAICRfc3339DateTime,
   isAICBehaviorConfirmation,
   isAICBehaviorStatus,
   validateAICBehaviorContract,
@@ -158,24 +159,60 @@ function canonicalize(value: unknown, ancestors = new Set<object>()): unknown {
   if (ancestors.has(value)) throw new TypeError("AIC canonical JSON cannot contain cycles.");
   ancestors.add(value);
   if (Array.isArray(value)) {
-    const result = value.map((item) => canonicalize(item, ancestors));
-    ancestors.delete(value);
-    return result;
+    const keys = Object.keys(value);
+    if (
+      keys.length !== value.length ||
+      keys.some((key, index) => key !== String(index)) ||
+      Reflect.ownKeys(value).some(
+        (key) => key !== "length" && (typeof key !== "string" || !keys.includes(key))
+      )
+    ) {
+      ancestors.delete(value);
+      throw new TypeError("AIC canonical JSON accepts only dense JSON arrays.");
+    }
+    try {
+      return keys.map((key) => {
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
+        if (!descriptor || !("value" in descriptor)) {
+          throw new TypeError("AIC canonical JSON does not evaluate accessors.");
+        }
+        return canonicalize(descriptor.value, ancestors);
+      });
+    } finally {
+      ancestors.delete(value);
+    }
   }
   if (isRecord(value)) {
     const prototype = Object.getPrototypeOf(value);
     if (prototype !== Object.prototype && prototype !== null) {
+      ancestors.delete(value);
       throw new TypeError("AIC canonical JSON accepts only plain data objects.");
     }
-    const result = Object.keys(value)
-      .sort()
-      .reduce<Record<string, unknown>>((result, key) => {
-        result[key] = canonicalize(value[key], ancestors);
-        return result;
-      }, {});
-    ancestors.delete(value);
-    return result;
+    const keys = Object.keys(value).sort();
+    if (Reflect.ownKeys(value).length !== keys.length) {
+      ancestors.delete(value);
+      throw new TypeError("AIC canonical JSON accepts only enumerable string-keyed data.");
+    }
+    const result: Record<string, unknown> = Object.create(null);
+    try {
+      for (const key of keys) {
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
+        if (!descriptor || !("value" in descriptor)) {
+          throw new TypeError("AIC canonical JSON does not evaluate accessors.");
+        }
+        Object.defineProperty(result, key, {
+          configurable: true,
+          enumerable: true,
+          value: canonicalize(descriptor.value, ancestors),
+          writable: true
+        });
+      }
+      return result;
+    } finally {
+      ancestors.delete(value);
+    }
   }
+  ancestors.delete(value);
   throw new TypeError("AIC canonical JSON accepts only JSON data.");
 }
 
@@ -490,8 +527,8 @@ export async function createAICEvidenceBundle(input: {
     );
   }
   if (
-    !Number.isFinite(Date.parse(input.startedAt)) ||
-    !Number.isFinite(Date.parse(input.completedAt)) ||
+    !isAICRfc3339DateTime(input.startedAt) ||
+    !isAICRfc3339DateTime(input.completedAt) ||
     Date.parse(input.completedAt) < Date.parse(input.startedAt)
   ) {
     throw new AICEvidenceCollectionError("evidence_invalid", "Evidence bundle timestamps are invalid or out of order.");

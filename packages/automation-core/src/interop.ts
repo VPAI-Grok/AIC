@@ -1,5 +1,6 @@
 import { readFile, realpath } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
+import { parseAICStrictJson } from "@aicorg/spec";
 import { createAICCanonicalJson, createAICDigest, verifyAICSignedAttestation, verifyAICTrustRegistry } from "./trust.js";
 
 export const AIC_INTEROP_SPEC = "aic.interop/0.1";
@@ -43,17 +44,8 @@ function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function normalize(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(normalize);
-  if (record(value)) return Object.keys(value).sort().reduce<Record<string, unknown>>((result, key) => {
-    result[key] = normalize(value[key]);
-    return result;
-  }, {});
-  return value;
-}
-
 function stableEqual(left: unknown, right: unknown): boolean {
-  return JSON.stringify(normalize(left)) === JSON.stringify(normalize(right));
+  return createAICCanonicalJson(left) === createAICCanonicalJson(right);
 }
 
 function validateSuite(value: unknown): asserts value is AICInteropSuite {
@@ -136,7 +128,7 @@ export async function loadAICInteropSuite(manifestPath: string): Promise<AICInte
   const root = dirname(absoluteManifest);
   const realRoot = await realpath(root);
   const realManifest = await realpath(absoluteManifest);
-  const manifest = JSON.parse(await readFile(absoluteManifest, "utf8")) as unknown;
+  const manifest = parseAICStrictJson(await readFile(absoluteManifest, "utf8"));
   validateSuite(manifest);
   const resolveFixtureValue = async (value: unknown): Promise<unknown> => {
     if (Array.isArray(value)) return Promise.all(value.map(resolveFixtureValue));
@@ -147,18 +139,27 @@ export async function loadAICInteropSuite(manifestPath: string): Promise<AICInte
       const realTarget = await realpath(target);
       const traversal = relative(realRoot, realTarget);
       if (traversal.startsWith("..") || traversal === "" || realTarget === realManifest) throw new Error(`Fixture reference must stay below the suite directory: ${value.$ref}`);
-      return jsonPointer(JSON.parse(await readFile(target, "utf8")) as unknown, fragment ? `#${fragment}` : "");
+      return jsonPointer(
+        parseAICStrictJson(await readFile(target, "utf8")),
+        fragment ? `#${fragment}` : ""
+      );
     }
-    const result: Record<string, unknown> = {};
-    for (const [key, child] of Object.entries(value)) result[key] = await resolveFixtureValue(child);
-    return result;
+    return Object.fromEntries(
+      await Promise.all(
+        Object.entries(value).map(async ([key, child]) => [key, await resolveFixtureValue(child)])
+      )
+    );
   };
   const resolvedCases: AICInteropCase[] = [];
   for (const testCase of manifest.cases) {
-    const resolvedInput: Record<string, unknown> = {};
-    for (const [name, value] of Object.entries(testCase.input)) {
-      resolvedInput[name] = await resolveFixtureValue(value);
-    }
+    const resolvedInput = Object.fromEntries(
+      await Promise.all(
+        Object.entries(testCase.input).map(async ([name, input]) => [
+          name,
+          await resolveFixtureValue(input)
+        ])
+      )
+    );
     resolvedCases.push({ ...testCase, input: resolvedInput });
   }
   return { ...manifest, cases: resolvedCases };

@@ -24,14 +24,30 @@ AIC is an open-source assurance layer for that gap. It helps teams:
 - adopt native WebMCP without duplicating equivalent metadata;
 - define protocol-neutral behavioral contracts;
 - execute the same scenarios across multiple surfaces;
-- fail CI when those surfaces diverge; and
+- fail CI when those surfaces diverge;
 - emit portable behavior proofs and deployment-bound, signed trust claims;
-- collect the same observation model through browser, MCP, and HTTP/OpenAPI adapters; and
-- apply reusable conformance packs and fail-closed assurance policy.
+- collect the same observation model through browser, MCP, and HTTP/OpenAPI adapters;
+- apply reusable conformance packs; and
+- make one local, fail-closed reliance decision from consumer-owned policy before an agent acts.
 
 AIC does not compete with WebMCP, MCP, OpenAPI, or future browser standards. Those are execution and description surfaces. AIC verifies the behavior behind them.
 
-## What is new: Open Ecosystem Conformance
+## What is new: Trust Fabric
+
+The repository now puts AIC in the relying party's pre-execution path without creating another invocation protocol:
+
+- `@aicorg/rely` evaluates caller-supplied evidence, signed attestations, pinned trust stores, exact deployment bindings, freshness, and every matching consumer-policy rule;
+- `aic rely evaluate` emits a canonical `aic_reliance_decision` with `allow`, `confirm`, `deny`, or `indeterminate` and exits successfully only for `allow`;
+- `assertAICRelianceAllowed` snapshots consumer input before an untrusted decision, returns a detached locally reproduced decision, and samples trusted time after reproduction; it rejects stateful, fabricated, substituted, stale, future-dated, expired, or deadline-crossed results, and can require residual validity within the 60-second portable cap;
+- the bundled [`actions/aic-rely`](./actions/aic-rely) GitHub action evaluates regular JSON inputs offline with the checked-in verifier bundle and fails closed before a release or agent workflow proceeds;
+- `@aicorg/reliance-server` is a read-only, mirrorable reference resolver for portable assurance records and history; resolver discovery remains untrusted; and
+- a policy can require a separately signed AIC transparency index and pinned log identities, while external receipt references remain `not_checked` until a provider-specific verifier checks them.
+
+WebMCP, MCP, OpenAPI, and browser UI remain the native description and execution surfaces. AIC supplies the protocol-neutral answer to a different question: does the evidence for this exact operation, deployment, and revision satisfy *my* policy strongly enough to proceed?
+
+The Trust Fabric packages, schemas, CLI command, reference resolver, and action are implemented in this repository but are not yet claimed as published npm packages, a hosted service, or externally adopted infrastructure. See [AIC Trust Fabric](./docs/trust-fabric.md) and [ADR 0005](./docs/adr/0005-trust-fabric-reliance-network.md).
+
+## Open Ecosystem Conformance foundation
 
 The repository now implements the technical foundation for a neutral conformance ecosystem:
 
@@ -158,6 +174,28 @@ aic trust attest ./aic-behavior-contract.json ./aic-browser-proof.json \
 
 The consumer runs `aic trust verify` with its own pinned trust store plus the expected origin and revision. Never distribute the private key with the proof.
 
+### 5. Fail closed before relying on it
+
+The relying agent, gateway, or release workflow owns the policy and trust store and evaluates the exact target immediately before execution:
+
+```bash
+aic rely evaluate \
+  ./policy.json \
+  ./aic-behavior-contract.json \
+  ./aic-browser-proof.json \
+  --observations ./aic-browser-observations.json \
+  --attestation ./checkout-attestation.json \
+  --trust-store ./consumer-trust-store.json \
+  --origin https://app.example.com \
+  --operation-id checkout.complete.domain \
+  --deployment-id deploy_001 \
+  --expect-revision 0123456789abcdef0123456789abcdef01234567 \
+  --environment production \
+  --out-file ./reliance-decision.json
+```
+
+The command returns nonzero for `confirm`, `deny`, or `indeterminate`. A resolver can help find candidate artifacts, but resolver inclusion never grants permission; the relying party's pinned inputs, trusted clock, and local verification determine whether execution may proceed. Read [AIC Trust Fabric](./docs/trust-fabric.md).
+
 ## WebMCP: native first, AIC verified
 
 When WebMCP provides a field or lifecycle primitive, AIC should consume it rather than invent a parallel one. AIC adds value where protocol metadata stops:
@@ -219,6 +257,9 @@ See [MCP Server Setup](./docs/mcp-server.md).
 | `@aicorg/evidence-mcp` | MCP tool evidence adapter with current stateless transport support |
 | `@aicorg/runner-remote` | Data-only, deployment-bound remote observation runner kit |
 | `@aicorg/conformance-packs` | Versioned checkout, billing, deletion, admin, and CRUD assurance profiles |
+| `@aicorg/verify-core` | Minimal trust, proof, policy, and transparency verifier with no scanner/compiler runtime dependency |
+| `@aicorg/rely` | Local, protocol-neutral reliance decisions and time-bounded preflight guards |
+| `@aicorg/reliance-server` | Read-only, exportable, mirrorable assurance-record discovery and optional local evaluation |
 | `@aicorg/cli` | Onboarding, behavior verification, trust signing/verification, registry, inspection, diff, and guarded apply commands |
 | `@aicorg/runtime` | Browser registry and live UI manifest serialization |
 | `@aicorg/sdk-react` | React hooks and components for explicit `agent*` semantics |
@@ -229,7 +270,7 @@ See [MCP Server Setup](./docs/mcp-server.md).
 | `@aicorg/ai-bootstrap*` | Review-assisted annotation suggestions |
 | `@aicorg/integrations-*` | Component-library adapters |
 
-The published npm line is alpha. Repository-only behavior-assurance additions ship with the next package release. See [npm Packages](./docs/npm-packages.md).
+The published npm line is alpha. The Trust Fabric and other next-wave packages are repository-only until a publish succeeds and registry availability is verified. See [npm Packages](./docs/npm-packages.md).
 
 ## Proof and examples
 
@@ -262,8 +303,9 @@ Current limitations:
 - WebMCP tracks an experimental browser API;
 - signed-claim primitives verify issuer intent, not current production reachability or runner independence;
 - the public registry interface has no fabricated external-adopter entries;
-- the remote runner is open software and must be operated by a genuinely independent party before its evidence can support an independence claim; and
-- a hosted evidence history/dashboard, globally operated transparency service, external certification, and three verified external adopters remain market and operations gates.
+- the remote runner is open software and must be operated by a genuinely independent party before its evidence can support an independence claim;
+- the reference resolver and bundled action are repository implementations, not a public hosted resolver, independent mirror, published npm release, or external adoption proof; and
+- external agent consumers, unrelated production adopters and runner operators, an independent verifier, a public resolver mirror pair with durable history, provider-verified transparency receipts, and certification remain external gates.
 
 Read [Supported Today](./docs/supported-today.md) and [Threat Model](./docs/threat-model.md) before making assurance claims.
 
@@ -288,6 +330,8 @@ Generated AIC JSON should be regenerated and reviewed, not hand-edited.
 | [Behavior Assurance](./docs/behavior-assurance.md) | Contracts, observations, proof semantics, harnesses, and CI |
 | [AIC Verified Trust Layer](./docs/trust-layer.md) | Native browser evidence, signed claims, trust stores, registries, and trust boundaries |
 | [Open Ecosystem Conformance](./docs/updates-2026-08-29-open-ecosystem-conformance.md) | Multi-protocol evidence, packs, policy, interoperability, rotation, and honest external gates |
+| [AIC Trust Fabric](./docs/trust-fabric.md) | Consumer preflight, canonical reliance decisions, resolver boundary, and completion gates |
+| [Trust Fabric ADR](./docs/adr/0005-trust-fabric-reliance-network.md) | Relying-party architecture and non-goals |
 | [Submit an Adopter Claim](./docs/adopter-submission.md) | Evidence requirements for a public external adopter listing |
 | [WebMCP with AIC](./docs/webmcp.md) | Native-first integration and compatibility boundary |
 | [Architecture](./docs/architecture.md) | Packages, data flow, and trust boundaries |
@@ -301,7 +345,7 @@ Generated AIC JSON should be regenerated and reviewed, not hand-edited.
 | [Release Status](./docs/release-status.md) | Current shipped and repository-only capabilities |
 | [Threat Model](./docs/threat-model.md) | What AIC proof does and does not establish |
 
-JSON Schemas live under [`schemas/`](./schemas/).
+JSON Schemas live under [`schemas/`](./schemas/). They provide portable structural screening; runtime validators and reliance preflight remain normative for semantic integrity and execution decisions.
 
 ## Open source
 

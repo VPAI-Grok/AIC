@@ -43,6 +43,7 @@
   "dependencies": {
     "@aicorg/runtime": "workspace:*",
     "@aicorg/spec": "workspace:*",
+    "@aicorg/verify-core": "workspace:*",
     "typescript": "^5.8.2"
   }
 }

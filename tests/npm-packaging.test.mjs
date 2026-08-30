@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { mkdir, readFile, readdir, rm } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { access, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
 import test from "node:test";
 
 import { createTempDir, resolveFromRepo } from "./helpers.mjs";
@@ -73,6 +73,24 @@ const publishablePackages = [
     hasClientExport: false,
     name: "@aicorg/runner-remote",
     path: "packages/runner-remote"
+  },
+  {
+    hasBin: false,
+    hasClientExport: false,
+    name: "@aicorg/verify-core",
+    path: "packages/verify-core"
+  },
+  {
+    hasBin: false,
+    hasClientExport: false,
+    name: "@aicorg/rely",
+    path: "packages/rely"
+  },
+  {
+    hasBin: false,
+    hasClientExport: false,
+    name: "@aicorg/reliance-server",
+    path: "packages/reliance-server"
   },
   {
     hasBin: false,
@@ -270,6 +288,20 @@ test("packed npm tarballs rewrite workspace dependencies and only ship built fil
     assert.ok(members.some((member) => member.startsWith("package/dist/")));
     assert.equal(members.some((member) => member.startsWith("package/src/")), false);
 
+    if (["@aicorg/rely", "@aicorg/verify-core"].includes(pkg.name)) {
+      for (const forbiddenPrefix of [
+        "package/dist/automation-core/",
+        "package/dist/runtime/",
+        "package/dist/typescript/"
+      ]) {
+        assert.equal(
+          members.some((member) => member.startsWith(forbiddenPrefix)),
+          false,
+          `${pkg.name} must not ship ${forbiddenPrefix}`
+        );
+      }
+    }
+
     for (const dependencyBucket of ["dependencies", "peerDependencies", "optionalDependencies"]) {
       const bucket = packedManifest[dependencyBucket];
 
@@ -305,4 +337,68 @@ test("packed npm tarballs rewrite workspace dependencies and only ship built fil
       assert.ok(members.some((m) => m.includes(binPath.replace("./", ""))));
     }
   }
+});
+
+test("packed reliance SDK imports with only the minimal verifier dependency closure", async (t) => {
+  const tempDir = await createTempDir("aic-rely-clean-install-");
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+  const tarballs = [];
+  for (const packagePath of ["packages/spec", "packages/verify-core", "packages/rely"]) {
+    tarballs.push(
+      await packPackage(
+        packagePath,
+        resolve(tempDir, "packs", packagePath.replaceAll("/", "__"))
+      )
+    );
+  }
+  const consumer = resolve(tempDir, "consumer");
+  await mkdir(consumer, { recursive: true });
+  await writeFile(
+    resolve(consumer, "package.json"),
+    `${JSON.stringify({ name: "aic-rely-clean-install", private: true, type: "module" })}\n`,
+    "utf8"
+  );
+  const install = await runCommand(
+    process.platform === "win32" ? process.execPath : "npm",
+    [
+      ...(process.platform === "win32"
+        ? [resolve(dirname(process.execPath), "node_modules/npm/bin/npm-cli.js")]
+        : []),
+      "install",
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund",
+      ...tarballs
+    ],
+    { cwd: consumer }
+  );
+  assert.equal(install.code, 0, install.stderr);
+
+  const imported = await runCommand(
+    process.execPath,
+    [
+      "--input-type=module",
+      "--eval",
+      [
+        'await import("@aicorg/rely");',
+        'await import("@aicorg/verify-core");',
+        'await import("@aicorg/verify-core/assurance");',
+        'await import("@aicorg/verify-core/policy");',
+        'await import("@aicorg/verify-core/transparency");',
+        'await import("@aicorg/verify-core/trust");'
+      ].join("\n")
+    ],
+    { cwd: consumer }
+  );
+  assert.equal(imported.code, 0, imported.stderr);
+  await assert.rejects(access(resolve(consumer, "node_modules", "typescript")));
+  await assert.rejects(
+    access(resolve(consumer, "node_modules", "@aicorg", "automation-core"))
+  );
+  assert.deepEqual(
+    (await readdir(resolve(consumer, "node_modules", "@aicorg"))).sort(),
+    ["rely", "spec", "verify-core"]
+  );
 });

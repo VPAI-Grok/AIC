@@ -10,6 +10,7 @@ AIC is a **contract-first framework** that makes web apps reliably operable by A
 4. **Consuming** — the MCP server exposes those manifests as tools that any AI agent can call
 5. **Proving** — protocol-neutral contracts and executed observations verify behavior across UI, WebMCP, MCP, and API surfaces
 6. **Attesting** — signed statements bind a passed proof to an issuer, origin, deployment, and source revision for independent verification
+7. **Relying** — an agent, gateway, or release system applies its own fail-closed policy to the exact target immediately before execution
 
 ---
 
@@ -24,6 +25,7 @@ graph TD
         diff["diff.ts (manifest diff engine)"]
         behavior["behavior.ts (behavior contracts and proof types)"]
         trust["trust.ts (signed claims, trust stores, registries)"]
+        reliance["reliance.ts (decisions, resolver records, snapshots)"]
     end
 
     subgraph RUNTIME["⚙️ @aicorg/runtime"]
@@ -44,14 +46,37 @@ graph TD
         generator["generateProjectArtifacts (manifest builder)"]
         doctor["createAICDoctorReport"]
         initializer["initializeAICProject (scaffolding)"]
-        assurance["verifyAICBehavior (parity and evidence engine)"]
-        trustEngine["trust.ts (signing and registry verification)"]
+        verifierCompatibility["verify-core compatibility re-exports"]
+        conformanceAuthoring["conformance, interop, and key-transition tooling"]
         writer["writeArtifactFiles"]
+    end
+
+    subgraph VERIFY["🔐 @aicorg/verify-core — Minimal Verifier"]
+        canonicalVerifier["canonical JSON and digest"]
+        trustVerifier["attestation and registry verification"]
+        policyVerifier["proof regeneration and policy evaluation"]
+        transparencyVerifier["checkpoint and consistency verification"]
     end
 
     subgraph EVIDENCE["🌐 @aicorg/evidence-playwright"]
         browserRunner["Chromium evidence session"]
         nativeWebMCP["document.modelContext inspection and execution"]
+    end
+
+    subgraph RELY["🛡️ @aicorg/rely"]
+        evaluateReliance["evaluateAICReliance"]
+        assertReliance["assertAICRelianceAllowed"]
+        preflight["createAICReliancePreflight"]
+    end
+
+    subgraph RESOLVER["🪞 @aicorg/reliance-server"]
+        resolverLookup["exact assurance lookup and history"]
+        resolverSnapshot["portable mirror snapshot"]
+        resolverEvaluate["optional locally configured evaluator"]
+    end
+
+    subgraph RELY_ACTION["✅ actions/aic-rely"]
+        actionBundle["bundled offline GitHub preflight"]
     end
 
     subgraph BOOTSTRAP["🤖 @aicorg/ai-bootstrap"]
@@ -77,6 +102,7 @@ graph TD
         cmd_verify["aic verify"]
         cmd_trust["aic trust keygen/attest/verify"]
         cmd_registry["aic registry build/verify/query"]
+        cmd_rely["aic rely evaluate"]
         cmd_bootstrap["aic bootstrap"]
         cmd_generate["aic generate project/discovery/ui/permissions/operate"]
         cmd_authoring["aic generate authoring-plan"]
@@ -116,11 +142,19 @@ graph TD
     SDK --> RUNTIME
     SDK --> SPEC
     AUTOMATION --> RUNTIME
+    AUTOMATION --> VERIFY
     AUTOMATION --> SPEC
+    VERIFY --> SPEC
     EVIDENCE --> SPEC
+    RELY --> VERIFY
+    RELY --> SPEC
+    RESOLVER --> VERIFY
+    RESOLVER --> SPEC
+    RELY_ACTION --> RELY
     PLUGINS --> AUTOMATION
     PLUGINS --> SPEC
     CLI --> AUTOMATION
+    CLI --> RELY
     CLI --> BOOTSTRAP
     CLI --> BOOTSTRAP_HTTP
     CLI --> BOOTSTRAP_OAI
@@ -290,7 +324,7 @@ See [AIC Verified Trust Layer](./trust-layer.md).
 
 ## Open Ecosystem Conformance
 
-The ecosystem layer keeps protocol execution, behavior proof, conformance, and reliance policy separate:
+The ecosystem layer keeps protocol execution, behavior proof, conformance, and consumer reliance separate:
 
 ```mermaid
 flowchart LR
@@ -304,20 +338,37 @@ flowchart LR
     PACK["versioned conformance pack"] --> CONF["digest-bound conformance result"]
     BINDING["authored application mapping"] --> CONF
     PROOF --> CONF
-    POLICY["consumer assurance policy"] --> DECISION["reliance decision"]
+    POLICY["consumer assurance policy"] --> DECISION["canonical reliance decision"]
     PROOF --> DECISION
     CLAIM["signed deployment claim"] --> DECISION
     CONF --> DECISION
-    DECISION --> HISTORY["signed checkpoint / external receipt reference"]
+    HISTORY["optional signed history"] --> DECISION
+    RESOLVER["untrusted mirrorable resolver"] -. candidate records .-> DECISION
+    DECISION --> PREFLIGHT["agent / gateway / release preflight"]
+    PREFLIGHT --> NATIVE["WebMCP / MCP / HTTP / UI execution"]
 ```
 
 `@aicorg/evidence-core` owns strict plans, projections, artifacts, receipts, and bundle verification. `@aicorg/evidence-http` and `@aicorg/evidence-mcp` adapt their native protocols. `@aicorg/runner-remote` adds exact production identity, public-network pinning, bounded execution, and operator capabilities; it never executes submitted code.
 
-`@aicorg/conformance-packs` supplies versioned operation-class obligations. The application binding is explicit and digest-bound. `@aicorg/automation-core` then regenerates proof, verifies conformance, applies every matching assurance-policy rule, verifies portable compatibility suites, operates the reference transparency format, and validates scheduled dual-signed key transitions.
+`@aicorg/conformance-packs` supplies versioned operation-class obligations. The application binding is explicit and digest-bound. `@aicorg/verify-core` contains the minimal trust, proof-regeneration, assurance-policy, and transparency verifier used by reliance gates, without loading the scanner/compiler toolchain. `@aicorg/automation-core` re-exports those primitives for compatibility and adds conformance, portable compatibility suites, scheduled dual-signed key transitions, scanning, and authoring.
 
 The deployment application's source revision and the runner software revision are distinct bindings. They are not required to match.
 
 See [Protocol Evidence and Remote Observation](./evidence-adapters.md), [Conformance Packs](./conformance-packs.md), [Assurance Policy](./assurance-policy.md), and [Transparency and Key Rotation](./transparency-and-key-rotation.md).
+
+## Trust Fabric — Consumer-Owned Preflight
+
+`@aicorg/rely` is the canonical relying-party boundary. It receives caller-supplied artifacts only, regenerates the proof through the assurance-policy evaluator, verifies the signed claim against a separately supplied trust store, checks the exact origin, operation, deployment, revision, freshness, revocation state, and any policy-required signed transparency history, then returns an `aic_reliance_decision` with `allow`, `confirm`, `deny`, or `indeterminate`.
+
+The decision is intentionally protocol-neutral. Thin adapters place the same guard before a WebMCP tool, MCP `tools/call`, HTTP mutation, browser action, or release promotion. They do not replace protocol-native authorization, confirmation, or invocation.
+
+`createAICReliancePreflight` canonical-snapshots caller inputs, evaluates against a trusted current clock, re-evaluates after a clock advance, and locally reproduces the entire decision before returning. `assertAICRelianceAllowed` snapshots the complete consumer-owned input before touching an untrusted raw decision, canonical-clones that decision without evaluating accessors, re-evaluates at the claimed time, and returns the detached result only after a full canonical match. Trusted time and optional residual validity are checked after reproduction. Fabricated or stateful results, forged deadlines, missing, extra, or substituted artifacts, a different request audience, future or over-age decisions, and decisions at their exclusive `valid_until` fail. Every portable `allow` is capped at 60 seconds and shortened to the earliest applicable evidence, attestation-expiry, or transparency-checkpoint boundary.
+
+The bundled `actions/aic-rely` JavaScript action applies the same verifier to bounded, regular JSON files in a GitHub runner without downloading a verifier at runtime. It pins the consumer policy and trust-store file digests plus explicit issuer, key, runner, origin, environment, deployment, operation, and revision identities. It succeeds only for a canonical `allow` produced at the runner's current time with at least 30 seconds of residual validity by default, and exposes the exclusive deadline separately so callers do not mistake a persisted boolean for authorization.
+
+`@aicorg/reliance-server` is a read-only Fetch API reference service. It provides exact lookups, history, and exportable snapshots for independent mirrors. Those records are `unverified_discovery`; the service does not fetch artifact references or execute submitted code. Its optional `POST /v1/rely` endpoint uses an operator-configured local evaluator and rate limiter, but clients can always reproduce the decision locally. Resolver availability, DNS, and operator identity never become implicit trust anchors.
+
+The package and action surfaces above are implemented in this repository. They are not yet evidence of npm publication, a public hosted resolver, external consumers, operator independence, or certification. See [AIC Trust Fabric](./trust-fabric.md) and [ADR 0005](./adr/0005-trust-fabric-reliance-network.md).
 
 ---
 
@@ -373,6 +424,7 @@ flowchart TD
 | `aic evidence run-remote/verify` | Collect a data-only production job and recompute its bundle/receipt bindings |
 | `aic conformance list/show/bind/verify` | Inspect packs, author digest-bound mappings, and verify contract or proof conformance |
 | `aic policy evaluate` | Regenerate proof and apply cumulative consumer reliance policy |
+| `aic rely evaluate` | Produce a canonical, fail-closed pre-execution decision for an exact operation and deployment |
 | `aic interop verify` | Execute portable canonicalization, digest, attestation, and registry vectors |
 | `aic transparency init/append/verify/consistency` | Operate and verify the signed reference history format |
 | `aic trust rotate/transition` | Prepare, verify, and apply dual-signed scheduled key transitions |
@@ -538,3 +590,6 @@ AIC scaffolds and tracks these files via `aic init` and `aic doctor`:
 
 > [!IMPORTANT]
 > **Describe natively, prove independently.** Prefer native protocol fields and keep behavioral requirements, evidence, and parity in a protocol-neutral AIC contract.
+
+> [!IMPORTANT]
+> **Discover openly, decide locally.** Resolver records are portable hints. The relying party owns the policy, trust stores, trusted clock, exact target bindings, and final execution decision.

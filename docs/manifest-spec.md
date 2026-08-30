@@ -133,4 +133,4 @@ The checked-in JSON Schemas live under [`schemas/`](../schemas):
 - [behavior-observation-set.schema.json](../schemas/behavior-observation-set.schema.json)
 - [behavior-proof.schema.json](../schemas/behavior-proof.schema.json)
 
-They are intended as the portable artifact definitions for integrators and docs. The repo’s TypeScript validators remain the enforcement source used in tests and CLI validation.
+They are intended as portable structural artifact definitions for integrators and docs. The repo’s TypeScript validators remain the normative enforcement source used in tests and CLI validation because hashes, cross-field equality, binding, and time-order invariants are not all expressible in JSON Schema. Schema acceptance alone is never permission for an agent to act.

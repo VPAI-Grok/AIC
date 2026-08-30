@@ -46,6 +46,7 @@
     "@aicorg/evidence-http": "workspace:*",
     "@aicorg/evidence-mcp": "workspace:*",
     "@aicorg/plugin-vite": "workspace:*",
+    "@aicorg/rely": "workspace:*",
     "@aicorg/runtime": "workspace:*",
     "@aicorg/runner-remote": "workspace:*",
     "@aicorg/spec": "workspace:*"

@@ -21,6 +21,7 @@ const requiredFiles = [
   "docs/coding-agents.md",
   "docs/evidence-adapters.md",
   "docs/npm-packages.md",
+  "docs/npm-trusted-publishing.md",
   "docs/assurance-policy.md",
   "docs/supported-today.md",
   "docs/transparency-and-key-rotation.md",
@@ -46,6 +47,9 @@ const requiredFiles = [
   "schemas/key-transition.schema.json",
   "schemas/policy-evaluation.schema.json",
   "schemas/remote-observation-job.schema.json",
+  "schemas/reliance-decision.schema.json",
+  "schemas/reliance-record.schema.json",
+  "schemas/reliance-snapshot.schema.json",
   "schemas/signed-attestation.schema.json",
   "schemas/transparency-checkpoint.schema.json",
   "schemas/transparency-index.schema.json",
@@ -64,6 +68,9 @@ const requiredFiles = [
   "packages/evidence-mcp/package.json",
   "packages/evidence-playwright/package.json",
   "packages/runner-remote/package.json",
+  "packages/verify-core/package.json",
+  "packages/rely/package.json",
+  "packages/reliance-server/package.json",
   "templates/agent-onboarding/AGENTS.md",
   "templates/agent-onboarding/CLAUDE.md",
   "templates/agent-onboarding/GEMINI.md",
@@ -142,4 +149,22 @@ test("automation-core onboarding templates stay in sync with checked-in template
       );
     })
   );
+});
+
+test("CI installs the isolated action toolchain and enforces source-bundle reproducibility", async () => {
+  const [ci, rootPackage] = await Promise.all([
+    readFile(resolveFromRepo(".github/workflows/ci.yml"), "utf8"),
+    readFile(resolveFromRepo("package.json"), "utf8").then(JSON.parse)
+  ]);
+
+  assert.match(
+    ci,
+    /npm --prefix actions\/aic-rely ci --ignore-scripts --no-audit --no-fund/u
+  );
+  assert.match(ci, /pnpm verify:action-bundle/u);
+  assert.equal(
+    rootPackage.scripts["verify:action-bundle"],
+    "npm --prefix actions/aic-rely run check:bundle"
+  );
+  assert.equal(rootPackage.scripts["test:contracts"], "node --test tests/*.test.mjs");
 });

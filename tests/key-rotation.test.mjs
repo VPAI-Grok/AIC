@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
+import { sign } from "node:crypto";
 import test from "node:test";
 
+import { createForeignSigningKey } from "./crypto-fixtures.mjs";
 import { importWorkspaceModule, readJsonFile, resolveFromRepo } from "./helpers.mjs";
 
 const automation = await importWorkspaceModule("packages/automation-core/dist/automation-core/src/index.js");
@@ -74,4 +76,65 @@ test("rotation cannot revoke the old key or alter unrelated pinned keys", () => 
   revoked.keys.find((key) => key.key_id === value.retiring.key_id).status = "revoked";
   const result = automation.verifyAICScheduledKeyTransition({ nextTrustStore: revoked, priorTrustStore: value.retiring.trust_store, transition: value.transition, verifiedAt: ISSUED });
   assert.ok(result.findings.some((finding) => finding.code === "key_policy_invalid"));
+});
+
+test("rotation verification rejects RSA and P-256 keys mislabeled as Ed25519", () => {
+  const value = fixture();
+
+  for (const kind of ["rsa", "ec"]) {
+    const retiring = createForeignSigningKey(kind);
+    const successor = createForeignSigningKey(kind);
+    const priorTrustStore = structuredClone(value.retiring.trust_store);
+    priorTrustStore.keys[0].key_id = retiring.key_id;
+    priorTrustStore.keys[0].public_key_pem = retiring.public_key_pem;
+
+    const nextTrustStore = structuredClone(value.next_trust_store);
+    nextTrustStore.keys[0].key_id = retiring.key_id;
+    nextTrustStore.keys[0].public_key_pem = retiring.public_key_pem;
+    nextTrustStore.keys[1].key_id = successor.key_id;
+    nextTrustStore.keys[1].public_key_pem = successor.public_key_pem;
+
+    const transition = structuredClone(value.transition);
+    transition.statement.retiring_key_id = retiring.key_id;
+    transition.statement.successor_key_id = successor.key_id;
+    transition.statement.prior_trust_store_digest =
+      automation.createAICDigest(priorTrustStore);
+    transition.statement.next_trust_store_digest =
+      automation.createAICDigest(nextTrustStore);
+    const bytes = Buffer.from(
+      `aic-key-transition-v1\0${automation.createAICCanonicalJson(transition.statement)}`,
+      "utf8"
+    );
+    transition.signatures = [
+      {
+        role: "authorizing",
+        signature: {
+          algorithm: "ed25519",
+          key_id: retiring.key_id,
+          value: sign(null, bytes, retiring.private_key).toString("base64")
+        }
+      },
+      {
+        role: "proof_of_possession",
+        signature: {
+          algorithm: "ed25519",
+          key_id: successor.key_id,
+          value: sign(null, bytes, successor.private_key).toString("base64")
+        }
+      }
+    ];
+
+    assert.equal(spec.validateAICSignedKeyTransition(transition).ok, true, kind);
+    const result = automation.verifyAICScheduledKeyTransition({
+      nextTrustStore,
+      priorTrustStore,
+      transition,
+      verifiedAt: ISSUED
+    });
+    assert.equal(result.status, "untrusted", kind);
+    assert.ok(
+      result.findings.some((finding) => finding.code === "signature_invalid"),
+      kind
+    );
+  }
 });

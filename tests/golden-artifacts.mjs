@@ -53,12 +53,11 @@ function sortObject(value) {
   }
 
   if (value && typeof value === "object") {
-    return Object.keys(value)
-      .sort()
-      .reduce((result, key) => {
-        result[key] = sortObject(value[key]);
-        return result;
-      }, {});
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, sortObject(value[key])])
+    );
   }
 
   return value;

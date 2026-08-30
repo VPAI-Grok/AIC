@@ -13,6 +13,7 @@
     "rules": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/rule" } }
   },
   "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "nonEmptyStrings": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
     "positiveInteger": { "type": "integer", "minimum": 1 },
     "rule": {
@@ -42,10 +43,50 @@
             "required_scenario_ids": { "$ref": "#/$defs/nonEmptyStrings" },
             "parity": { "const": "all_required" },
             "required_surface_kinds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["human_ui", "webmcp", "mcp", "openapi", "custom"] } },
-            "attestation": { "$ref": "#/$defs/attestation" }
+            "attestation": { "$ref": "#/$defs/attestation" },
+            "transparency": { "$ref": "#/$defs/transparency" }
           }
         }
       }
+    },
+    "transparency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "allowed_log_ids": { "$ref": "#/$defs/nonEmptyStrings" },
+        "allowed_key_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" } },
+        "expected_checkpoint_digest": { "$ref": "#/$defs/digest" },
+        "expected_prior_checkpoint_digest": { "$ref": "#/$defs/digest" },
+        "maximum_checkpoint_age_seconds": { "$ref": "#/$defs/positiveInteger" },
+        "minimum_size": { "$ref": "#/$defs/positiveInteger" },
+        "require_consistency": { "type": "boolean" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "required": { "const": false } } },
+          "then": { "not": { "anyOf": [{ "required": ["allowed_log_ids"] }, { "required": ["allowed_key_ids"] }, { "required": ["expected_checkpoint_digest"] }, { "required": ["expected_prior_checkpoint_digest"] }, { "required": ["maximum_checkpoint_age_seconds"] }, { "required": ["minimum_size"] }, { "required": ["require_consistency"] }] } }
+        },
+        {
+          "if": { "required": ["required"], "properties": { "required": { "const": true } } },
+          "then": {
+            "anyOf": [
+              { "required": ["expected_checkpoint_digest"] },
+              { "required": ["maximum_checkpoint_age_seconds"] },
+              { "required": ["require_consistency", "expected_prior_checkpoint_digest"], "properties": { "require_consistency": { "const": true } } }
+            ]
+          }
+        },
+        {
+          "if": { "required": ["require_consistency"], "properties": { "require_consistency": { "const": true } } },
+          "then": { "required": ["expected_prior_checkpoint_digest"] }
+        },
+        {
+          "if": { "required": ["expected_prior_checkpoint_digest"] },
+          "then": { "required": ["require_consistency"], "properties": { "require_consistency": { "const": true } } }
+        }
+      ]
     },
     "attestation": {
       "type": "object",

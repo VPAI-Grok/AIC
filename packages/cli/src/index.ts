@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
 import { writeSync } from "node:fs";
-import { chmod, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { chmod, mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { format } from "node:util";
 import { runAICEcosystemCommand } from "./ecosystem.js";
+import { readAICUtf8File } from "./utf8.js";
 import {
   analyzeProjectForAICAnnotations,
   analyzeProjectForWebMCPReadiness,
@@ -59,6 +60,7 @@ import {
   type AICTrustRunnerKind,
   type AICTrustStore,
   MANIFEST_VERSION,
+  parseAICStrictJson,
   SPEC_VERSION,
   renderAICAuthoringPatchPlanSummary,
   validateDiscoveryManifest,
@@ -111,8 +113,8 @@ const validators: ValidationMap = {
 };
 
 async function readJson<T>(filePath: string): Promise<T> {
-  const contents = await readFile(resolve(process.cwd(), filePath), "utf8");
-  return JSON.parse(contents) as T;
+  const contents = await readAICUtf8File(resolve(process.cwd(), filePath));
+  return parseAICStrictJson<T>(contents);
 }
 
 function resolveConfigRelativePath(configFile: string, candidatePath: string | undefined): string | undefined {
@@ -133,12 +135,11 @@ function sortObject(value: unknown): unknown {
   }
 
   if (value && typeof value === "object") {
-    return Object.keys(value)
-      .sort()
-      .reduce<Record<string, unknown>>((result, key) => {
-        result[key] = sortObject((value as Record<string, unknown>)[key]);
-        return result;
-      }, {});
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, sortObject((value as Record<string, unknown>)[key])])
+    );
   }
 
   return value;
@@ -152,7 +153,7 @@ Usage:
   aic init [project-root] [--framework <nextjs|vite|react>] [--app-name <name>] [--view-id <id>] [--view-url <url>] [--dry-run] [--force]
   aic doctor [project-root] [--config <file>] [--report-file <file>] [--webmcp]
   aic validate <discovery|ui|permissions|workflows|actions|behavior|behavior-proof|trust-statement|attestation|trust-store|registry> <file>
-  aic validate <conformance-pack|conformance-binding|conformance-result|assurance-policy|policy-evaluation|evidence-plan|evidence-bundle|deployment-identity|remote-job|transparency-checkpoint|transparency-index|key-transition> <file>
+  aic validate <conformance-pack|conformance-binding|conformance-result|assurance-policy|policy-evaluation|reliance-decision|reliance-record|reliance-snapshot|evidence-plan|evidence-bundle|deployment-identity|remote-job|transparency-checkpoint|transparency-index|key-transition> <file>
   aic verify <behavior-contract-file> (--harness <module> | --observations <file>) [--observations-out-file <file>] [--out-file <file>] [--generated-at <iso>]
   aic trust keygen --issuer-id <id> --private-key <file> --public-key <file> --trust-store <file> [--origin <origin>] [--generated-at <iso>] [--force]
   aic trust attest <contract> <proof> --private-key <file> --origin <origin> --environment <environment> --deployment-id <id> --source-revision <sha> --issuer-id <id> --runner-id <id> --out-file <file> [binding options]
@@ -165,6 +166,7 @@ Usage:
   aic conformance bind <pack-id-or-file> <profile-id> <contract> <mapping> --out-file <file>
   aic conformance verify <pack-id-or-file> <binding> <contract> [--proof <file>] [--out-file <file>]
   aic policy evaluate <policy> <contract> <proof> --observations <file> [trust and binding options] [--out-file <file>]
+  aic rely evaluate <policy> <contract> <proof> --observations <file> --attestation <file> --trust-store <file> --origin <origin> --operation-id <id> --deployment-id <id> --expect-revision <sha> --environment <environment> [--minimum-validity-seconds <0-60> (default 30)] [--out-file <file>] [--evaluated-at <iso> (audit-only)]
   aic interop verify <suite> [--out-file <file>]
   aic evidence verify <bundle> [--runner-public-key <file> --runner-key-id <sha256:id>] [--out-file <file>]
   aic evidence run-remote <job> --runner-id <id> --runner-revision <sha> --out-file <file> [--secret <ref=ENV>] [--receipt-private-key <file>] [--allow-mutation <operation=canary-scope>] [--allow-destructive-operation <operation>]
@@ -222,7 +224,7 @@ async function scanPath(targetPath: string, args: string[] = []): Promise<number
     targetPath.endsWith(".ts") ||
     targetPath.endsWith(".tsx")
       ? (() => {
-          return readFile(fullPath, "utf8").then((contents) => {
+          return readAICUtf8File(fullPath).then((contents) => {
             const fileResult = scanSourceForAICAnnotations(contents, fullPath);
             return {
               diagnostics: fileResult.diagnostics,
@@ -431,7 +433,7 @@ async function trustAttest(args: string[]): Promise<number> {
         id: requireOption(args, "--issuer-id"),
         kind: readIssuerKind(readOptionValue(args, "--issuer-kind"))
       },
-      privateKeyPem: await readFile(resolve(process.cwd(), privateKeyFile), "utf8"),
+      privateKeyPem: await readAICUtf8File(resolve(process.cwd(), privateKeyFile)),
       proof: await readJson<unknown>(proofFile),
       references: {
         ...(readOptionValue(args, "--contract-ref")
@@ -515,7 +517,7 @@ async function registryBuild(args: string[]): Promise<number> {
     if (files.length === 0) throw new Error("No JSON attestations were found.");
     const attestations: AICSignedAttestation[] = [];
     for (const file of files) {
-      const value = JSON.parse(await readFile(resolve(directory, file), "utf8")) as unknown;
+      const value = parseAICStrictJson(await readAICUtf8File(resolve(directory, file)));
       const validation = validateAICSignedAttestation(value);
       if (!validation.ok) {
         throw new Error(`${file} is not a valid signed attestation: ${validation.issues.map((issue) => `${issue.path}: ${issue.message}`).join("; ")}`);
@@ -1610,7 +1612,7 @@ function summarizeProjectReportNextActions(
 
 async function readOptionalGeneratedArtifact<T>(baseDir: string, relativePath: string): Promise<T | undefined> {
   try {
-    return JSON.parse(await readFile(resolve(baseDir, relativePath), "utf8")) as T;
+    return parseAICStrictJson<T>(await readAICUtf8File(resolve(baseDir, relativePath)));
   } catch {
     return undefined;
   }

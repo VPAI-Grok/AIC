@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aic.dev/schemas/reliance-snapshot.schema.json",
+  "$comment": "Structural interchange screening only. Record ID uniqueness, time ordering, inline artifact integrity, and record semantics are enforced by validateAICRelianceSnapshot with an AIC canonical digest implementation. Schema acceptance never establishes trust or permission to execute.",
+  "title": "AIC Reliance Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_type", "spec", "id", "updated_at", "records"],
+  "properties": {
+    "artifact_type": { "const": "aic_reliance_snapshot" },
+    "spec": { "const": "aic.reliance-snapshot/0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "records": {
+      "type": "array",
+      "items": { "$ref": "https://aic.dev/schemas/reliance-record.schema.json" }
+    }
+  }
+}

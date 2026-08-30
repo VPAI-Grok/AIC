@@ -8,6 +8,7 @@ import type {
   AICValidationSeverity,
   ValidationResult
 } from "./types.js";
+import { isAICRfc3339DateTime as isIsoDateTime } from "./date-time.js";
 
 export const AIC_CONFORMANCE_SPEC = "aic.conformance/0.1";
 
@@ -164,14 +165,6 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isStableId(value: unknown): value is string {
   return isNonEmptyString(value) && /^[a-z0-9][a-z0-9._-]*$/i.test(value);
-}
-
-function isIsoDateTime(value: unknown): value is string {
-  return (
-    isNonEmptyString(value) &&
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) &&
-    !Number.isNaN(Date.parse(value))
-  );
 }
 
 function isDigest(value: unknown): value is string {

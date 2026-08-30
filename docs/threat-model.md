@@ -1,6 +1,6 @@
 # AIC Threat Model
 
-This threat model covers interaction metadata, guarded WebMCP execution, behavior contracts, conformance packs and bindings, protocol evidence collection, proof generation, assurance policy, signed trust claims, issuer stores, scheduled key transitions, reference transparency indexes, and registries.
+This threat model covers interaction metadata, guarded WebMCP execution, behavior contracts, conformance packs and bindings, protocol evidence collection, proof generation, assurance policy, signed trust claims, issuer stores, scheduled key transitions, reference transparency indexes, registries, canonical reliance decisions, the bundled reliance action, and the reference resolver.
 
 ## Primary failure modes
 
@@ -30,6 +30,13 @@ This threat model covers interaction metadata, guarded WebMCP execution, behavio
 - Hash-bound external receipt metadata is presented as cryptographically verified without running the provider-specific verifier.
 - A registry rewrites unsigned index fields or serves stale claims.
 - A valid old claim is replayed after the deployment changes.
+- A valid old `allow` decision is replayed for a later request, a different operation/deployment binding, or after its attestation expires.
+- An untrusted caller supplies a convenient evaluation timestamp so stale evidence appears current.
+- A resolver record, resolver-produced decision, DNS host, or AIC-operated service is treated as a universal trust root.
+- A resolver fetches or executes publisher-supplied content, or leaks private evidence through its public snapshot.
+- A consumer sends private evidence, trust policy, or secrets to a resolver-operated evaluation endpoint and mistakes local verification semantics for local data custody.
+- A CI gate downloads a mutable verifier, follows a symlink outside the workspace, accepts a changed consumer policy or trust store, or proceeds on `confirm`/`indeterminate`.
+- A policy that requires transparency accepts an unsigned, wrongly keyed, disallowed-log, or non-including history.
 
 ## Current mitigations
 
@@ -59,7 +66,13 @@ This threat model covers interaction metadata, guarded WebMCP execution, behavio
 - domain-separated linear entry hashes and signed, pinned reference checkpoints with prefix consistency verification;
 - external receipt references that are artifact-bound but explicitly reported `not_checked`;
 - registries that embed the signed attestation and re-derive index fields; and
-- GitHub OIDC/Sigstore provenance for trusted CI evidence bundles.
+- GitHub OIDC/Sigstore provenance for trusted CI evidence bundles;
+- canonical reliance-decision validation that binds the verdict, reason codes, artifact digests, policy evaluation, exact request, freshness, and check consistency;
+- local reliance evaluation from caller-supplied artifacts and consumer-owned fail-closed policy and trust stores, with no implicit network, resolver, registry, filesystem, or environment discovery;
+- trusted-current-clock preflight plus complete local decision reproduction from consumer-owned inputs, a normative 60-second maximum `allow` lifetime, evidence-derived exclusive deadlines, zero future skew by default, and current attestation-expiry checks;
+- optional policy-required verification of the signed reference transparency index, exact attestation inclusion, and allowed log/key identities;
+- a bundled offline GitHub action that accepts bounded regular JSON files, rejects symlinks and paths outside the workspace, pins policy and trust-store file digests and expected identities, writes a canonical decision, and succeeds only for `allow`; and
+- a read-only resolver that exposes exact lookups and portable snapshots, labels discovery untrusted, never fetches artifact references, and requires an operator-provided limiter when local evaluation is enabled.
 
 ## Trust boundaries
 
@@ -101,13 +114,33 @@ A dual-signed transition proves that both the retiring and successor keys approv
 
 ### Reference transparency and external receipts
 
-The AIC transparency index is an offline/reference, append-only linear hash chain with a signed checkpoint. A pinned checkpoint key and consistency verification detect tampering within the histories a verifier receives. They do not provide global witnessing, gossip, fork detection across isolated consumers, or public availability.
+The AIC transparency index is an offline/reference, append-only linear hash chain with a signed checkpoint. A pinned checkpoint key plus consumer policy can bound checkpoint age and minimum size, pin an exact checkpoint digest, and require consistency with a last-seen trusted index. These controls detect a replayed older prefix for a stateful or explicitly pinned consumer. Stateless inclusion alone cannot detect rollback or a split view. None of these controls provide global witnessing, gossip, fork detection across isolated consumers, or public availability.
 
 External receipt records are metadata bound into the entry digest. AIC core does not cryptographically verify provider profiles such as COSE Receipts/SCITT or Sigstore bundles, so those references remain `not_checked` until a compatible external verifier validates them.
+
+All AIC byte-parsing trust boundaries reject duplicate JSON object member names, including escape-equivalent names, before schema validation or canonicalization. Native `JSON.parse` is last-member-wins and is not sufficient for untrusted signed bytes. SDK callers that receive bytes must call `parseAICStrictJson`; a parsed object cannot reveal that its original envelope contained duplicate members.
 
 ### Registry
 
 The registry is untrusted discovery data. Clients must ignore its convenience fields until the embedded attestation signature, digest, and derived fields verify against their own pinned trust store. Registry inclusion is not endorsement. The current public registry has no verified external adopters.
+
+### Reliance decision and trusted time
+
+An `aic_reliance_decision` is a portable result of one consumer policy over exact supplied artifacts and request bindings at one evaluation time. `allow` requires valid artifacts, exact binding, trusted signed attestation, and passing cumulative policy. `confirm` still requires a real confirmation flow; `deny` and `indeterminate` must stop execution.
+
+Schema validity and internally consistent fields do not authenticate or reproduce a decision. Authenticated provenance does not prove that the producer used the consumer's policy, trust store, artifacts, or correct deadline. If consumers accept a decision from another process, they must call `assertAICRelianceAllowed` with the complete pinned evaluation input and their trusted clock, then use the detached decision it returns. The guard snapshots consumer input before the raw decision, rejects active accessors, locally re-evaluates at the claimed time, canonical-compares the entire result, and samples trusted time after that reproduction. Every `allow` carries an exclusive `valid_until` no later than 60 seconds after evaluation and no later than any applicable proof, observation, attestation, expiry, or transparency-checkpoint boundary; consumers can impose a shorter age or minimum residual lifetime.
+
+The time window limits stale replay but does not make a decision single-use. Consequential integrations still need protocol-native authorization and confirmation plus application idempotency or a consumer-managed nonce where duplicate execution matters.
+
+### Reliance GitHub action
+
+The checked-in action bundle avoids downloading a mutable verifier during the enforcement job. It still inherits the security of the pinned action commit, GitHub runner, checked-in bundle review, consumer-owned policy and trust-store changes, and workflow protections. Policy and trust-store digests detect byte changes; repository review controls decide whether a new digest is acceptable. The action is a release/agent gate, not application authorization, production reachability proof, or certification.
+
+### Reliance resolver
+
+`@aicorg/reliance-server` distributes candidate records and history. Its snapshots are intentionally exportable for independent mirroring and therefore must contain public assurance material only. Resolver records are `unverified_discovery`; the consumer's separately pinned trust stores, policy, exact bindings, and trusted current clock decide whether execution is allowed. The optional evaluator endpoint is a convenience and does not make the resolver operator an implicit issuer or trust anchor.
+
+An evaluator endpoint receives the supplied policy, trust store, contract, observations, proof, and attestation. The open verifier can run locally, so consumers should not send private artifacts or secrets to a resolver they do not trust. Protocol-level local verification does not imply local data custody when the endpoint is remote.
 
 ### GitHub artifact provenance
 
@@ -129,6 +162,11 @@ GitHub artifact attestation binds the packaged evidence archive to GitHub reposi
 - Require expected origin and revision at verification time for consequential use.
 - Use short validity windows, protected signing keys, scheduled dual-signed rotation, and revocation for production issuers.
 - Treat external receipt references as metadata until a provider-specific verifier succeeds.
+- Recompute reliance locally when possible; otherwise authenticate the decision source and enforce trusted-time, expiry, and exact request-binding checks before use.
+- Make the relying party—not the application publisher or resolver—own the fail-closed policy, issuer/runner/log pins, and final disposition.
+- Pin the reliance action to a full commit SHA, protect policy and trust-store changes, keep its checked-in bundle reproducible, and never continue an enforcement workflow after a non-`allow` verdict.
+- Publish only public artifacts through a resolver and preserve portable snapshot export so another operator can mirror it.
+- Keep sensitive policy, evidence, and trust data local unless the selected evaluator operator and transport are explicitly trusted; never put private keys or implicit secrets in a reliance request.
 - Keep production secrets and side effects out of untrusted pull-request jobs.
 
 ## Deferred hardening
@@ -136,6 +174,8 @@ GitHub artifact attestation binds the packaged evidence archive to GitHub reposi
 - independently operated hosted production runners and external reachability attestations;
 - globally witnessed transparency, gossip, and provider-specific verification of external receipts;
 - hosted policy, evidence-history, and review dashboards;
+- a public resolver plus independently operated mirror with durable history and externally enforced service-level objectives;
+- external agent and gateway consumers that enforce AIC in their normal pre-execution path;
 - compromise-specific recovery-key and threshold-authority workflows;
 - verified external adopters and independent conformance certification;
 - deeper custom-component inference and broader guarded write-back; and

@@ -3,29 +3,49 @@ name: Publish Packages
 on:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
-  publish-alpha:
+  verify-and-pack:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify protected release ref and checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF}" = "refs/heads/main"
+          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
         with:
-          version: 10.8.1
+          version: 10.28.2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           cache: pnpm
-          node-version: 22
-          registry-url: https://registry.npmjs.org
+          node-version: 24.20.0
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install dependencies without lifecycle scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Install isolated action build dependencies
+        run: npm --prefix actions/aic-rely ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify bundled action matches reviewed source
+        run: pnpm verify:action-bundle
 
       - name: Typecheck workspace
         run: pnpm check
@@ -42,7 +62,111 @@ jobs:
       - name: Verify npm packaging smoke tests
         run: pnpm test:packaging
 
-      - name: Publish alpha packages
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm release:publish
+      - name: Pack immutable alpha tarballs
+        run: pnpm release:pack -- --out-dir .artifacts/npm-alpha
+
+      - name: Upload immutable alpha tarballs
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: npm-alpha-tarballs
+          path: .artifacts/npm-alpha/*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish-alpha:
+    if: github.ref == 'refs/heads/main'
+    needs: verify-and-pack
+    runs-on: ubuntu-latest
+    environment:
+      name: npm-alpha
+    permissions:
+      id-token: write
+    steps:
+      - name: Set up Node.js with trusted-publishing support
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.20.0
+          registry-url: https://registry.npmjs.org/
+
+      - name: Download the exact immutable artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.verify-and-pack.outputs.artifact-id }}
+          path: npm-alpha
+
+      - name: Verify and publish alpha tarballs
+        shell: bash
+        working-directory: npm-alpha
+        run: |
+          set -euo pipefail
+
+          npm_version="$(npm --version)"
+          node --input-type=module -e '
+            const actual = process.argv[1].split(".").map(Number);
+            const minimum = [11, 5, 1];
+            let comparison = 0;
+            for (let index = 0; index < minimum.length; index += 1) {
+              if (actual[index] === minimum[index]) continue;
+              comparison = actual[index] < minimum[index] ? -1 : 1;
+              break;
+            }
+            if (actual.length !== 3 || actual.some((part) => !Number.isInteger(part)) || comparison < 0) {
+              throw new Error(`npm >=11.5.1 is required for trusted publishing; found ${process.argv[1]}`);
+            }
+          ' "$npm_version"
+          test "$(head -n 1 publish-plan.tsv)" = $'package\tversion\ttarball\tsha256'
+          test "$(wc -l < publish-plan.tsv)" -gt 1
+          sha256sum --check --strict SHA256SUMS
+
+          mapfile -t declared_tarballs < <(tail -n +2 publish-plan.tsv | cut -f3 | sort)
+          mapfile -t checksum_tarballs < <(sed -E 's/^[0-9a-f]{64}  //' SHA256SUMS | sort)
+          diff --unified <(printf '%s\n' "${declared_tarballs[@]}") <(printf '%s\n' "${checksum_tarballs[@]}")
+
+          mapfile -t expected_files < <({ printf '%s\n' SHA256SUMS publish-plan.tsv; printf '%s\n' "${declared_tarballs[@]}"; } | sort)
+          mapfile -t downloaded_files < <(find . -mindepth 1 -maxdepth 1 -type f -printf '%f\n' | sort)
+          diff --unified <(printf '%s\n' "${expected_files[@]}") <(printf '%s\n' "${downloaded_files[@]}")
+          test -z "$(find . -mindepth 1 -maxdepth 1 ! -type f -print -quit)"
+
+          while IFS=$'\t' read -r package_name package_version tarball expected_digest; do
+            test -n "$package_name"
+            [[ "$package_name" =~ ^@aicorg/[a-z0-9]+(-[a-z0-9]+)*$ ]]
+            [[ "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+-alpha\.[0-9]+$ ]]
+            [[ "$tarball" =~ ^aicorg-[a-z0-9-]+-[0-9]+\.[0-9]+\.[0-9]+-alpha\.[0-9]+\.tgz$ ]]
+            [[ "$expected_digest" =~ ^[0-9a-f]{64}$ ]]
+            test -f "$tarball"
+            test ! -L "$tarball"
+            test "$(sha256sum "$tarball" | cut -d' ' -f1)" = "$expected_digest"
+
+            packed_identity="$(tar -xOf "$tarball" package/package.json | node --input-type=module -e '
+              const chunks = [];
+              for await (const chunk of process.stdin) chunks.push(chunk);
+              const input = new TextDecoder("utf-8", { fatal: true }).decode(Buffer.concat(chunks));
+              const manifest = JSON.parse(input);
+              process.stdout.write(`${manifest.name}\t${manifest.version}`);
+            ')"
+            test "$packed_identity" = "$package_name"$'\t'"$package_version"
+
+            if npm view "$package_name@$package_version" version --json --registry https://registry.npmjs.org/ >/dev/null 2>&1; then
+              registry_integrity="$(npm view "$package_name@$package_version" dist.integrity --json --registry https://registry.npmjs.org/ | node --input-type=module -e '
+                const chunks = [];
+                for await (const chunk of process.stdin) chunks.push(chunk);
+                const input = new TextDecoder("utf-8", { fatal: true }).decode(Buffer.concat(chunks));
+                const integrity = JSON.parse(input);
+                if (typeof integrity !== "string" || !/^sha512-[A-Za-z0-9+/]+={0,2}$/.test(integrity)) {
+                  throw new Error("The existing registry version has no valid sha512 integrity value.");
+                }
+                process.stdout.write(integrity);
+              ')"
+              local_integrity="$(node --input-type=module -e '
+                import { createHash } from "node:crypto";
+                import { readFile } from "node:fs/promises";
+                const bytes = await readFile(process.argv[1]);
+                process.stdout.write(`sha512-${createHash("sha512").update(bytes).digest("base64")}`);
+              ' "$tarball")"
+              test "$registry_integrity" = "$local_integrity"
+              echo "$package_name@$package_version is already present with identical bytes; skipping"
+            else
+              npm publish "./$tarball" --tag alpha --access public --provenance --ignore-scripts --registry https://registry.npmjs.org/
+            fi
+          done < <(tail -n +2 publish-plan.tsv)

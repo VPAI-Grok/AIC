@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, rm } from "node:fs/promises";
+import { access, rm, writeFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
@@ -7,7 +7,8 @@ import {
   readJsonFile,
   resolveFromRepo,
   runCli,
-  writeJsonFile
+  writeJsonFile,
+  writeTextFile
 } from "./helpers.mjs";
 
 const checkoutContract = resolveFromRepo(
@@ -157,6 +158,36 @@ test("ecosystem CLI validates the checked-in critical assurance policy", async (
   assert.match(result.stdout, /assurance-policy is valid/);
 });
 
+test("ecosystem CLI rejects malformed UTF-8 before strict JSON parsing", async (t) => {
+  const tempDir = await createTempDir("aic-invalid-utf8-cli-");
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+  const invalidFile = `${tempDir}/invalid-policy.json`;
+  await writeFile(
+    invalidFile,
+    Buffer.from([0x7b, 0x22, 0x78, 0x22, 0x3a, 0x22, 0x80, 0x22, 0x7d])
+  );
+  const result = await runCli(["validate", "assurance-policy", invalidFile]);
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /valid UTF-8 bytes/);
+});
+
+test("ecosystem CLI rejects duplicate JSON members before trust validation", async (t) => {
+  const tempDir = await createTempDir("aic-duplicate-json-cli-");
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+  const policyFile = `${tempDir}/duplicate-policy.json`;
+  await writeTextFile(
+    policyFile,
+    '{"artifact_type":"aic_assurance_policy","spec":"aic.policy/0.1","id":"first","id":"second","unmatched":"fail","rules":[]}'
+  );
+  const result = await runCli(["validate", "assurance-policy", policyFile]);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /Duplicate JSON object member/);
+});
+
 test("ecosystem CLI evaluates the five-scenario checkout evidence with a short-lived signed attestation", async (t) => {
   const tempDir = await createTempDir("aic-policy-cli-");
   t.after(async () => {
@@ -175,6 +206,7 @@ test("ecosystem CLI evaluates the five-scenario checkout evidence with a short-l
   });
   const attestationFile = `${tempDir}/checkout-attestation.json`;
   const evaluationFile = `${tempDir}/policy-evaluation.json`;
+  const relianceFile = `${tempDir}/reliance-decision.json`;
   const attest = await runCli([
     "trust",
     "attest",
@@ -244,6 +276,305 @@ test("ecosystem CLI evaluates the five-scenario checkout evidence with a short-l
   );
   assert.equal(evaluation.findings.length, 0);
   assert.equal(typeof evaluation.subjects.attestation_digest, "string");
+
+  const rely = await runCli([
+    "rely",
+    "evaluate",
+    criticalAssurancePolicy,
+    checkoutContract,
+    checkoutBrowserProof,
+    "--observations",
+    checkoutBrowserObservations,
+    "--attestation",
+    attestationFile,
+    "--trust-store",
+    keys.trustStore,
+    "--origin",
+    origin,
+    "--operation-id",
+    "checkout.complete.domain",
+    "--deployment-id",
+    "checkout-production-2026-08-29",
+    "--expect-revision",
+    sourceRevision,
+    "--environment",
+    "production",
+    "--evaluated-at",
+    "2026-08-29T00:30:00.000Z",
+    "--out-file",
+    relianceFile
+  ]);
+  assert.equal(rely.code, 2, rely.stderr);
+  assert.match(rely.stderr, /audit-only/);
+  const decision = await readJsonFile(relianceFile);
+  assert.equal(decision.verdict, "allow");
+  assert.deepEqual(decision.reason_codes, ["requirements_satisfied"]);
+  assert.equal(decision.checks.trust, "passed");
+  assert.equal(decision.checks.policy, "passed");
+
+  const validateDecision = await runCli(["validate", "reliance-decision", relianceFile]);
+  assert.equal(validateDecision.code, 0, validateDecision.stderr);
+  assert.match(validateDecision.stdout, /reliance-decision is valid/);
+
+  const wrongRevision = await runCli([
+    "rely",
+    "evaluate",
+    criticalAssurancePolicy,
+    checkoutContract,
+    checkoutBrowserProof,
+    "--observations",
+    checkoutBrowserObservations,
+    "--attestation",
+    attestationFile,
+    "--trust-store",
+    keys.trustStore,
+    "--origin",
+    origin,
+    "--operation-id",
+    "checkout.complete.domain",
+    "--deployment-id",
+    "checkout-production-2026-08-29",
+    "--expect-revision",
+    "e".repeat(40),
+    "--environment",
+    "production",
+    "--evaluated-at",
+    "2026-08-29T00:30:00.000Z"
+  ]);
+  assert.equal(wrongRevision.code, 1);
+  assert.equal(JSON.parse(wrongRevision.stdout).verdict, "deny");
+  assert.ok(JSON.parse(wrongRevision.stdout).reason_codes.includes("binding_revision_mismatch"));
+
+  const unsafePolicyFile = `${tempDir}/unsafe-unmatched-allow-policy.json`;
+  const unsafePolicy = await readJsonFile(criticalAssurancePolicy);
+  unsafePolicy.unmatched = "allow";
+  unsafePolicy.rules.forEach((rule) => {
+    rule.match.operation_ids = ["another.operation"];
+  });
+  await writeJsonFile(unsafePolicyFile, unsafePolicy);
+  const unmatchedAllow = await runCli([
+    "rely",
+    "evaluate",
+    unsafePolicyFile,
+    checkoutContract,
+    checkoutBrowserProof,
+    "--observations",
+    checkoutBrowserObservations,
+    "--attestation",
+    attestationFile,
+    "--trust-store",
+    keys.trustStore,
+    "--origin",
+    origin,
+    "--operation-id",
+    "checkout.complete.domain",
+    "--deployment-id",
+    "checkout-production-2026-08-29",
+    "--expect-revision",
+    sourceRevision,
+    "--environment",
+    "production",
+    "--evaluated-at",
+    "2026-08-29T00:30:00.000Z"
+  ]);
+  assert.equal(unmatchedAllow.code, 1);
+  const unmatchedDecision = JSON.parse(unmatchedAllow.stdout);
+  assert.equal(unmatchedDecision.verdict, "deny");
+  assert.ok(unmatchedDecision.reason_codes.includes("policy_not_fail_closed"));
+  assert.ok(unmatchedDecision.reason_codes.includes("policy_rule_unmatched"));
+
+  const unmatchedPolicyEvaluation = await runCli([
+    "policy",
+    "evaluate",
+    unsafePolicyFile,
+    checkoutContract,
+    checkoutBrowserProof,
+    "--observations",
+    checkoutBrowserObservations,
+    "--environment",
+    "production",
+    "--expect-origin",
+    origin,
+    "--expect-revision",
+    sourceRevision,
+    "--evaluated-at",
+    "2026-08-29T00:30:00.000Z"
+  ]);
+  assert.equal(unmatchedPolicyEvaluation.code, 1);
+  const unsafeEvaluation = JSON.parse(unmatchedPolicyEvaluation.stdout);
+  assert.ok(
+    unsafeEvaluation.findings.some(
+      (finding) => finding.code === "policy_not_fail_closed"
+    )
+  );
+  assert.ok(
+    unsafeEvaluation.findings.some((finding) => finding.code === "unmatched_policy")
+  );
+});
+
+test("rely CLI returns actionable success only for a current decision", async (t) => {
+  const tempDir = await createTempDir("aic-current-rely-cli-");
+  t.after(async () => {
+    await rm(tempDir, { force: true, recursive: true });
+  });
+  const now = Date.now();
+  const origin = "https://checkout.example";
+  const issuerId = "github:VPAI-Grok/AIC:behavior-assurance";
+  const sourceRevision = "d".repeat(40);
+  const keys = await generateCliKeyPair({
+    generatedAt: new Date(now - 60_000).toISOString(),
+    issuerId,
+    origin,
+    stem: "current-policy-issuer",
+    tempDir
+  });
+  const policyFile = `${tempDir}/current-policy.json`;
+  const attestationFile = `${tempDir}/current-attestation.json`;
+  await writeJsonFile(policyFile, {
+    artifact_type: "aic_assurance_policy",
+    id: "current.execution.policy",
+    rules: [
+      {
+        id: "current-checkout",
+        match: { operation_ids: ["checkout.complete.domain"] },
+        require: {
+          attestation: {
+            allowed_issuer_ids: [issuerId],
+            require_expected_origin: true,
+            require_expected_revision: true,
+            require_expiry: true,
+            required: true
+          },
+          observations_required: true,
+          proof_status: "passed"
+        }
+      }
+    ],
+    spec: "aic.policy/0.1",
+    unmatched: "fail"
+  });
+  const attest = await runCli([
+    "trust",
+    "attest",
+    checkoutContract,
+    checkoutBrowserProof,
+    "--private-key",
+    keys.privateKey,
+    "--origin",
+    origin,
+    "--environment",
+    "production",
+    "--deployment-id",
+    "checkout-current",
+    "--source-revision",
+    sourceRevision,
+    "--issuer-id",
+    issuerId,
+    "--issuer-kind",
+    "github_actions",
+    "--runner-id",
+    "github:VPAI-Grok/AIC:behavior-assurance",
+    "--runner-kind",
+    "github_actions",
+    "--issued-at",
+    new Date(now - 10_000).toISOString(),
+    "--expires-at",
+    new Date(now + 3_600_000).toISOString(),
+    "--out-file",
+    attestationFile
+  ]);
+  assert.equal(attest.code, 0, attest.stderr);
+
+  const relianceArgs = [
+    "rely",
+    "evaluate",
+    policyFile,
+    checkoutContract,
+    checkoutBrowserProof,
+    "--observations",
+    checkoutBrowserObservations,
+    "--attestation",
+    attestationFile,
+    "--trust-store",
+    keys.trustStore,
+    "--origin",
+    origin,
+    "--operation-id",
+    "checkout.complete.domain",
+    "--deployment-id",
+    "checkout-current",
+    "--expect-revision",
+    sourceRevision,
+    "--environment",
+    "production"
+  ];
+  const missingEnvironment = await runCli(relianceArgs.slice(0, -2));
+  assert.equal(missingEnvironment.code, 1);
+  assert.match(missingEnvironment.stderr, /Missing required option: --environment/);
+
+  const result = await runCli(relianceArgs);
+  assert.equal(result.code, 0, result.stderr);
+  const allowed = JSON.parse(result.stdout);
+  assert.equal(allowed.verdict, "allow");
+  assert.ok(Date.parse(allowed.valid_until) > Date.now() + 25_000);
+
+  const invalidMinimum = await runCli([
+    ...relianceArgs,
+    "--minimum-validity-seconds",
+    "61"
+  ]);
+  assert.equal(invalidMinimum.code, 1);
+  assert.match(invalidMinimum.stderr, /decimal integer from 0 through 60/);
+
+  const shortLivedAttestationFile = `${tempDir}/short-lived-attestation.json`;
+  const nearExpiryOutput = `${tempDir}/near-expiry-decision.json`;
+  const shortLivedNow = Date.now();
+  const shortLivedAttest = await runCli([
+    "trust",
+    "attest",
+    checkoutContract,
+    checkoutBrowserProof,
+    "--private-key",
+    keys.privateKey,
+    "--origin",
+    origin,
+    "--environment",
+    "production",
+    "--deployment-id",
+    "checkout-current",
+    "--source-revision",
+    sourceRevision,
+    "--issuer-id",
+    issuerId,
+    "--issuer-kind",
+    "github_actions",
+    "--runner-id",
+    "github:VPAI-Grok/AIC:behavior-assurance",
+    "--runner-kind",
+    "github_actions",
+    "--issued-at",
+    new Date(shortLivedNow - 10_000).toISOString(),
+    "--expires-at",
+    new Date(shortLivedNow + 20_000).toISOString(),
+    "--out-file",
+    shortLivedAttestationFile
+  ]);
+  assert.equal(shortLivedAttest.code, 0, shortLivedAttest.stderr);
+  await writeFile(nearExpiryOutput, '{"verdict":"allow"}\n', "utf8");
+  const nearExpiryArgs = [...relianceArgs];
+  nearExpiryArgs[nearExpiryArgs.indexOf(attestationFile)] =
+    shortLivedAttestationFile;
+  const nearExpiry = await runCli([
+    ...nearExpiryArgs,
+    "--minimum-validity-seconds",
+    "30",
+    "--out-file",
+    nearExpiryOutput
+  ]);
+  assert.equal(nearExpiry.code, 1);
+  assert.equal(nearExpiry.stdout, "");
+  assert.match(nearExpiry.stderr, /residual validity/);
+  await assert.rejects(access(nearExpiryOutput), { code: "ENOENT" });
 });
 
 test("ecosystem CLI initializes, appends, verifies, and checks a pinned transparency history", async (t) => {

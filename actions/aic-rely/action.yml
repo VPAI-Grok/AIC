@@ -1,0 +1,92 @@
+name: AIC reliance gate
+description: Fail closed unless pinned AIC evidence satisfies a consumer-owned assurance policy.
+author: AIC contributors
+
+branding:
+  color: blue
+  icon: shield
+
+inputs:
+  policy-file:
+    description: Consumer-owned AIC assurance policy JSON.
+    required: true
+  policy-sha256:
+    description: Exact lowercase SHA-256 hex digest of policy-file.
+    required: true
+  contract-file:
+    description: AIC behavior contract JSON.
+    required: true
+  proof-file:
+    description: AIC behavior proof JSON.
+    required: true
+  observations-file:
+    description: Raw AIC behavior observations used to regenerate the proof.
+    required: true
+  attestation-file:
+    description: Deployment-bound AIC signed attestation JSON.
+    required: true
+  trust-store-file:
+    description: Consumer-pinned AIC trust store JSON.
+    required: true
+  trust-store-sha256:
+    description: Exact lowercase SHA-256 hex digest of trust-store-file.
+    required: true
+  transparency-index-file:
+    description: Optional signed AIC transparency index containing the attestation.
+    required: false
+  transparency-prior-index-file:
+    description: Optional prior signed index used to prove append-only consistency when policy requires it.
+    required: false
+  transparency-trust-store-file:
+    description: Consumer-pinned trust store for the optional transparency index signer.
+    required: false
+  transparency-trust-store-sha256:
+    description: Exact lowercase SHA-256 digest required with transparency-trust-store-file.
+    required: false
+  expected-operation-id:
+    description: Stable domain operation_id the caller intends to rely on.
+    required: true
+  expected-origin:
+    description: Canonical deployed origin the attestation must bind.
+    required: true
+  expected-environment:
+    description: Expected deployment environment (development, test, staging, or production).
+    required: true
+  expected-deployment-id:
+    description: Exact deployment identifier the attestation must bind.
+    required: true
+  expected-revision:
+    description: Full 40- or 64-character lowercase hexadecimal source revision the attestation must bind.
+    required: true
+  expected-issuer-id:
+    description: Exact issuer identity the consumer policy must allow.
+    required: true
+  expected-key-id:
+    description: Exact sha256 key identifier the consumer policy and trust store must pin.
+    required: true
+  expected-runner-id:
+    description: Exact evidence-runner identity the consumer policy must allow.
+    required: true
+  minimum-validity-seconds:
+    description: Minimum residual allow-decision validity required at publication (canonical decimal integer 0-60).
+    required: false
+    default: "30"
+  decision-file:
+    description: JSON path beneath workspace .aic/ for the canonical AIC reliance decision.
+    required: false
+    default: .aic/reliance-decision.json
+
+outputs:
+  allowed:
+    description: "true only when the canonical allow is written and passes the final publication-time reassertion."
+  verdict:
+    description: The allow, confirm, deny, or indeterminate reliance verdict.
+  decision-file:
+    description: Workspace-relative path to the canonical aic_reliance_decision; blank unless its atomic write succeeds.
+  valid-until:
+    description: Exclusive RFC 3339 deadline for the finalized allow; blank for every non-allow or failed finalization.
+  reason-codes:
+    description: JSON array of canonical AIC reliance reason codes.
+runs:
+  using: node24
+  main: dist/index.js
