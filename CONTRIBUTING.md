@@ -21,9 +21,7 @@
 - Update docs when the public behavior or supported boundary changes.
 - Include tests for any behavior change.
 - Call out intentional contract changes in the PR description.
-- Significant external contributions may be held until contributor licensing terms are in place.
 - Behavior-verifier changes must include both passing evidence and a regression case that fails for the intended divergence.
-- By opening a pull request, you acknowledge that maintainers may ask for a contributor agreement before merging work that affects future relicensing flexibility.
 
 ## Ground Rules
 
@@ -33,10 +31,10 @@
 - Native protocol fields take precedence over duplicate AIC metadata.
 - Behavior harnesses are trusted code; proofs must state their evidence level without implying signatures or production attestation.
 
-## Licensing Flexibility
+## Licensing
 
-- The repository is currently licensed under Apache-2.0 to maximize adoption.
-- That does not guarantee future versions will always use the same license.
-- Already-released Apache-2.0 versions remain under Apache-2.0 for recipients of those versions.
-- To preserve future licensing flexibility, maintainers may prefer small patches, documentation fixes, issue reports, and design discussion unless or until a formal contributor licensing process is established.
+- The AIC open-source core and published packages are licensed under Apache-2.0.
+- Contributions intentionally submitted for inclusion are accepted under Apache-2.0 unless a different written agreement is made before submission.
+- AIC does not currently require a contributor license agreement.
+- Hosted services and support may have separate commercial terms without changing the license of the open-source core.
 - See [CONTRIBUTOR-LICENSING.md](./CONTRIBUTOR-LICENSING.md) for the current project policy.

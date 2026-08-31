@@ -2,7 +2,7 @@
 
 # AIC — Agent Interaction Control
 
-**Behavioral assurance and verifiable trust for agent-operated software.**
+**WebMCP makes a page callable. AIC makes consequential agent actions verifiable.**
 
 [![npm](https://img.shields.io/npm/v/@aicorg/cli?label=%40aicorg%2Fcli&color=4f9cf9)](https://www.npmjs.com/package/@aicorg/cli)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
@@ -16,7 +16,7 @@
 
 </div>
 
-A browser protocol can describe a tool. It cannot, by itself, prove that the human UI, WebMCP tool, MCP server, and API enforce the same authorization, confirmation, side effects, and outcomes.
+A browser protocol can describe and invoke a tool. It cannot, by itself, prove that the human UI, WebMCP tool, MCP server, and API enforce the same authorization, confirmation, side effects, and outcomes.
 
 AIC is an open-source assurance layer for that gap. It helps teams:
 
@@ -31,6 +31,26 @@ AIC is an open-source assurance layer for that gap. It helps teams:
 - make one local, fail-closed reliance decision from consumer-owned policy before an agent acts.
 
 AIC does not compete with WebMCP, MCP, OpenAPI, or future browser standards. Those are execution and description surfaces. AIC verifies the behavior behind them.
+
+## Start here
+
+AIC is a public developer alpha. All 24 reviewed packages are available from npm under the `alpha` tag, and the repository includes a runnable Next.js checkout example with human-UI/WebMCP parity proof.
+
+Inspect the published CLI without cloning the repository:
+
+```bash
+npx -y @aicorg/cli@alpha --help
+```
+
+Then choose the path that matches what you are building:
+
+| Goal | Start with |
+|---|---|
+| Make an owned React, Next.js, or Vite app agent-readable | [Adopt AIC in an existing app](./docs/adopt-existing-app.md) |
+| Add native WebMCP tools with authored safety gates | [WebMCP with AIC](./docs/webmcp.md) |
+| Prove a consequential action behaves the same through UI and WebMCP | [Next.js checkout example](./examples/nextjs-checkout-demo) |
+| Fail closed before an agent, gateway, or release acts | [AIC Trust Fabric](./docs/trust-fabric.md) |
+| Understand what the alpha does and does not claim | [Supported Today](./docs/supported-today.md) |
 
 ## What is new: Trust Fabric
 
@@ -341,7 +361,7 @@ Generated AIC JSON should be regenerated and reviewed, not hand-edited.
 | [MCP Server](./docs/mcp-server.md) | Read-only agent discovery |
 | [Adopt an Existing App](./docs/adopt-existing-app.md) | Practical onboarding path |
 | [Coding Agents](./docs/coding-agents.md) | Versioned onboarding instructions for coding agents |
-| [npm Packages](./docs/npm-packages.md) | Published and next-wave package matrix |
+| [npm Packages](./docs/npm-packages.md) | Published alpha package matrix and install paths |
 | [Release Status](./docs/release-status.md) | Current shipped and repository-only capabilities |
 | [Threat Model](./docs/threat-model.md) | What AIC proof does and does not establish |
 

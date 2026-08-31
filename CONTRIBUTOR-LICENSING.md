@@ -1,42 +1,26 @@
 # Contributor Licensing Policy
 
-This project is currently published under Apache-2.0 because the immediate priority is adoption.
-
-At the same time, the project owner wants to preserve flexibility for future licensing, commercial packaging, hosted offerings, and other business-model decisions. Because of that, outside contributions need a clearer policy than "everything merged now is guaranteed to stay under the same license forever."
+AIC's open-source core and published packages are licensed under Apache-2.0. The project welcomes outside contributions that improve the shared contracts, tooling, verification, examples, and documentation.
 
 ## Current Policy
 
-- The current public releases are under Apache-2.0.
-- Future releases may use different licensing or commercial terms.
-- Anyone who received an Apache-2.0 release keeps Apache-2.0 rights for that released version.
-- Maintainers may decline or delay merging substantial external code contributions until a formal contributor agreement process is in place.
+- Source code and public package releases in this repository are available under Apache-2.0 unless a file clearly says otherwise.
+- Contributions intentionally submitted for inclusion are accepted under Apache-2.0, consistent with the contribution terms in the license, unless a different written agreement is made before submission.
+- AIC does not currently require a contributor license agreement.
+- Maintainers may decline a contribution because of scope, quality, security, maintainability, or product direction.
+- Hosted services, implementation support, and other commercial offerings may use separate service terms without changing the license of the open-source core.
 
-## What Contributions Are Easiest To Accept
+## Good Ways To Contribute
 
 - bug reports
 - reproduction cases
 - documentation improvements
 - test cases
-- small, clearly scoped fixes
+- focused fixes and features with tests
 - design discussion and implementation proposals
-
-## What May Require Additional Review
-
-- large feature additions
-- architectural refactors
-- major new packages or subsystems
-- contributions that would materially complicate future relicensing or commercial packaging
-
-## Why This Exists
-
-Without a contributor agreement or other explicit rights process, large third-party code contributions can make future relicensing harder. This policy exists to keep the repo open and easy to adopt now without accidentally removing future business flexibility.
+- independent verifier implementations and compatibility results
+- conformance packs and reproducible adopter evidence
 
 ## Future Direction
 
-If the project starts receiving significant outside contributions, maintainers may introduce one of these:
-
-- a contributor license agreement (CLA)
-- a developer certificate of origin (DCO) plus separate commercial-rights process
-- a more formal governance and relicensing policy
-
-Until then, the maintainers reserve discretion over which contributions are accepted and when contributor licensing terms are required.
+If the project later introduces a Developer Certificate of Origin, contributor agreement, or more formal governance process, the change will be documented prospectively. Existing releases and accepted contributions retain the rights granted when they were published or submitted.

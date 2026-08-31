@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Improved public-alpha onboarding, naming consistency, release documentation, and contributor guidance.
+
+## 0.1.0-alpha.2 - 2026-08-31
+
 - Added `aic.behavior/0.1` contracts, observations, proofs, validators, and public JSON Schemas.
 - Added deterministic behavior verification with evidence classification, canonical SHA-256 digests, scenario checks, and cross-surface parity findings.
 - Added `aic validate behavior`, `aic verify`, and behavior-proof inspection.
@@ -18,8 +22,9 @@
 - Added CLI commands and schemas for conformance, policy, evidence bundles, remote jobs, interoperability, transparency, and key transitions.
 - Added an evidence-first adopter submission process while keeping the public adopter list and registry empty until genuine claims pass review.
 - Repositioned WebMCP as a native execution surface and AIC as the protocol-neutral assurance layer.
+- Published all 24 reviewed `@aicorg/*` packages under the npm `alpha` tag with registry integrity and SLSA provenance verification. Twenty-three packages resolve to `0.1.0-alpha.2`; `@aicorg/devtools` resolves to `0.1.0-alpha.1`.
 
-## 0.1.0
+## 0.1.0-alpha.1
 
 - Core AIC platform implemented across spec, runtime, React SDK, framework plugins, CLI, devtools, bootstrap, and reference integrations.
 - Guarded authoring-plan apply flow implemented through the CLI.
@@ -29,9 +34,9 @@
 - Reference consumer proof harness added to show external consumption without selector-first fallbacks.
 - First alpha npm publish completed for the first `@aicorg/*` package wave, with package metadata, release tooling, and tarball smoke tests in place.
 
-### Current Boundaries
+### Boundaries at the initial alpha wave
 
-- `@aicorg/devtools` and example apps remain private.
+- Example apps remained private workspace fixtures rather than published npm packages.
 - Supported target is owned React/Next/Vite apps.
 - Dynamic inference and heuristic repo mutation remain out of scope.
 - Stable GA npm publication is still pending.

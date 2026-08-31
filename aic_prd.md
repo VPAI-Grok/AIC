@@ -1,4 +1,4 @@
-# AIC (Agent Interaction Contract) — Codex Implementation PRD
+# AIC (Agent Interaction Control) — Historical Codex Implementation PRD
 
 > **Current direction (2026-08-28):** This is the foundational interaction-manifest PRD. The implemented product has expanded into Agent Interaction Control: a protocol-neutral behavioral assurance layer for agent-operated software. Native WebMCP capabilities take precedence over duplicate AIC fields, while AIC contracts, observations, parity verification, and proof remain independent of protocol. See [`docs/behavior-assurance.md`](./docs/behavior-assurance.md) and [ADR 0002](./docs/adr/0002-behavioral-assurance.md); they supersede conflicting positioning in this historical plan.
 
