@@ -45,7 +45,7 @@ The repository now puts AIC in the relying party's pre-execution path without cr
 
 WebMCP, MCP, OpenAPI, and browser UI remain the native description and execution surfaces. AIC supplies the protocol-neutral answer to a different question: does the evidence for this exact operation, deployment, and revision satisfy *my* policy strongly enough to proceed?
 
-The Trust Fabric packages, schemas, CLI command, reference resolver, and action are implemented in this repository but are not yet claimed as published npm packages, a hosted service, or externally adopted infrastructure. See [AIC Trust Fabric](./docs/trust-fabric.md) and [ADR 0005](./docs/adr/0005-trust-fabric-reliance-network.md).
+The Trust Fabric packages and CLI are published on npm under the `alpha` tag, and the bundled action and reference resolver implementation are available in this repository. AIC does not claim an AIC-operated public resolver, an independent mirror, or external adoption from package publication alone. See [AIC Trust Fabric](./docs/trust-fabric.md) and [ADR 0005](./docs/adr/0005-trust-fabric-reliance-network.md).
 
 ## Open Ecosystem Conformance foundation
 
@@ -208,7 +208,7 @@ When WebMCP provides a field or lifecycle primitive, AIC should consume it rathe
 The current `@aicorg/webmcp` adapter remains useful as a fail-closed compatibility bridge for the experimental browser API. Its wrapper is not the long-term moat; portable behavior contracts, evidence, parity verification, and CI policy are.
 
 ```bash
-pnpm add @aicorg/webmcp@workspace:*
+pnpm add @aicorg/webmcp@alpha
 pnpm add -D webmcp-types@0.1.5
 pnpm aic scan ./src --webmcp
 ```
@@ -270,7 +270,7 @@ See [MCP Server Setup](./docs/mcp-server.md).
 | `@aicorg/ai-bootstrap*` | Review-assisted annotation suggestions |
 | `@aicorg/integrations-*` | Component-library adapters |
 
-The published npm line is alpha. The Trust Fabric and other next-wave packages are repository-only until a publish succeeds and registry availability is verified. See [npm Packages](./docs/npm-packages.md).
+All 24 reviewed public packages, including WebMCP, evidence, conformance, verification, and Trust Fabric packages, are published under the npm `alpha` tag with registry integrity and provenance verified on August 31, 2026. See [npm Packages](./docs/npm-packages.md).
 
 ## Proof and examples
 
@@ -304,7 +304,7 @@ Current limitations:
 - signed-claim primitives verify issuer intent, not current production reachability or runner independence;
 - the public registry interface has no fabricated external-adopter entries;
 - the remote runner is open software and must be operated by a genuinely independent party before its evidence can support an independence claim;
-- the reference resolver and bundled action are repository implementations, not a public hosted resolver, independent mirror, published npm release, or external adoption proof; and
+- the published reference-resolver package and bundled action do not create a public hosted resolver, independent mirror, or external adoption proof; and
 - external agent consumers, unrelated production adopters and runner operators, an independent verifier, a public resolver mirror pair with durable history, provider-verified transparency receipts, and certification remain external gates.
 
 Read [Supported Today](./docs/supported-today.md) and [Threat Model](./docs/threat-model.md) before making assurance claims.

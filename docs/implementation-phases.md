@@ -73,7 +73,7 @@ The repository now includes:
 7. A bundled, offline `actions/aic-rely` GitHub action that pins consumer policy, trust-store digests, and expected issuer, key, runner, origin, environment, deployment, operation, and revision identities.
 8. `@aicorg/reliance-server`, a read-only reference resolver with exact lookup, history, exportable snapshots, and optional locally configured evaluation. Discovery records remain untrusted and mirrorable.
 
-This is an in-repository technical milestone. The new packages and CLI surface are not claimed as published until npm release and registry verification complete. The reference server is not a hosted public resolver, and repository fixtures do not establish external use or operator independence.
+This technical milestone is published under the npm `alpha` tag, with registry integrity and provenance verified after release. The reference-server package is not a hosted public resolver, and package availability or repository fixtures do not establish external use or operator independence.
 
 ## Next Trust Fabric adoption and operations gate
 

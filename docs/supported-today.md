@@ -80,7 +80,7 @@ Supported in the repository:
 - a bundled offline GitHub action that pins policy and trust-store digests plus expected issuer, key, runner, origin, environment, deployment, operation, and revision identities; and
 - a read-only reference resolver with exact lookup, history, portable snapshots, and optional local verification. Resolver records remain untrusted and independently mirrorable.
 
-These surfaces are implemented and tested in the repository. The packages and expanded CLI are not yet claimed as published on npm, and AIC does not claim a public hosted resolver or independent mirror.
+These surfaces are implemented, tested, and published under the npm `alpha` tag. AIC does not claim a public hosted resolver or independent mirror from package publication alone.
 
 ## Not guaranteed
 

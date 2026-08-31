@@ -8,9 +8,9 @@ The durable product direction is behavioral assurance plus consumer-owned relian
 
 ## Published alpha
 
-The existing npm alpha includes the core spec, runtime, React SDK, automation, CLI, framework plugins, component integrations, bootstrap providers, devtools, and MCP server. See [npm Packages](./npm-packages.md) for the exact published matrix.
+The current npm alpha contains all 24 reviewed public packages: the core spec, runtime, React SDK, automation, CLI, framework plugins, component integrations, bootstrap providers, devtools, MCP server, WebMCP adapter, evidence adapters, remote runner, conformance packs, minimal verifier, and Trust Fabric reliance packages. Exact versions, `alpha` dist-tags, registry integrity, and SLSA provenance were verified after the August 31, 2026 release. See [npm Packages](./npm-packages.md) for the exact matrix.
 
-## Implemented in this repository for the next release
+## Published WebMCP, assurance, and Trust Fabric surface
 
 - `@aicorg/webmcp` compatibility adapter, declarative props, readiness analysis, and tests;
 - `aic.behavior/0.1` contract and observation types;
@@ -35,7 +35,7 @@ The existing npm alpha includes the core spec, runtime, React SDK, automation, C
 - the bundled offline `actions/aic-rely` GitHub action for pinned, fail-closed consumer enforcement; and
 - `@aicorg/reliance-server`, a read-only, exportable, mirrorable reference resolver that keeps discovery untrusted.
 
-Do not describe repository-only additions as published npm capabilities until the next alpha publish succeeds.
+These package and CLI surfaces are now published under the npm `alpha` tag. The bundled GitHub action remains repository-distributed rather than an npm package.
 
 ## Verification surfaces
 
@@ -72,7 +72,7 @@ The checkout fixtures cover success, authorization denial, confirmation decline,
 - teams that want CI to catch divergence between human and agent paths; and
 - agent, gateway, and release-system teams that want a local, portable pre-execution policy gate.
 
-AIC is not yet the best fit for arbitrary websites, unreviewed inferred contracts, non-React production fleets, or buyers requiring GA stability, independent production certification, or a mature external trust network. The Trust Fabric technical milestone is implemented in the repository, but its packages are not yet claimed as published and no public hosted resolver is claimed. Three unrelated production adopters, two separately controlled runner operators, two external enforcing consumers, an independent verifier, a public resolver plus independent mirror with durable history, and provider-verified transparency receipts remain external gates.
+AIC is not yet the best fit for arbitrary websites, unreviewed inferred contracts, non-React production fleets, or buyers requiring GA stability, independent production certification, or a mature external trust network. The Trust Fabric packages are published, but no public hosted resolver is claimed. Three unrelated production adopters, two separately controlled runner operators, two external enforcing consumers, an independent verifier, a public resolver plus independent mirror with durable history, and provider-verified transparency receipts remain external gates.
 
 ## Evaluation path
 

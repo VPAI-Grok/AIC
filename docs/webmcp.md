@@ -46,12 +46,8 @@ The human and WebMCP paths should call the same domain operation. Protocol tool 
 ## Imperative registration
 
 ```bash
-# In this monorepo
-pnpm add @aicorg/webmcp@workspace:*
-pnpm add -D webmcp-types@0.1.5
-
-# After the package is included in an npm alpha release
 pnpm add @aicorg/webmcp@alpha
+pnpm add -D webmcp-types@0.1.5
 ```
 
 ```tsx

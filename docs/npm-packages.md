@@ -1,16 +1,18 @@
 # npm Packages
 
-The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
+All 24 reviewed `@aicorg/*` packages are published to npm under the `alpha` tag. Registry downloads, exact dist-tags, integrity metadata, and SLSA provenance were independently verified after [Publish Packages run 33408392192](https://github.com/VPAI-Grok/AIC/actions/runs/33408392192) completed from source revision `e52df5f9e8e742034960f06d3bbfa22f34492a0f` on August 31, 2026.
 
-## Published Alpha Wave
+The `alpha` tag resolves to `0.1.0-alpha.2` for every package except `@aicorg/devtools`, which resolves to `0.1.0-alpha.1`.
+
+## Published Alpha Packages
 
 | Package | Purpose |
 | --- | --- |
-| `@aicorg/spec` | Published interaction manifest types and validators |
+| `@aicorg/spec` | Interaction manifest types and validators |
 | `@aicorg/runtime` | Runtime registry and manifest serialization |
 | `@aicorg/sdk-react` | React SDK for explicit AIC annotations |
-| `@aicorg/automation-core` | Published deterministic scanning, generation, and readiness analysis |
-| `@aicorg/cli` | Published onboarding, generation, validation, and inspection commands |
+| `@aicorg/automation-core` | Deterministic scanning, generation, and readiness analysis |
+| `@aicorg/cli` | Onboarding, generation, validation, and inspection commands |
 | `@aicorg/plugin-vite` | Vite scanning and artifact generation helpers |
 | `@aicorg/plugin-next` | Next.js scanning and artifact generation helpers |
 | `@aicorg/integrations-radix` | Radix UI helper factories |
@@ -20,18 +22,6 @@ The core `@aicorg/*` packages are now published to npm under the `alpha` tag.
 | `@aicorg/ai-bootstrap-openai` | OpenAI bootstrap provider adapter |
 | `@aicorg/devtools` | Browser devtools bridge, overlay, and inspector helpers |
 | `@aicorg/mcp-server` | MCP server exposing AIC manifests to AI agents |
-
-## Deferred From The First npm Wave
-
-- `examples/*`
-  Stay private as demos, proof surfaces, and test fixtures.
-
-## Implemented Next Alpha Wave
-
-The following package surfaces are implemented and tested in this repository, but are not claimed as published until the next npm alpha release and registry verification complete:
-
-| Package | Purpose |
-| --- | --- |
 | `@aicorg/webmcp` | Guarded native `document.modelContext` registration for authored, execution-ready tools |
 | `@aicorg/evidence-core` | Data-only evidence plans, strict projections, deployment identities, receipts, and bundle verification |
 | `@aicorg/evidence-http` | Fail-closed HTTP and OpenAPI observation collection |
@@ -43,7 +33,9 @@ The following package surfaces are implemented and tested in this repository, bu
 | `@aicorg/rely` | Local consumer-owned assurance evaluation with mandatory exact artifact/request assertions and policy-derived deadlines |
 | `@aicorg/reliance-server` | Read-only, exportable, mirrorable assurance-record discovery with optional local evaluation |
 
-The same release extends `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg/cli` with behavior and trust artifacts, cumulative assurance policy, compatibility vectors, signed reference transparency checkpoints, scheduled dual-signed key transitions, canonical reliance decisions and resolver records, and `aic rely evaluate`. The open remote-runner and resolver packages can be operated by separate parties, but AIC does not currently operate or claim an independent hosted runner, public resolver, or resolver mirror.
+This alpha extends `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg/cli` with behavior and trust artifacts, cumulative assurance policy, compatibility vectors, signed reference transparency checkpoints, scheduled dual-signed key transitions, canonical reliance decisions and resolver records, and `aic rely evaluate`. The open remote-runner and resolver packages can be operated by separate parties, but AIC does not currently operate or claim an independent hosted runner, public resolver, or resolver mirror.
+
+Workspace examples remain private demos, proof surfaces, and test fixtures rather than published packages.
 
 ## Install Targets
 
@@ -52,29 +44,25 @@ The same release extends `@aicorg/spec`, `@aicorg/automation-core`, and `@aicorg
 For a React, Next.js, or Vite app that you own:
 
 ```bash
-pnpm add @aicorg/spec @aicorg/runtime @aicorg/sdk-react
-pnpm add -D @aicorg/cli
+pnpm add @aicorg/spec@alpha @aicorg/runtime@alpha @aicorg/sdk-react@alpha
+pnpm add -D @aicorg/cli@alpha
 ```
 
 Add framework helpers if you want project generation and scanning support:
 
 ```bash
-pnpm add @aicorg/plugin-vite @aicorg/plugin-next
+pnpm add @aicorg/plugin-vite@alpha @aicorg/plugin-next@alpha
 ```
 
 ### Runtime And React SDK
 
 ```bash
-pnpm add @aicorg/spec @aicorg/runtime @aicorg/sdk-react
+pnpm add @aicorg/spec@alpha @aicorg/runtime@alpha @aicorg/sdk-react@alpha
 ```
 
 ### WebMCP Browser Tools
 
 ```bash
-# Inside this monorepo
-pnpm add @aicorg/webmcp@workspace:*
-
-# After the next npm alpha release
 pnpm add @aicorg/webmcp@alpha
 pnpm add -D webmcp-types@0.1.5
 ```
@@ -84,10 +72,6 @@ Use this only for explicit task-level tools. Generated and inferred AIC contract
 ### Native Browser Evidence
 
 ```bash
-# Inside this monorepo
-pnpm add -D @aicorg/evidence-playwright@workspace:*
-
-# After the next npm alpha release
 pnpm add -D @aicorg/evidence-playwright@alpha
 ```
 
@@ -96,10 +80,6 @@ The package launches Chromium-family browsers, inspects native `document.modelCo
 ### Protocol Evidence Adapters
 
 ```bash
-# Inside this monorepo
-pnpm add @aicorg/evidence-core@workspace:* @aicorg/evidence-http@workspace:* @aicorg/evidence-mcp@workspace:*
-
-# After the next npm alpha release
 pnpm add @aicorg/evidence-core@alpha @aicorg/evidence-http@alpha @aicorg/evidence-mcp@alpha
 ```
 
@@ -108,10 +88,6 @@ Evidence plans are data, not executable plugins. HTTP/OpenAPI and MCP adapters v
 ### Conformance Packs
 
 ```bash
-# Inside this monorepo
-pnpm add @aicorg/conformance-packs@workspace:*
-
-# After the next npm alpha release
 pnpm add @aicorg/conformance-packs@alpha
 ```
 
@@ -120,10 +96,6 @@ Pack selection does not certify an application. The application supplies a revie
 ### Self-Hosted Remote Evidence Runner
 
 ```bash
-# Inside this monorepo
-pnpm add @aicorg/runner-remote@workspace:*
-
-# After the next npm alpha release
 pnpm add @aicorg/runner-remote@alpha
 ```
 
@@ -134,10 +106,6 @@ The runner accepts only validated data-only jobs, revalidates public-network tar
 The validators live in `@aicorg/spec`. The minimal trust, proof-regeneration, assurance-policy, and transparency verifier lives in `@aicorg/verify-core`, so reliance consumers do not load or install the scanner/compiler toolchain. Compatibility-suite, key-transition, scanning, and authoring operations remain available through `@aicorg/automation-core` and `@aicorg/cli`.
 
 ```bash
-# Inside this monorepo
-pnpm add @aicorg/spec@workspace:* @aicorg/verify-core@workspace:* @aicorg/automation-core@workspace:*
-
-# After the next npm alpha release
 pnpm add @aicorg/spec@alpha @aicorg/verify-core@alpha @aicorg/automation-core@alpha
 pnpm add -D @aicorg/cli@alpha
 ```
@@ -147,17 +115,13 @@ pnpm add -D @aicorg/cli@alpha
 `@aicorg/rely` consumes caller-supplied evidence and pinned trust data only. It performs no implicit registry, resolver, network, filesystem, or environment discovery. Its preflight helper uses a caller-trusted current clock, binds the exact operation and deployment request, and rejects non-`allow`, stale, future-dated, expired, request-mismatched, or out-of-window decisions.
 
 ```bash
-# Inside this monorepo
-pnpm add @aicorg/rely@workspace:*
-
-# After the next npm alpha release and registry verification
 pnpm add @aicorg/rely@alpha
 ```
 
-The matching CLI is also repository-only until that release:
+The matching command is available from the published alpha CLI:
 
 ```bash
-pnpm aic rely evaluate <policy> <contract> <proof> \
+npx @aicorg/cli@alpha rely evaluate <policy> <contract> <proof> \
   --observations <file> \
   --attestation <file> \
   --trust-store <file> \
@@ -173,10 +137,6 @@ Optional transparency inputs verify the signed reference index and exact attesta
 ### Self-Hosted Reliance Resolver
 
 ```bash
-# Inside this monorepo
-pnpm add @aicorg/reliance-server@workspace:*
-
-# After the next npm alpha release and registry verification
 pnpm add @aicorg/reliance-server@alpha
 ```
 
@@ -189,19 +149,19 @@ The reference server exposes a Fetch API handler for exact assurance lookup, his
 ### CLI-Driven Onboarding And Artifact Generation
 
 ```bash
-pnpm add -D @aicorg/cli
+pnpm add -D @aicorg/cli@alpha
 ```
 
 ### Framework And Integration Helpers
 
 ```bash
-pnpm add @aicorg/plugin-vite @aicorg/plugin-next @aicorg/integrations-radix @aicorg/integrations-shadcn
+pnpm add @aicorg/plugin-vite@alpha @aicorg/plugin-next@alpha @aicorg/integrations-radix@alpha @aicorg/integrations-shadcn@alpha
 ```
 
 ### Devtools And Inspector Helpers
 
 ```bash
-pnpm add @aicorg/devtools
+pnpm add @aicorg/devtools@alpha
 ```
 
 ### MCP Consumer Path
@@ -209,20 +169,20 @@ pnpm add @aicorg/devtools
 For AI-agent integration without changing your app runtime dependencies:
 
 ```bash
-npx @aicorg/mcp-server
+npx @aicorg/mcp-server@alpha
 ```
 
 ### Bootstrap Providers
 
 ```bash
-pnpm add @aicorg/ai-bootstrap @aicorg/ai-bootstrap-http @aicorg/ai-bootstrap-openai
+pnpm add @aicorg/ai-bootstrap@alpha @aicorg/ai-bootstrap-http@alpha @aicorg/ai-bootstrap-openai@alpha
 ```
 
 ## Release Notes
 
 - The current npm release uses the `alpha` tag.
 - Alpha publication uses a [no-OIDC verification and immutable-packaging job followed by a protected, OIDC-only publishing job](./npm-trusted-publishing.md). The GitHub `npm-alpha` environment and npm Trusted Publisher bindings are external prerequisites; the workflow does not accept a static npm token.
-- The implemented next-wave packages and `aic rely evaluate` remain repository-only until the next publish workflow succeeds and npm registry contents are verified; use `workspace:*` only inside this monorepo.
+- All 24 reviewed packages and `aic rely evaluate` are available through the `alpha` tag; `workspace:*` remains an internal monorepo development protocol rather than an external install target.
 - Workspace examples remain private demos, proof surfaces, and test fixtures.
 - Package tarballs are validated with local smoke tests before any publish step runs in CI.
 - `@aicorg/devtools` is part of the publishable alpha package surface.

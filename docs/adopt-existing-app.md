@@ -190,7 +190,7 @@ aic verify ./aic-behavior-contract.json \
 
 Cover success, denial, confirmation decline, declared failures, recovery, and required parity in proportion to the action's risk. See [Behavior Assurance](./behavior-assurance.md).
 
-The conformance, protocol-evidence, policy, interoperability, transparency, and key-transition commands below are implemented in this repository and targeted for the next npm alpha wave. Use the workspace CLI here; outside the monorepo, use them only after that release is verified as published.
+The conformance, protocol-evidence, policy, interoperability, transparency, reliance, and key-transition commands below are published in `@aicorg/cli@alpha`. Use the workspace CLI while developing this monorepo or install the alpha CLI in another project.
 
 ## 7. Apply A Reusable Conformance Profile
 

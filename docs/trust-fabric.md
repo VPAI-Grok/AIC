@@ -9,7 +9,7 @@ WebMCP, MCP, HTTP/OpenAPI, and a human UI describe or invoke an operation. AIC a
 The decision is protocol-neutral and locally verifiable. A hosted resolver can make records easier to discover, but it is never an implicit trust root.
 
 > [!IMPORTANT]
-> The Trust Fabric packages, schemas, CLI command, reference resolver, and GitHub action are implemented in this repository. They are not yet claimed as published npm additions, an AIC-operated public resolver, an independent mirror, or externally adopted infrastructure.
+> The Trust Fabric packages and CLI are published under the npm `alpha` tag, and the reference resolver implementation and GitHub action are available from this repository. Publication does not establish an AIC-operated public resolver, an independent mirror, or externally adopted infrastructure.
 
 ## Reliance decision
 
