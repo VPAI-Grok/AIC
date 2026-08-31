@@ -94,6 +94,7 @@ jobs:
         with:
           artifact-ids: ${{ needs.verify-and-pack.outputs.artifact-id }}
           path: npm-alpha
+          merge-multiple: true
 
       - name: Verify and publish alpha tarballs
         shell: bash

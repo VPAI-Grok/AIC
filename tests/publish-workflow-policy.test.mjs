@@ -99,6 +99,7 @@ test("publish workflow isolates OIDC from all repository execution", async () =>
     publishJob,
     /artifact-ids: \$\{\{ needs\.verify-and-pack\.outputs\.artifact-id \}\}/u
   );
+  assert.match(publishJob, /merge-multiple: true/u);
   assert.match(publishJob, /sha256sum --check --strict SHA256SUMS/u);
   assert.match(publishJob, /downloaded_files/u);
   assert.match(publishJob, /! -type f/u);
