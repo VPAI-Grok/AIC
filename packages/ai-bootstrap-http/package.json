@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/ai-bootstrap-http",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "type": "module",
   "description": "Generic HTTP provider adapter for AIC bootstrap suggestions.",
   "license": "Apache-2.0",

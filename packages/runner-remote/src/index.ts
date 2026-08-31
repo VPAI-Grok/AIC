@@ -24,7 +24,7 @@ import {
   validateAICRemoteObservationJob
 } from "@aicorg/spec";
 
-export const AIC_REMOTE_RUNNER_VERSION = "0.1.0-alpha.1";
+export const AIC_REMOTE_RUNNER_VERSION = "0.1.0-alpha.2";
 export const AIC_REMOTE_DEFAULT_MAX_RESPONSE_BYTES = 1_048_576;
 export const AIC_REMOTE_DEFAULT_MAX_RUN_MS = 60_000;
 

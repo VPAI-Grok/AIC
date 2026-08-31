@@ -21,7 +21,7 @@ import type {
 } from "@aicorg/spec";
 
 export const AIC_HTTP_EVIDENCE_ADAPTER_ID = "@aicorg/evidence-http";
-export const AIC_HTTP_EVIDENCE_ADAPTER_VERSION = "0.1.0-alpha.1";
+export const AIC_HTTP_EVIDENCE_ADAPTER_VERSION = "0.1.0-alpha.2";
 export const AIC_OPENAPI_PROTOCOL_VERSION = "OpenAPI 3.0/3.1/3.2";
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);

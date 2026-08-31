@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/evidence-mcp",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "type": "module",
   "description": "Stateless MCP 2026-07-28 and injected-call evidence collection for AIC.",
   "license": "Apache-2.0",
@@ -12,10 +12,18 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "assurance", "mcp", "model-context-protocol"],
+  "keywords": [
+    "aic",
+    "agents",
+    "assurance",
+    "mcp",
+    "model-context-protocol"
+  ],
   "main": "./dist/evidence-mcp/src/index.js",
   "types": "./dist/evidence-mcp/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/evidence-mcp/src/index.d.ts",

@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/evidence-http",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "type": "module",
   "description": "Fail-closed HTTP and OpenAPI evidence collection for AIC behavior proofs.",
   "license": "Apache-2.0",
@@ -12,10 +12,18 @@
   "bugs": {
     "url": "https://github.com/VPAI-Grok/AIC/issues"
   },
-  "keywords": ["aic", "agents", "assurance", "http", "openapi"],
+  "keywords": [
+    "aic",
+    "agents",
+    "assurance",
+    "http",
+    "openapi"
+  ],
   "main": "./dist/evidence-http/src/index.js",
   "types": "./dist/evidence-http/src/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/evidence-http/src/index.d.ts",

@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/rely",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "type": "module",
   "description": "Protocol-neutral, local assurance-policy decisions for AI agent preflight checks.",
   "license": "Apache-2.0",

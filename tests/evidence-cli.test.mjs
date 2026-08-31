@@ -132,7 +132,7 @@ async function signedBundle() {
         adapter: {
           id: "@aicorg/evidence-http",
           protocol_version: "OpenAPI 3.0/3.1/3.2",
-          version: "0.1.0-alpha.1"
+          version: "0.1.0-alpha.2"
         },
         artifacts: [artifact],
         observations: {
@@ -147,7 +147,7 @@ async function signedBundle() {
               contract_id: contractValue.id,
               environment: {
                 adapter: "@aicorg/evidence-http",
-                adapter_version: "0.1.0-alpha.1",
+                adapter_version: "0.1.0-alpha.2",
                 protocol_version: "HTTP",
                 target_origin: ORIGIN
               },
@@ -181,7 +181,7 @@ async function signedBundle() {
       id: "runner.example",
       software_name: "@aicorg/runner-remote",
       software_revision: "b".repeat(40),
-      software_version: "0.1.0-alpha.1"
+      software_version: "0.1.0-alpha.2"
     },
     signer: async (canonicalReceipt) => ({
       algorithm: "ed25519",

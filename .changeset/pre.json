@@ -1,0 +1,42 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "@aicorg/example-bootstrap-openai": "0.1.0",
+    "@aicorg/example-nextjs-checkout-demo": "0.1.0",
+    "@aicorg/example-vite-crm-demo": "0.1.0",
+    "free-nextjs-admin-dashboard": "2.2.4",
+    "todomvc-react": "0.0.0",
+    "@aicorg/ai-bootstrap": "0.1.0-alpha.1",
+    "@aicorg/ai-bootstrap-http": "0.1.0-alpha.1",
+    "@aicorg/ai-bootstrap-openai": "0.1.0-alpha.1",
+    "@aicorg/automation-core": "0.1.0-alpha.1",
+    "@aicorg/cli": "0.1.0-alpha.1",
+    "@aicorg/conformance-packs": "0.1.0-alpha.1",
+    "@aicorg/devtools": "0.1.0-alpha.1",
+    "@aicorg/evidence-core": "0.1.0-alpha.1",
+    "@aicorg/evidence-http": "0.1.0-alpha.1",
+    "@aicorg/evidence-mcp": "0.1.0-alpha.1",
+    "@aicorg/evidence-playwright": "0.1.0-alpha.1",
+    "@aicorg/integrations-radix": "0.1.0-alpha.1",
+    "@aicorg/integrations-shadcn": "0.1.0-alpha.1",
+    "@aicorg/mcp-server": "0.1.0-alpha.1",
+    "@aicorg/plugin-next": "0.1.0-alpha.1",
+    "@aicorg/plugin-vite": "0.1.0-alpha.1",
+    "@aicorg/reliance-server": "0.1.0-alpha.1",
+    "@aicorg/rely": "0.1.0-alpha.1",
+    "@aicorg/runner-remote": "0.1.0-alpha.1",
+    "@aicorg/runtime": "0.1.0-alpha.1",
+    "@aicorg/sdk-react": "0.1.0-alpha.1",
+    "@aicorg/spec": "0.1.0-alpha.1",
+    "@aicorg/verify-core": "0.1.0-alpha.1",
+    "@aicorg/webmcp": "0.1.0-alpha.1"
+  },
+  "changesets": [
+    "agents-rely-openly",
+    "bright-proofs-agree",
+    "calm-tools-govern-webmcp",
+    "open-ecosystems-conform",
+    "steady-trust-connects"
+  ]
+}

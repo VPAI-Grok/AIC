@@ -20,7 +20,7 @@ import type {
 } from "@aicorg/spec";
 
 export const AIC_MCP_EVIDENCE_ADAPTER_ID = "@aicorg/evidence-mcp";
-export const AIC_MCP_EVIDENCE_ADAPTER_VERSION = "0.1.0-alpha.1";
+export const AIC_MCP_EVIDENCE_ADAPTER_VERSION = "0.1.0-alpha.2";
 export const AIC_MCP_PROTOCOL_VERSION = "2026-07-28";
 
 const SENSITIVE_HEADERS = new Set([

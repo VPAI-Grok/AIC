@@ -193,7 +193,7 @@ function runnerInput(job, overrides = {}) {
     runner: {
       id: "independent-runner.example",
       software_name: "@aicorg/runner-remote",
-      software_version: "0.1.0-alpha.1",
+      software_version: "0.1.0-alpha.2",
       software_revision: "b".repeat(40)
     },
     ...runnerOverrides
