@@ -20,6 +20,7 @@ import {
   type AICDetailedManifestDiff,
   AICActionContract,
   AICDiscoveryManifest,
+  AICDiscoveryWebMCP,
   AICElementManifest,
   type AICFieldDiffEntry,
   type AICInitFileResult,
@@ -109,6 +110,7 @@ export interface AICProjectArtifactsOptions {
   updatedAt?: string;
   viewId?: string;
   viewUrl?: string;
+  webmcp?: AICDiscoveryWebMCP;
   workflows?: AICWorkflowManifest["workflows"];
 }
 
@@ -552,6 +554,7 @@ interface AICProjectConfigInput {
   updatedAt?: string;
   viewId?: string;
   viewUrl?: string;
+  webmcp?: AICDiscoveryWebMCP;
   workflows?: AICWorkflowManifest["workflows"];
 }
 
@@ -963,6 +966,7 @@ export async function createAICDoctorReport(
     updatedAt: config.updatedAt,
     viewId: config.viewId,
     viewUrl: config.viewUrl,
+    webmcp: config.webmcp,
     workflows: config.workflows
   });
 
@@ -2921,10 +2925,26 @@ function createWebMCPSourceFinding(
   };
 }
 
+/**
+ * Third-party WebMCP registration wrappers. Most real WebMCP apps never call
+ * `document.modelContext.registerTool` directly; they use a community hook that
+ * forwards the same tool descriptor. Treating those calls as invisible would
+ * report a fully instrumented app as having no WebMCP integration at all.
+ */
+const WEBMCP_WRAPPER_MODULES = new Set([
+  "@mcp-b/react-webmcp",
+  "@mcp-b/webmcp",
+  "use-webmcp",
+  "use-webmcp-tool",
+  "webmcp-react"
+]);
+
 function scanSourceForWebMCP(source: string, file: string): AICWebMCPFileScanResult {
   const sourceFile = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const governedFunctionNames = new Set<string>();
   const governedNamespaceNames = new Set<string>();
+  const wrapperFunctionNames = new Set<string>();
+  const wrapperNamespaceNames = new Set<string>();
   const findings: AICWebMCPSourceFinding[] = [];
   let currentNativeRegistrations = 0;
   let declarativeTools = 0;
@@ -2937,26 +2957,33 @@ function scanSourceForWebMCP(source: string, file: string): AICWebMCPFileScanRes
       continue;
     }
 
-    if (
-      statement.moduleSpecifier.text !== "@aicorg/webmcp" &&
-      statement.moduleSpecifier.text !== "@aicorg/webmcp/react"
-    ) {
+    const moduleSpecifier = statement.moduleSpecifier.text;
+    const governedModule =
+      moduleSpecifier === "@aicorg/webmcp" || moduleSpecifier === "@aicorg/webmcp/react";
+    const wrapperModule = WEBMCP_WRAPPER_MODULES.has(moduleSpecifier);
+
+    if (!governedModule && !wrapperModule) {
       continue;
     }
 
     const bindings = statement.importClause?.namedBindings;
     if (bindings && ts.isNamespaceImport(bindings)) {
-      governedNamespaceNames.add(bindings.name.text);
+      (governedModule ? governedNamespaceNames : wrapperNamespaceNames).add(bindings.name.text);
     }
 
     if (bindings && ts.isNamedImports(bindings)) {
       for (const specifier of bindings.elements) {
-        if (
-          ["registerAICWebMCPTool", "useAICWebMCPTool"].includes(
-            specifier.propertyName?.text ?? specifier.name.text
-          )
-        ) {
-          governedFunctionNames.add(specifier.name.text);
+        const importedName = specifier.propertyName?.text ?? specifier.name.text;
+
+        if (governedModule) {
+          if (["registerAICWebMCPTool", "useAICWebMCPTool"].includes(importedName)) {
+            governedFunctionNames.add(specifier.name.text);
+          }
+          continue;
+        }
+
+        if (["registerTool", "useWebMCP", "useWebMCPTool"].includes(importedName)) {
+          wrapperFunctionNames.add(specifier.name.text);
         }
       }
     }
@@ -2975,6 +3002,15 @@ function scanSourceForWebMCP(source: string, file: string): AICWebMCPFileScanRes
           callPath === `${namespaceName}.useAICWebMCPTool`
       );
 
+      const wrapperDirect =
+        ts.isIdentifier(node.expression) && wrapperFunctionNames.has(node.expression.text);
+      const wrapperNamespaced = Array.from(wrapperNamespaceNames).some(
+        (namespaceName) =>
+          callPath === `${namespaceName}.registerTool` ||
+          callPath === `${namespaceName}.useWebMCP` ||
+          callPath === `${namespaceName}.useWebMCPTool`
+      );
+
       if (governedDirect || governedNamespaced) {
         governedRegistrations += 1;
       } else if (callPath === "document.modelContext.registerTool") {
@@ -2987,6 +3023,19 @@ function scanSourceForWebMCP(source: string, file: string): AICWebMCPFileScanRes
               "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
             message:
               "Native WebMCP registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+            severity: "warning"
+          })
+        );
+      } else if (wrapperDirect || wrapperNamespaced) {
+        currentNativeRegistrations += 1;
+        directNativeRegistrations += 1;
+        findings.push(
+          createWebMCPSourceFinding(sourceFile, file, node, {
+            code: "direct_native_registration",
+            fix_hint:
+              "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+            message:
+              "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
             severity: "warning"
           })
         );
@@ -3254,7 +3303,8 @@ export async function generateProjectArtifacts(
     appVersion: options.appVersion,
     framework: options.framework,
     generated_at: timestamp,
-    notes: options.notes
+    notes: options.notes,
+    webmcp: options.webmcp
   });
   const permissions = registry.createPermissionsManifest(options.permissions);
   permissions.generated_at = timestamp;

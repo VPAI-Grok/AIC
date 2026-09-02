@@ -4,6 +4,7 @@ import {
   createEmptyPermissionsManifest,
   type AICDiscoveryCapabilities,
   type AICDiscoveryManifest,
+  type AICDiscoveryWebMCP,
   type AICElementAction,
   type AICElementManifest,
   type AICMetadataProvenance,
@@ -39,6 +40,7 @@ export interface AICDiscoveryOptions {
   framework?: string;
   generated_at?: string;
   notes?: string[];
+  webmcp?: AICDiscoveryWebMCP;
 }
 
 export interface AICOperateTextOptions {
@@ -267,6 +269,11 @@ export class AICRegistry {
   }
 
   createDiscoveryManifest(options: AICDiscoveryOptions): AICDiscoveryManifest {
+    // Only advertise WebMCP when the project actually declares governed tools.
+    // An empty tool list is a configuration mistake, not an enabled surface.
+    const webmcp =
+      options.webmcp && options.webmcp.tools.length > 0 ? options.webmcp : undefined;
+
     return {
       spec: SPEC_VERSION,
       manifest_version: MANIFEST_VERSION,
@@ -287,8 +294,10 @@ export class AICRegistry {
         entityModel: true,
         executionModel: true,
         recoveryModel: true,
+        ...(webmcp ? { webmcp: true } : {}),
         ...options.capabilities
       },
+      ...(webmcp ? { webmcp } : {}),
       endpoints: {
         ui: "/.well-known/agent/ui",
         actions: "/.well-known/agent/actions",

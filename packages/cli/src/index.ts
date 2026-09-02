@@ -78,6 +78,7 @@ import {
   type AICAuthoringPatchPlan,
   type AICDoctorReport,
   type AICDiscoveryManifest,
+  type AICDiscoveryWebMCP,
   type AICElementManifest,
   type AICInitResult,
   type AICPermissionsManifest,
@@ -906,6 +907,7 @@ async function generateProject(filePath: string, args: string[]): Promise<number
     updatedAt?: string;
     viewId?: string;
     viewUrl?: string;
+    webmcp?: AICDiscoveryWebMCP;
     workflows?: AICWorkflowManifest["workflows"];
   }>(filePath);
   const outDir = readOptionValue(args, "--out-dir");
@@ -929,6 +931,7 @@ async function generateProject(filePath: string, args: string[]): Promise<number
     updatedAt: config.updatedAt,
     viewId: config.viewId,
     viewUrl: config.viewUrl,
+    webmcp: config.webmcp,
     workflows: config.workflows
   });
   const frameworkReport = createProjectArtifactReport(framework, artifacts, {

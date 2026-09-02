@@ -1,0 +1,199 @@
+{
+  "artifact_type": "aic_webmcp_readiness_report",
+  "baseline": {
+    "api": "document.modelContext",
+    "draft": "2026-08-26",
+    "types": "0.1.5"
+  },
+  "files": [
+    "App.tsx",
+    "navigation.ts",
+    "vite-env.d.ts",
+    "auth/LoginPage.tsx",
+    "auth/SignupPage.tsx",
+    "cart/AddToCartButton.tsx",
+    "cart/CartDrawer.tsx",
+    "cart/cartUiStore.ts",
+    "cart/celebrate.ts",
+    "catalog/CatalogPage.tsx",
+    "catalog/ProductCard.tsx",
+    "catalog/ProductPage.tsx",
+    "compare/ComparePage.tsx",
+    "compare/CompareTable.tsx",
+    "compare/CompareToggle.tsx",
+    "compare/highlightStore.ts",
+    "orders/OrdersPage.tsx",
+    "server/actions.ts",
+    "server/cart.ts",
+    "server/catalog.seed.ts",
+    "server/queries.ts",
+    "server/seed.ts",
+    "shared/compatibility.test.ts",
+    "shared/compatibility.ts",
+    "shared/format.ts",
+    "shared/machineSpecKeys.ts",
+    "webmcp/WebMCPTools.tsx",
+    "webmcp/schemas.ts"
+  ],
+  "findings": [
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 94,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 104,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 113,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 123,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 133,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 147,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 157,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 170,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 198,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 210,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 220,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 231,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 242,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 252,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 262,
+      "file": "webmcp/WebMCPTools.tsx"
+    },
+    {
+      "code": "direct_native_registration",
+      "fix_hint": "Wrap the tool with registerAICWebMCPTool and bind it to an authored, execution-ready AIC action contract.",
+      "message": "A third-party WebMCP wrapper registers this tool. Registration is current, but it bypasses AIC risk, confirmation, entity, verification, and recovery guards.",
+      "severity": "warning",
+      "column": 5,
+      "line": 272,
+      "file": "webmcp/WebMCPTools.tsx"
+    }
+  ],
+  "generated_at": "2026-09-02T21:56:41.625Z",
+  "next_actions": [
+    "Bind direct WebMCP tools to authored AIC action contracts through @aicorg/webmcp.",
+    "Select one task-level tool and implement an explicit AIC-governed WebMCP binding as the pilot.",
+    "Run browser tests with WebMCP enabled and verify that unsupported browsers degrade without changing the human flow."
+  ],
+  "status": "review_needed",
+  "summary": {
+    "current_native_registrations": 16,
+    "declarative_tools": 0,
+    "direct_native_registrations": 16,
+    "files_scanned": 28,
+    "governed_registrations": 0,
+    "obsolete_api_usages": 0
+  }
+}

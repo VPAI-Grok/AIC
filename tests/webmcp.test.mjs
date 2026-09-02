@@ -1,10 +1,18 @@
 import assert from "node:assert/strict";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
 import test from "node:test";
 
 import { importWorkspaceModule } from "./helpers.mjs";
 
 const runtime = await importWorkspaceModule("packages/runtime/dist/runtime/src/index.js");
 const webmcp = await importWorkspaceModule("packages/webmcp/dist/webmcp/src/index.js");
+const automation = await importWorkspaceModule(
+  "packages/automation-core/dist/automation-core/src/index.js"
+);
+
+const NEWLINE = String.fromCharCode(10);
 
 function createReadyBinding(overrides = {}) {
   const registry = overrides.registry ?? new runtime.AICRegistry();
@@ -332,4 +340,73 @@ test("registration blocks insecure cross-origin exposure", async () => {
     }),
     (error) => error.code === "registration_blocked"
   );
+});
+
+test("source readiness detects third-party WebMCP wrapper registrations", async () => {
+  const workspace = await mkdtemp(resolve(tmpdir(), "aic-webmcp-wrapper-test-"));
+
+  try {
+    await writeFile(
+      resolve(workspace, "Tools.tsx"),
+      [
+        'import { useWebMCP } from "use-webmcp-tool";',
+        "",
+        "export function Tools() {",
+        "  useWebMCP({",
+        '    name: "checkout",',
+        '    description: "Place the order. Irreversible.",',
+        "    inputSchema: {},",
+        "    annotations: { readOnlyHint: false },",
+        "    execute: async () => placeOrder()",
+        "  });",
+        "  return null;",
+        "}",
+        ""
+      ].join(NEWLINE),
+      "utf8"
+    );
+
+    const report = await automation.analyzeProjectForWebMCPReadiness(workspace);
+
+    // A wrapper registration is a real, current registration. Reporting it as
+    // "not detected" would hide every tool in a typical WebMCP app.
+    assert.equal(report.status, "review_needed");
+    assert.equal(report.summary.current_native_registrations, 1);
+    assert.equal(report.summary.direct_native_registrations, 1);
+    assert.equal(report.summary.governed_registrations, 0);
+    assert.equal(report.summary.obsolete_api_usages, 0);
+    assert.equal(
+      report.findings.filter((finding) => finding.code === "direct_native_registration").length,
+      1
+    );
+  } finally {
+    await rm(workspace, { force: true, recursive: true });
+  }
+});
+
+test("source readiness does not count governed AIC bindings as ungoverned", async () => {
+  const workspace = await mkdtemp(resolve(tmpdir(), "aic-webmcp-governed-test-"));
+
+  try {
+    await writeFile(
+      resolve(workspace, "Governed.tsx"),
+      [
+        'import { useAICWebMCPTool } from "@aicorg/webmcp/react";',
+        "",
+        "export function Governed() {",
+        "  useAICWebMCPTool(() => binding, []);",
+        "  return null;",
+        "}",
+        ""
+      ].join(NEWLINE),
+      "utf8"
+    );
+
+    const report = await automation.analyzeProjectForWebMCPReadiness(workspace);
+
+    assert.equal(report.summary.governed_registrations, 1);
+    assert.equal(report.summary.direct_native_registrations, 0);
+  } finally {
+    await rm(workspace, { force: true, recursive: true });
+  }
 });

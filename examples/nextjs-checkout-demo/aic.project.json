@@ -2,7 +2,10 @@
   "appName": "AIC Checkout Demo",
   "framework": "nextjs",
   "generatedAt": "2026-03-28T00:00:00.000Z",
-  "notes": ["example project", "checkout proof harness"],
+  "notes": [
+    "example project",
+    "checkout proof harness"
+  ],
   "permissions": {
     "actionPolicies": {
       "checkout.save_cart": {
@@ -61,5 +64,29 @@
       ],
       "title": "Checkout Review"
     }
-  ]
+  ],
+  "webmcp": {
+    "api": "document.modelContext",
+    "draft": "2026-08-26",
+    "enabled": true,
+    "tools": [
+      {
+        "name": "get_checkout_summary",
+        "operation_id": "checkout.read_summary",
+        "read_only": true,
+        "requires_confirmation": false,
+        "risk": "low",
+        "workflow_id": "checkout.review"
+      },
+      {
+        "name": "complete_checkout",
+        "operation_id": "checkout.submit_order",
+        "read_only": false,
+        "requires_confirmation": true,
+        "requires_permission": "checkout.submit_order",
+        "risk": "critical",
+        "workflow_id": "checkout.review"
+      }
+    ]
+  }
 }

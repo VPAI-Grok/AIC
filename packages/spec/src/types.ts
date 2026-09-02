@@ -92,6 +92,30 @@ export interface AICDiscoveryCapabilities {
   entityModel?: boolean;
   executionModel?: boolean;
   recoveryModel?: boolean;
+  webmcp?: boolean;
+}
+
+/**
+ * One governed browser tool, described with the semantics the WebMCP tool
+ * descriptor itself cannot carry. `document.modelContext` annotations are
+ * limited to `readOnlyHint` and `untrustedContentHint`, so risk, confirmation,
+ * required permission, and workflow membership are published here instead.
+ */
+export interface AICDiscoveryWebMCPTool {
+  name: string;
+  operation_id?: string;
+  read_only: boolean;
+  requires_confirmation: boolean;
+  requires_permission?: string;
+  risk: AICRisk;
+  workflow_id?: string;
+}
+
+export interface AICDiscoveryWebMCP {
+  api: string;
+  draft: string;
+  enabled: boolean;
+  tools: AICDiscoveryWebMCPTool[];
 }
 
 export interface AICDiscoveryEndpoints {
@@ -114,6 +138,7 @@ export interface AICDiscoveryManifest {
   generated_at: string;
   manifest_version?: string;
   notes?: string[];
+  webmcp?: AICDiscoveryWebMCP;
 }
 
 export interface AICPageMetadata {
