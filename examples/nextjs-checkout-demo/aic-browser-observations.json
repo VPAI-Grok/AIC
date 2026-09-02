@@ -1,18 +1,18 @@
 {
   "artifact_type": "aic_behavior_observation_set",
   "contract_id": "checkout.complete.behavior",
-  "generated_at": "2026-09-02T21:58:27.948Z",
+  "generated_at": "2026-08-29T00:00:00.000Z",
   "observations": [
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1064,
+      "duration_ms": 1229,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "not_applicable",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "false",
         "surface": "human-ui",
@@ -21,7 +21,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:99662c3590b2b5086afdee3458ded802439b831b7d2de230a5ef6654b673cd7d",
+          "digest": "sha256:013fc6b55db7296a385c1e8ed19133c43e5e0b5a283c699c0755d1e89d0ae82d",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/success--human-ui.png"
         }
@@ -124,14 +124,14 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1007,
+      "duration_ms": 1081,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "json_string_compat",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "true",
         "surface": "webmcp",
@@ -140,7 +140,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:ad33a054e12a7f0728fff800076dc7f973df810c2564b390f0a0e90d2aeb226c",
+          "digest": "sha256:f9f79616073975299a2227f868ed62ef8f1e2cbc95cdcc6ae3b9c071052f29ea",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/success--webmcp.png"
         }
@@ -243,14 +243,14 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1035,
+      "duration_ms": 1162,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "not_applicable",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "false",
         "surface": "human-ui",
@@ -259,7 +259,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:4bb543d4ccdf4cdd9231c4a0745a4c35b6d4fb701584f2ea24e424183d2f065c",
+          "digest": "sha256:85ba40bae4ddca0b37f00f064a9bc502085774f93acf30c11aff94c207d7cf62",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/authorization-denied--human-ui.png"
         }
@@ -359,14 +359,14 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 977,
+      "duration_ms": 1017,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "json_string_compat",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "true",
         "surface": "webmcp",
@@ -375,7 +375,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:80fe4ba1e2672fee6ac3d67c6d335526939f704451f0a351dd52da778c4a03fa",
+          "digest": "sha256:39d9ffc4ad6186d21dff2effcf3fda8f0856a3a0dd6afb8ada421ead22c98601",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/authorization-denied--webmcp.png"
         }
@@ -475,14 +475,14 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1057,
+      "duration_ms": 982,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "not_applicable",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "false",
         "surface": "human-ui",
@@ -491,7 +491,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:4bb543d4ccdf4cdd9231c4a0745a4c35b6d4fb701584f2ea24e424183d2f065c",
+          "digest": "sha256:85ba40bae4ddca0b37f00f064a9bc502085774f93acf30c11aff94c207d7cf62",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/confirmation-declined--human-ui.png"
         }
@@ -591,14 +591,14 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1009,
+      "duration_ms": 972,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "json_string_compat",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "true",
         "surface": "webmcp",
@@ -607,7 +607,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:80fe4ba1e2672fee6ac3d67c6d335526939f704451f0a351dd52da778c4a03fa",
+          "digest": "sha256:39d9ffc4ad6186d21dff2effcf3fda8f0856a3a0dd6afb8ada421ead22c98601",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/confirmation-declined--webmcp.png"
         }
@@ -707,14 +707,14 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1026,
+      "duration_ms": 1090,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "not_applicable",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "false",
         "surface": "human-ui",
@@ -723,7 +723,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:ddbcb7963744eb90fd2115c5777870505d8cd403dfb0de7b83668cff4461f25f",
+          "digest": "sha256:83452ed6c3c79db94063a2465baa83a74d4908124b96bd810d21fc573e957baf",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/business-failure--human-ui.png"
         }
@@ -828,14 +828,14 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1026,
+      "duration_ms": 1067,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "json_string_compat",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "true",
         "surface": "webmcp",
@@ -844,7 +844,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:a451532dd4313b9d7f0d457f244f5e2bc9372b6958702622119e25e849e4a81a",
+          "digest": "sha256:fffc01f3772db7abdad72842fa60af204752161c9fc57bdce33f1b5f01f52d61",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/business-failure--webmcp.png"
         }
@@ -949,14 +949,14 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1007,
+      "duration_ms": 1028,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "not_applicable",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "false",
         "surface": "human-ui",
@@ -965,7 +965,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:3661c19c502324dbba489c5a36241e4c7dfdaa110c4520d3ed53b36f000ab419",
+          "digest": "sha256:10e033b401aabe9c447e8aef8a6af9f861637bfaa5d2da7f5bc34916bb9f0638",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/recovery--human-ui.png"
         }
@@ -1074,14 +1074,14 @@
     },
     {
       "artifact_type": "aic_behavior_observation",
-      "captured_at": "2026-09-02T21:58:27.948Z",
+      "captured_at": "2026-08-29T00:00:00.000Z",
       "contract_id": "checkout.complete.behavior",
-      "duration_ms": 1012,
+      "duration_ms": 982,
       "environment": {
         "adapter": "@aicorg/evidence-playwright",
         "argument_encoding": "json_string_compat",
         "browser": "Google Chrome",
-        "browser_version": "152.0.7977.75",
+        "browser_version": "152.0.7977.65",
         "feature_mode": "testing_flag",
         "native_webmcp": "true",
         "surface": "webmcp",
@@ -1090,7 +1090,7 @@
       },
       "evidence": [
         {
-          "digest": "sha256:6f9439086f2234dff093b490ec8ddcdbb2a45e4e1295baa81f3d0a2600140a12",
+          "digest": "sha256:9b422ed060d9dbd7171690452f880d44188857965a31423ad9045e89b6f51cc9",
           "kind": "screenshot",
           "ref": "aic-browser-evidence/recovery--webmcp.png"
         }
