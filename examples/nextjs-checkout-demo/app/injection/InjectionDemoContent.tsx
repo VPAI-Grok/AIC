@@ -3,12 +3,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAICRegistry } from "@aicorg/sdk-react/client";
 import { useAICWebMCPTool } from "@aicorg/webmcp/react";
+import { installDemoModelContext, modelContextMode } from "./demo-model-context.mjs";
 import {
   GUARDED_SUBMIT_ACTION,
   GUARDED_SUBMIT_ELEMENT,
   INJECTED_CONTENT,
   INJECTION_ORDER
 } from "./injection-contract.mjs";
+
+type ContextMode = "native" | "shim" | "unsupported";
+
+// Installed at module load so both arms register exactly once, against a
+// context that is already present. Doing this in an effect would change the
+// context after registration had begun and race the two registrations.
+if (typeof document !== "undefined") {
+  installDemoModelContext();
+}
 
 type LogKind = "blocked" | "charged" | "info";
 
@@ -88,6 +98,10 @@ function useUngovernedTool(onCharge: () => void): boolean {
 
 export function InjectionDemoContent() {
   const registry = useAICRegistry();
+  const [mode, setMode] = useState<ContextMode>("unsupported");
+  useEffect(() => {
+    setMode(modelContextMode() as ContextMode);
+  }, []);
   const [log, setLog] = useState<LogEntry[]>([]);
   const [unguardedCharges, setUnguardedCharges] = useState(0);
   const [guardedCharges, setGuardedCharges] = useState(0);
@@ -175,7 +189,43 @@ export function InjectionDemoContent() {
     [registry, append]
   );
 
-  const supported = unguardedRegistered || guarded.status === "registered";
+  const [running, setRunning] = useState(false);
+
+  const runAsAgent = useCallback(async () => {
+    const modelContext = (
+      document as Document & {
+        modelContext?: {
+          executeTool: (tool: unknown, input?: string) => Promise<unknown>;
+        };
+      }
+    ).modelContext;
+
+    if (!modelContext?.executeTool) {
+      append("webmcp", "info", "No model context available in this browser.");
+      return;
+    }
+
+    setRunning(true);
+    try {
+      try {
+        await modelContext.executeTool("place_order_unguarded", "{}");
+      } catch {
+        append("webmcp", "info", "Ungoverned tool threw.");
+      }
+
+      try {
+        await modelContext.executeTool(
+          "place_order_guarded",
+          JSON.stringify({ order_id: INJECTION_ORDER.order_id })
+        );
+      } catch {
+        // The adapter rejects before execute() when confirmation is declined.
+        // The decline itself is already logged by the confirm handler.
+      }
+    } finally {
+      setRunning(false);
+    }
+  }, [append]);
 
   return (
     <main style={styles.main}>
@@ -188,10 +238,19 @@ export function InjectionDemoContent() {
         </p>
       </header>
 
-      {!supported && (
+      {mode === "native" ? (
+        <p style={styles.native}>
+          <strong>Native WebMCP.</strong> This browser exposes <code>document.modelContext</code>.
+          Both tools below are registered with the real browser API.
+        </p>
+      ) : (
         <p style={styles.warn}>
-          <code>document.modelContext</code> is unavailable. Open this page in Chrome with{" "}
-          <code>chrome://flags/#enable-webmcp-testing</code> enabled. The human UI still works.
+          <strong>Demo compatibility mode.</strong> This browser does not expose{" "}
+          <code>document.modelContext</code>, so the page installed a small stand-in. Every line of
+          the AIC gating and the ungoverned control arm runs unchanged against it — only the browser
+          plumbing is substituted. For the native path, use Chrome with{" "}
+          <code>chrome://flags/#enable-webmcp-testing</code>. The committed evidence in{" "}
+          <code>aic-injection-result.json</code> is recorded against native Chrome only.
         </p>
       )}
 
@@ -278,6 +337,17 @@ export function InjectionDemoContent() {
         </section>
       </div>
 
+      <section style={styles.runner}>
+        <h2 style={styles.h2}>Act as the agent</h2>
+        <p style={styles.muted}>
+          This calls each tool through <code>document.modelContext.executeTool</code>, which is what
+          an agent that obeyed the seller note would do.
+        </p>
+        <button type="button" style={styles.runButton} onClick={runAsAgent} disabled={running}>
+          {running ? "Running…" : "Follow the injected instruction"}
+        </button>
+      </section>
+
       <section>
         <h2 style={styles.h2}>What happened</h2>
         {log.length === 0 ? (
@@ -337,8 +407,35 @@ const styles = {
     border: "1px solid #a16207",
     borderRadius: "0.5rem",
     color: "#fde68a",
+    lineHeight: 1.55,
     margin: 0,
     padding: "0.75rem 1rem"
+  },
+  native: {
+    background: "#052e2b",
+    border: "1px solid #0d9488",
+    borderRadius: "0.5rem",
+    color: "#99f6e4",
+    lineHeight: 1.55,
+    margin: 0,
+    padding: "0.75rem 1rem"
+  },
+  runner: {
+    background: "#1e293b",
+    border: "1px solid #334155",
+    borderRadius: "0.75rem",
+    padding: "1.25rem"
+  },
+  runButton: {
+    background: "#7c3aed",
+    border: "none",
+    borderRadius: "0.5rem",
+    color: "#f5f3ff",
+    cursor: "pointer",
+    fontSize: "0.95rem",
+    fontWeight: 600,
+    marginTop: "0.75rem",
+    padding: "0.7rem 1.1rem"
   },
   orderCard: {
     background: "#1e293b",

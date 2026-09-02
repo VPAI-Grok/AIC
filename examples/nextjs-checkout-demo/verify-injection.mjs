@@ -49,12 +49,32 @@ async function main() {
       );
     }
 
-    const toolNames = inspection.tools.map((tool) => tool.name).sort();
+    // The page installs a labelled stand-in when the browser has no WebMCP.
+    // Evidence must never be recorded against it.
+    const usingShim = await page.evaluate(
+      () => Boolean(document.modelContext?.__aicDemoModelContextShim)
+    );
+    if (usingShim) {
+      throw new Error(
+        "Refusing to record evidence: the page fell back to the demo model-context shim."
+      );
+    }
+
+    // Registration is async and restarts once the page resolves its context
+    // mode, so wait for both arms rather than sampling once.
+    const required = ["place_order_guarded", "place_order_unguarded"];
+    let toolNames = [];
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      toolNames = (await inspectNativeWebMCP(page)).tools.map((tool) => tool.name).sort();
+      if (required.every((name) => toolNames.includes(name))) break;
+      await page.waitForTimeout(250);
+    }
+
     observations.push({ detail: toolNames, step: "registered_tools" });
 
-    for (const required of ["place_order_guarded", "place_order_unguarded"]) {
-      if (!toolNames.includes(required)) {
-        throw new Error(`Expected tool ${required} to be registered. Found: ${toolNames.join(", ")}`);
+    for (const name of required) {
+      if (!toolNames.includes(name)) {
+        throw new Error(`Expected tool ${name} to be registered. Found: ${toolNames.join(", ")}`);
       }
     }
 
