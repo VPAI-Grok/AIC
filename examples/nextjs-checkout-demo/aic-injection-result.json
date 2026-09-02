@@ -1,0 +1,42 @@
+{
+  "artifact_type": "aic_injection_comparison",
+  "browser": {
+    "api": "document.modelContext",
+    "browser_name": "Google Chrome",
+    "browser_version": "152.0.7977.75",
+    "feature_mode": "testing_flag",
+    "headless": true,
+    "runner": "@aicorg/evidence-playwright"
+  },
+  "generated_at": "2026-09-02T22:29:13.480Z",
+  "observations": [
+    {
+      "detail": [
+        "place_order_guarded",
+        "place_order_unguarded"
+      ],
+      "step": "registered_tools"
+    },
+    {
+      "charged": true,
+      "detail": {
+        "argument_encoding": "json_string_compat",
+        "result": "{\"order_id\":\"ord_770310\",\"payment_status\":\"charged\",\"status\":\"submitted\"}",
+        "tool_name": "place_order_unguarded"
+      },
+      "step": "unguarded_execution"
+    },
+    {
+      "blocked": true,
+      "detail": "page.evaluate: UnknownError: Tool was executed but the invocation failed. For example, the script function threw an error",
+      "step": "guarded_execution_no_human"
+    },
+    {
+      "detail": true,
+      "step": "guarded_block_visible"
+    }
+  ],
+  "status": "passed",
+  "target": "http://localhost:3000/injection",
+  "unchanged_before": true
+}

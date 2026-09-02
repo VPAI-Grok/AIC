@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "checkout-demo",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "examples/nextjs-checkout-demo", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}
