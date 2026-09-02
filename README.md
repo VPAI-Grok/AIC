@@ -235,6 +235,35 @@ pnpm aic scan ./src --webmcp
 
 WebMCP remains feature-detected and experimental. In browsers without `document.modelContext`, the human application continues to work. Read [WebMCP with AIC](./docs/webmcp.md).
 
+### What WebMCP cannot say, and AIC publishes
+
+A WebMCP tool descriptor supports exactly two annotations: `readOnlyHint` and `untrustedContentHint`. There is no field for risk, required permission, confirmation, or workflow. Today the only place to express "this is irreversible" is prose inside `description`, which nothing enforces and no agent can check before acting.
+
+AIC publishes those semantics in `/.well-known/agent.json` so an agent can read them *before* it calls anything:
+
+```json
+"webmcp": {
+  "api": "document.modelContext",
+  "draft": "2026-08-26",
+  "enabled": true,
+  "tools": [
+    {
+      "name": "complete_checkout",
+      "operation_id": "checkout.submit_order",
+      "read_only": false,
+      "requires_confirmation": true,
+      "requires_permission": "checkout.submit_order",
+      "risk": "critical",
+      "workflow_id": "checkout.review"
+    }
+  ]
+}
+```
+
+The same values are enforced at registration and around `execute`, so the published claim and the runtime behavior cannot drift apart.
+
+For a concrete measurement of the gap, see the [espresso-store cross-check](./docs/evidence/espresso-cross-check.md): a well-built WebMCP app with 16 tools, 16 current-API registrations, and zero enforceable risk semantics.
+
 ## Existing discovery and operation surface
 
 AIC can generate and serve:

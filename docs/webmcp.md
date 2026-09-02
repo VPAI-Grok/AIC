@@ -120,6 +120,34 @@ The React SDK maps explicit properties to the current declarative attributes:
 
 AIC suppresses `toolautosubmit` unless the action is low risk and does not require confirmation.
 
+## Discovery
+
+`document.modelContext` tool descriptors cannot carry risk, permission, confirmation, or workflow.
+Declare governed tools in `aic.project.json` and the generated `/.well-known/agent.json` gains a
+`webmcp` block publishing those semantics for agents to read before they call anything:
+
+```json
+"webmcp": {
+  "api": "document.modelContext",
+  "draft": "2026-08-26",
+  "enabled": true,
+  "tools": [
+    {
+      "name": "complete_checkout",
+      "operation_id": "checkout.submit_order",
+      "read_only": false,
+      "requires_confirmation": true,
+      "requires_permission": "checkout.submit_order",
+      "risk": "critical",
+      "workflow_id": "checkout.review"
+    }
+  ]
+}
+```
+
+The block is emitted only when at least one governed tool is declared. It is generated, not
+hand-written; regenerate with `aic generate project` rather than editing the JSON.
+
 ## Readiness commands
 
 ```bash
@@ -128,7 +156,7 @@ aic doctor . --webmcp
 aic generate webmcp-plan ./src --out-file ./webmcp-plan.json
 ```
 
-These commands find governed registrations, direct registrations that bypass the current adapter, obsolete API shapes, declarative tools, and risky auto-submit review points. Readiness analysis prepares implementation; it is not executed proof.
+These commands find governed registrations, direct registrations that bypass the current adapter, obsolete API shapes, declarative tools, and risky auto-submit review points. Registrations made through community wrapper hooks (`use-webmcp-tool`, `use-webmcp`, `@mcp-b/react-webmcp`, `@mcp-b/webmcp`, `webmcp-react`) count as current-but-ungoverned, since most real WebMCP apps never call `registerTool` directly. Readiness analysis prepares implementation; it is not executed proof.
 
 ## Behavior verification
 
