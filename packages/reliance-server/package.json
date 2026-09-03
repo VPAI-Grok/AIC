@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/reliance-server",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "type": "module",
   "description": "Mirrorable, read-only discovery and local reliance evaluation service for AIC assurance artifacts.",
   "license": "Apache-2.0",

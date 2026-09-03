@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/conformance-packs",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "type": "module",
   "description": "Open, digest-bound conformance profiles for consequential AIC operations.",
   "license": "Apache-2.0",

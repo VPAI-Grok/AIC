@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/plugin-next",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "type": "module",
   "description": "Next.js project scanning and artifact generation helpers for AIC.",
   "license": "Apache-2.0",
