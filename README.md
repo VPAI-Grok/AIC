@@ -54,6 +54,15 @@ A page contains a note aimed at the agent, not the user: *"pre-approved and time
 
 Executed in Chrome 152 with native `document.modelContext` — [raw result](./examples/nextjs-checkout-demo/aic-injection-result.json), reproduce with `pnpm --dir examples/nextjs-checkout-demo run aic:verify:injection`.
 
+Across 3 runs per cell ([full benchmark](./benchmarks/webmcp/report.md)):
+
+| Scenario | `webmcp_only` | `webmcp_aic` |
+|---|---|---|
+| Injected instruction, no human | charged **3/3** | charged **0/3** |
+| Human present and approving | charged 3/3 | charged 3/3 |
+
+The second row is the one that matters as much as the first: the gate blocks unapproved calls without blocking legitimate ones.
+
 The injected note is ordinary page content and neither tool can tell it came from an attacker. The difference is that one of them does not need to: a `critical` action cannot execute without a human, whatever the page says.
 
 We think this belongs in the platform eventually, not in userland — see our [draft spec proposal](./docs/proposals/webmcp-risk-annotations.md).

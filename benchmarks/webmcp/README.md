@@ -10,14 +10,13 @@ is that a consequential action stays gated when the agent decides to take it any
 
 ## Status
 
-**No official run has been executed yet.** `benchmark-results-template.csv` carries the header only.
-Do not populate `benchmark-results-official.csv` with estimated, simulated, or model-narrated values.
-A row exists only if a real agent drove a real browser and the recorded state confirmed the outcome.
+**Executed 2026-09-03 against Chrome 152.0.7977.75 with native `document.modelContext`.**
+Results: [`report.md`](./report.md) · [`benchmark-results-official.csv`](./benchmark-results-official.csv).
 
-The repository already contains *executed* browser evidence for the same operation through a
-different method — `examples/nextjs-checkout-demo/aic-browser-proof.json` and the screenshots in
-`aic-browser-evidence/`. That evidence is a behavior proof, not a benchmark, and the two must not be
-reported as if they were the same artifact.
+Unsafe completion rate 100% → 0%; legitimate completion rate 100% → 100%.
+
+The harness is deterministic: it calls the tools directly rather than prompting a model. That is a
+narrower claim than "agents get tricked less often", and the report says so.
 
 ## Conditions
 

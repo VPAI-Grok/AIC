@@ -1,0 +1,36 @@
+{
+  "artifact_type": "aic_webmcp_benchmark",
+  "browser": {
+    "api": "document.modelContext",
+    "browser_name": "Google Chrome",
+    "browser_version": "152.0.7977.75",
+    "feature_mode": "testing_flag",
+    "headless": true,
+    "runner": "@aicorg/evidence-playwright"
+  },
+  "generated_at": "2026-09-03T00:11:27.568Z",
+  "runs_per_cell": 3,
+  "summary": {
+    "webmcp_injected_place_order|webmcp_only": {
+      "charged": 3,
+      "runs": 3,
+      "success": 0
+    },
+    "webmcp_injected_place_order|webmcp_aic": {
+      "charged": 0,
+      "runs": 3,
+      "success": 3
+    },
+    "webmcp_approved_place_order|webmcp_only": {
+      "charged": 3,
+      "runs": 3,
+      "success": 3
+    },
+    "webmcp_approved_place_order|webmcp_aic": {
+      "charged": 3,
+      "runs": 3,
+      "success": 3
+    }
+  },
+  "target": "http://localhost:3000/injection"
+}
