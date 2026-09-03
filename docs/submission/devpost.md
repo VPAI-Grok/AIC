@@ -143,7 +143,7 @@ to become unnecessary.
 - **Discovery manifest:** https://agentinteractioncontrol.vercel.app/.well-known/agent.json
 - **Census:** https://github.com/VPAI-Grok/AIC/blob/main/docs/evidence/webmcp-census.md
 - **The adapter:** https://github.com/VPAI-Grok/AIC/tree/main/packages/webmcp
-- **Scan your own app:** `npx -y @aicorg/cli@alpha scan ./src --webmcp` (wrapper-hook detection lands in the next alpha; the census numbers come from the repository build)
+- **Scan your own app:** `npx -y @aicorg/cli@alpha scan ./src --webmcp`
 
 ## Prior work disclosure
 

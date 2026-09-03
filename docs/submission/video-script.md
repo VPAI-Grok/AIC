@@ -76,15 +76,14 @@ committed; don't improvise figures on camera.
 **Screen:** terminal. Run it live against the espresso clone.
 
 ```bash
-pnpm aic scan /path/to/espresso/src --webmcp
+npx -y @aicorg/cli@alpha scan /path/to/espresso/src --webmcp
 ```
 
-> "You can run this against any WebMCP app. Sixteen tools, sixteen ungoverned — that's the storefront
-> from the opening."
+> "You can run this against your own WebMCP app right now. One command, no install. Sixteen tools,
+> sixteen ungoverned — that's the storefront from the opening."
 
-**Use the repository build for this shot, not `npx @aicorg/cli@alpha`.** Wrapper-hook detection is
-not in the published alpha yet, so the npx form prints `not_detected` — zero tools — on the espresso
-store and the shot dies on camera. Verify the exact command in your terminal before recording.
+Verified against published `@aicorg/cli@alpha` (0.1.0-alpha.4): 16 registrations on the espresso
+store, and 52 across the census applications. Still run it once in your terminal before recording.
 
 ### 2:35 — 2:45 · Close
 

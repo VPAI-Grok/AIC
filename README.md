@@ -39,18 +39,8 @@ Read [**the WebMCP Safety Census**](./docs/evidence/webmcp-census.md) for the fu
 npx -y @aicorg/cli@alpha scan ./src --webmcp
 ```
 
-It reports every WebMCP registration it finds, which bypass governance, and which use obsolete API shapes.
+No install, no config, no account. It reports every WebMCP registration it finds, which bypass governance, and which use obsolete API shapes.
 
-> **Note on the published CLI.** Wrapper-hook detection is not in `@aicorg/cli@alpha` yet. That build
-> matches only literal `document.modelContext.registerTool` calls, so it finds 16 of the 52 tools the
-> census reports — it misses every app registering through `use-webmcp-tool` and similar hooks. The
-> census was produced with the repository build below; a fixed alpha is pending release.
-
-```bash
-git clone https://github.com/VPAI-Grok/AIC && cd AIC
-pnpm install && pnpm build
-pnpm aic scan /path/to/your/app/src --webmcp
-```
 
 
 **Live demo:** <https://agentinteractioncontrol.vercel.app> · **the comparison below:** <https://agentinteractioncontrol.vercel.app/injection>
