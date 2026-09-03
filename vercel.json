@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm build --filter \"@aicorg/example-nextjs-checkout-demo...\"",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": "examples/nextjs-checkout-demo/.next",
+  "framework": "nextjs",
+  "headers": [
+    {
+      "source": "/.well-known/agent.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/agent-(permissions|workflows).json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    }
+  ]
+}

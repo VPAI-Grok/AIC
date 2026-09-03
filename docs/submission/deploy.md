@@ -5,23 +5,42 @@ built from the repository root, not from the example directory.
 
 ## Vercel
 
+`vercel.json` at the repository root already sets the build, install, output directory, and the
+JSON content-type headers for the discovery manifests. You should not need to configure anything in
+the dashboard.
+
 From the repository root:
 
 ```bash
-npx vercel --cwd . --build-env ENABLE_EXPERIMENTAL_COREPACK=1
+npx vercel login
 ```
 
-Project settings, if you configure it in the dashboard instead:
+then:
+
+```bash
+npx vercel --prod
+```
+
+Accept the defaults when it asks to link a project; the root directory must stay `.` (the repository
+root), **not** the example directory — the example depends on `workspace:*` packages that only
+resolve from the root.
+
+### If you configure it by hand instead
 
 | Setting | Value |
 |---|---|
-| Root directory | `.` (repository root — **not** the example) |
+| Root directory | `.` |
 | Install command | `pnpm install --frozen-lockfile` |
-| Build command | `pnpm build --filter @aicorg/example-nextjs-checkout-demo...` |
+| Build command | `pnpm --filter "@aicorg/example-nextjs-checkout-demo..." build` |
 | Output directory | `examples/nextjs-checkout-demo/.next` |
 | Node version | 20.x or newer |
 
-The `...` suffix on the filter is deliberate: it builds the example *and its workspace dependencies*.
+Two details that will bite otherwise:
+
+- **The filter goes before `build`, not after.** `pnpm build --filter X` passes `--filter` through to
+  `tsc`, which fails with `TS5023: Unknown compiler option '--filter'`. Verified the hard way.
+- **The trailing `...` is load-bearing.** It builds the example *and its workspace dependencies*.
+  Without it the example builds against missing `dist` output.
 
 ## After deploying, check these three URLs
 
