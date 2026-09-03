@@ -344,8 +344,9 @@ export function InjectionDemoContent() {
           an agent that obeyed the seller note would do.
         </p>
         <button type="button" style={styles.runButton} onClick={runAsAgent} disabled={running}>
-          {running ? "Running…" : "Follow the injected instruction"}
+          Follow the injected instruction
         </button>
+        {running && <span style={styles.status}>Running…</span>}
       </section>
 
       <section>

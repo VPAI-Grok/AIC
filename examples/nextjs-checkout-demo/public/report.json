@@ -54,7 +54,7 @@
     "warnings": []
   },
   "diagnostics": [],
-  "filesScanned": 11,
+  "filesScanned": 13,
   "framework": "nextjs",
   "generated_manifests": {
     "findings": [],
@@ -271,6 +271,19 @@
       },
       "source_key": "app/ContractProof.tsx:82:7:AICButton",
       "tagName": "AICButton"
+    },
+    {
+      "column": 9,
+      "file": "app/injection/InjectionDemoContent.tsx",
+      "label": "Follow the injected instruction",
+      "line": 346,
+      "opening_tag_signature": "<button type=\"button\" style={styles.runButton} onClick={runAsAgent} disabled={running}>",
+      "role": "button",
+      "selectors": {
+        "text": "Follow the injected instruction"
+      },
+      "source_key": "app/injection/InjectionDemoContent.tsx:346:9:button",
+      "tagName": "button"
     }
   ]
 }
