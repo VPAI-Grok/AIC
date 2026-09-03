@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/mcp-server",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "type": "module",
   "description": "MCP server that exposes AIC manifests to AI agents for reliable web app operation.",
   "license": "Apache-2.0",

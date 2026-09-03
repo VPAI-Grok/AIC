@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/webmcp",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "type": "module",
   "description": "Fail-closed WebMCP registration and React lifecycle helpers backed by explicit AIC contracts.",
   "license": "Apache-2.0",

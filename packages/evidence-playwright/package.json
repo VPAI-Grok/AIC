@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/evidence-playwright",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "type": "module",
   "description": "Native browser and WebMCP evidence collection primitives for AIC behavior proofs.",
   "license": "Apache-2.0",

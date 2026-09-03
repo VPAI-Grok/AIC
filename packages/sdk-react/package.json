@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/sdk-react",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "type": "module",
   "description": "React SDK for authoring AIC metadata and runtime registrations.",
   "license": "Apache-2.0",

@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/integrations-shadcn",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "type": "module",
   "description": "shadcn/ui wrapper components for attaching AIC metadata.",
   "license": "Apache-2.0",

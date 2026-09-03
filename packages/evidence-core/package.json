@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/evidence-core",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "type": "module",
   "description": "Protocol-neutral evidence plans, projections, receipts, and bundle verification for AIC.",
   "license": "Apache-2.0",

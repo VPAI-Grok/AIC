@@ -34,6 +34,7 @@
   },
   "changesets": [
     "agents-rely-openly",
+    "alpha-4-consistent-wave",
     "bright-proofs-agree",
     "calm-tools-govern-webmcp",
     "devtools-version-with-workspace",

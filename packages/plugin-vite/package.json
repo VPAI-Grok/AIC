@@ -1,6 +1,6 @@
 {
   "name": "@aicorg/plugin-vite",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "type": "module",
   "description": "Vite project scanning and artifact generation helpers for AIC.",
   "license": "Apache-2.0",
