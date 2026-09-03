@@ -1,0 +1,105 @@
+{
+  "artifact_type": "aic_espresso_retrofit_verification",
+  "browser": {
+    "api": "document.modelContext",
+    "browser_name": "Google Chrome",
+    "browser_version": "152.0.7977.75",
+    "feature_mode": "testing_flag",
+    "headless": true,
+    "runner": "@aicorg/evidence-playwright"
+  },
+  "generated_at": "2026-09-03T16:43:12.564Z",
+  "governed_tools": [
+    "checkout",
+    "apply_coupon"
+  ],
+  "observations": [
+    {
+      "detail": {
+        "count": 16,
+        "names": [
+          "add_to_cart",
+          "apply_coupon",
+          "check_compatibility",
+          "checkout",
+          "clear_highlights",
+          "compare_products",
+          "get_cart",
+          "get_compare_list",
+          "get_my_coupons",
+          "get_my_gear",
+          "get_product_details",
+          "highlight_differences",
+          "remove_from_cart",
+          "search_products",
+          "set_compare_list",
+          "update_cart_quantity"
+        ]
+      },
+      "passed": true,
+      "step": "all_16_tools_registered"
+    },
+    {
+      "detail": {
+        "checkout": true,
+        "apply_coupon": true
+      },
+      "passed": true,
+      "step": "governed_tools_present"
+    },
+    {
+      "detail": {
+        "result": "{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"lines\\\":[],\\\"subtotalCents\\\":0,\\\"coupon\\\":null,\\\"totalCents\\\":0}\"}]}"
+      },
+      "passed": true,
+      "step": "ungoverned_read_tool_intact"
+    },
+    {
+      "detail": {
+        "lines": 1,
+        "slug": "mahlkonig-x54"
+      },
+      "passed": true,
+      "step": "cart_seeded"
+    },
+    {
+      "detail": {
+        "detail": "{\"lines\":[{\"slug\":\"mahlkonig-x54\",\"name\":\"Mahlkönig X54 Allround\",\"color\":\"\",\"quantity\":1,\"unitPriceCents\":44900,\"lineTotalCents\":44900,\"imageUrl\":\"/img/products/mahlkonig-x54.png\"}],\"subtotalCents\":4"
+      },
+      "passed": true,
+      "step": "governed_medium_risk_tool_succeeds"
+    },
+    {
+      "detail": {
+        "detail": "page.evaluate: UnknownError: Tool was executed but the invocation failed. For example, the script function threw an error",
+        "cart_lines_after": 1,
+        "cart_lines_before": 1,
+        "prompt_shown": "Place this order and charge the card now? This empties your cart and cannot be undone."
+      },
+      "passed": true,
+      "step": "checkout_blocked_when_confirmation_declined"
+    },
+    {
+      "detail": {
+        "prompt": "Place this order and charge the card now? This empties your cart and cannot be undone."
+      },
+      "passed": true,
+      "step": "confirmation_prompt_came_from_aic_contract"
+    },
+    {
+      "detail": {
+        "detail": "{\"orderId\":9,\"totalCents\":40410,\"effect\":\"Order #9 placed; the cart is now empty.\"}",
+        "cart_lines_after": 0,
+        "cart_lines_before": 1,
+        "prompt_shown": "Place this order and charge the card now? This empties your cart and cannot be undone."
+      },
+      "passed": true,
+      "step": "checkout_succeeds_when_human_approves"
+    }
+  ],
+  "status": "passed",
+  "subject": "vincanger/webmcp-espresso-store (retrofitted with @aicorg/webmcp)",
+  "target": "http://localhost:3000",
+  "total_tools": 16,
+  "ungoverned_tools": 14
+}
