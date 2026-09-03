@@ -34,5 +34,9 @@ The generated plans are readiness analysis, not executed proof. They say what wo
 they do not claim any of it has been done.
 
 ```bash
-npx -y @aicorg/cli@alpha generate webmcp-plan ./src --out-file ./webmcp-plan.json
+pnpm aic generate webmcp-plan ./src --out-file ./webmcp-plan.json
 ```
+
+These plans were generated with the repository build. The published `@aicorg/cli@alpha` accepts the
+same command but predates wrapper-hook detection, so for apps registering through `use-webmcp-tool`
+it reports `not_detected` and emits a thinner plan.

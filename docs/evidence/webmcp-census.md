@@ -140,8 +140,20 @@ Two things follow:
 npx @aicorg/cli@alpha scan ./src --webmcp
 ```
 
-No install, no config, no account. It reports every registration it finds, which ones bypass
-governance, and which use obsolete API shapes.
+It reports every registration it finds, which ones bypass governance, and which use obsolete API
+shapes.
+
+> **Note on the published CLI.** Wrapper-hook detection is not in `@aicorg/cli@alpha` yet. That build
+> matches only literal `document.modelContext.registerTool` calls, so it finds 16 of the 52 tools this
+> census reports — it misses every app registering through `use-webmcp-tool` and similar hooks. The
+> numbers above were produced with the repository build; a fixed alpha is pending release.
+
+```bash
+git clone https://github.com/VPAI-Grok/AIC && cd AIC
+pnpm install && pnpm build
+pnpm aic scan /path/to/your/app/src --webmcp
+```
+
 
 ## Limitations
 

@@ -151,12 +151,25 @@ hand-written; regenerate with `aic generate project` rather than editing the JSO
 ## Readiness commands
 
 ```bash
-aic scan ./src --webmcp
-aic doctor . --webmcp
-aic generate webmcp-plan ./src --out-file ./webmcp-plan.json
+pnpm aic scan ./src --webmcp
+pnpm aic doctor . --webmcp
+pnpm aic generate webmcp-plan ./src --out-file ./webmcp-plan.json
 ```
 
-These commands find governed registrations, direct registrations that bypass the current adapter, obsolete API shapes, declarative tools, and risky auto-submit review points. Registrations made through community wrapper hooks (`use-webmcp-tool`, `use-webmcp`, `@mcp-b/react-webmcp`, `@mcp-b/webmcp`, `webmcp-react`) count as current-but-ungoverned, since most real WebMCP apps never call `registerTool` directly. Readiness analysis prepares implementation; it is not executed proof.
+These commands find governed registrations, direct registrations that bypass the current adapter, obsolete API shapes, declarative tools, and risky auto-submit review points. Readiness analysis prepares implementation; it is not executed proof.
+
+Registrations made through community wrapper hooks (`use-webmcp-tool`, `use-webmcp`, `@mcp-b/react-webmcp`, `@mcp-b/webmcp`, `webmcp-react`) count as current-but-ungoverned, since most real WebMCP apps never call `registerTool` directly.
+
+> **This wrapper-hook detection is not in the published CLI yet.** `@aicorg/cli@alpha` (0.1.0-alpha.2)
+> matches only literal `document.modelContext.registerTool` calls, so it reports `not_detected` for
+> apps built on those hooks — 16 of the 52 tools across the
+> [census](./evidence/webmcp-census.md) sample. Use the repository build until a fixed alpha ships:
+>
+> ```bash
+> git clone https://github.com/VPAI-Grok/AIC && cd AIC
+> pnpm install && pnpm build
+> pnpm aic scan /path/to/your/app/src --webmcp
+> ```
 
 ## Behavior verification
 
