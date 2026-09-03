@@ -44,9 +44,9 @@ Two details that will bite otherwise:
 
 ## After deploying, check these three URLs
 
-1. `LIVE_URL/` — the checkout demo renders
-2. `LIVE_URL/injection` — both panels present, counters at 0
-3. `LIVE_URL/.well-known/agent.json` — contains the `webmcp` block with
+1. `https://agentinteractioncontrol.vercel.app/` — the checkout demo renders
+2. `https://agentinteractioncontrol.vercel.app/injection` — both panels present, counters at 0
+3. `https://agentinteractioncontrol.vercel.app/.well-known/agent.json` — contains the `webmcp` block with
    `"risk": "critical"` on `complete_checkout`
 
 If (3) 404s, confirm `public/.well-known/agent.json` is committed — some deploy configs ignore

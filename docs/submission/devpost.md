@@ -1,6 +1,6 @@
 # Devpost submission copy
 
-Paste-ready. Replace `LIVE_URL` and `VIDEO_URL` before submitting.
+Paste-ready. The live URL is filled in; replace `VIDEO_URL` once the demo video is uploaded.
 
 ---
 
@@ -138,9 +138,9 @@ to become unnecessary.
 
 ## Try it
 
-- **Live demo:** LIVE_URL
-- **Injection comparison:** LIVE_URL/injection
-- **Discovery manifest:** LIVE_URL/.well-known/agent.json
+- **Live demo:** https://agentinteractioncontrol.vercel.app
+- **Injection comparison:** https://agentinteractioncontrol.vercel.app/injection
+- **Discovery manifest:** https://agentinteractioncontrol.vercel.app/.well-known/agent.json
 - **Census:** https://github.com/VPAI-Grok/AIC/blob/main/docs/evidence/webmcp-census.md
 - **The adapter:** https://github.com/VPAI-Grok/AIC/tree/main/packages/webmcp
 - **Scan your own app:** `npx -y @aicorg/cli@alpha scan ./src --webmcp`

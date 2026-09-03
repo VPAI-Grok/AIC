@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "cd ../.. && pnpm --filter \"@aicorg/example-nextjs-checkout-demo...\" build",
   "framework": "nextjs",
+  "outputDirectory": ".next",
   "headers": [
     {
       "source": "/.well-known/agent.json",
