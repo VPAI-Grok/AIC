@@ -9,7 +9,6 @@
   "privatePackages": false,
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@aicorg/devtools",
     "@aicorg/example-bootstrap-openai",
     "@aicorg/example-nextjs-checkout-demo",
     "@aicorg/example-vite-crm-demo"
