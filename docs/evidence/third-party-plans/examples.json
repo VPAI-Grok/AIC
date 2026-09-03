@@ -1,0 +1,56 @@
+{
+  "acceptance_criteria": [
+    "No obsolete WebMCP API usage remains.",
+    "Every mutating tool is backed by an authored execution-ready AIC action contract.",
+    "Critical tools enforce authorization, entity scope, structured confirmation, and post-execution verification.",
+    "Unsupported browsers preserve the human workflow without errors.",
+    "Browser tests cover success, denial, cancellation, verification failure, and lifecycle disposal."
+  ],
+  "artifact_type": "aic_webmcp_implementation_plan",
+  "baseline": {
+    "api": "document.modelContext",
+    "draft": "2026-08-26",
+    "types": "0.1.5"
+  },
+  "generated_at": "2026-09-03T00:47:57.296Z",
+  "source_status": "blocked",
+  "workstreams": [
+    {
+      "actions": [
+        "Replace navigator.modelContext and provideContext usage.",
+        "Pin implementation checks to document.modelContext and the recorded draft baseline."
+      ],
+      "id": "migrate-current-api",
+      "priority": "now",
+      "title": "Migrate obsolete WebMCP APIs"
+    },
+    {
+      "actions": [
+        "Create authored execution-ready AIC action contracts for each task-level tool.",
+        "Replace direct registerTool calls with registerAICWebMCPTool."
+      ],
+      "id": "add-aic-governance",
+      "priority": "now",
+      "title": "Add AIC governance to native tools"
+    },
+    {
+      "actions": [
+        "Choose one high-value task rather than exposing individual UI controls.",
+        "Author input validation, authorization, confirmation, execution, verification, and recovery behavior."
+      ],
+      "id": "pilot-tool",
+      "priority": "now",
+      "title": "Implement the first governed WebMCP tool"
+    },
+    {
+      "actions": [
+        "Test current Chromium support and the unsupported-browser path.",
+        "Verify identical domain behavior for human and WebMCP execution.",
+        "Re-run aic doctor --webmcp when the draft or webmcp-types baseline changes."
+      ],
+      "id": "verify-and-maintain",
+      "priority": "next",
+      "title": "Verify browser behavior and draft compatibility"
+    }
+  ]
+}
