@@ -11,3 +11,5 @@ benchmarks/twenty-adoption/benchmark-results-rerun.csv
 benchmarks/twenty-adoption/benchmark-summary-rerun.md
 examples/tailadmin-dashboard/
 .codex-loop/
+
+.vercel
