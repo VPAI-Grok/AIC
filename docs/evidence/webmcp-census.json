@@ -1,6 +1,6 @@
 {
   "artifact_type": "aic_webmcp_census",
-  "generated_at": "2026-09-02T22:24:08.964Z",
+  "generated_at": "2026-09-03T00:28:29.060Z",
   "method": "aic scan <repo> --webmcp over shallow clones of every public WebMCP repository discoverable from awesome-webmcp, the WebMCP spec repo, and GoogleChromeLabs.",
   "subjects": [
     {

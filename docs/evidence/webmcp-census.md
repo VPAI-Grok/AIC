@@ -2,7 +2,7 @@
 
 **Every public WebMCP application we could find, scanned for enforceable risk semantics.**
 
-Run date: 2026-09-02 · Raw data: [`webmcp-census.json`](./webmcp-census.json) ·
+Run date: 2026-09-02, re-verified 2026-09-03 against current upstream — totals unchanged. · Raw data: [`webmcp-census.json`](./webmcp-census.json) ·
 Reproduce: `node scripts/webmcp-census.mjs <clone-dir> --out-file docs/evidence/webmcp-census.json`
 
 ---
