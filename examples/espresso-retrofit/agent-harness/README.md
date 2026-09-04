@@ -34,9 +34,14 @@ curl -s http://127.0.0.1:9333/json/version
 
 In a **second terminal**:
 
+`claude` is not on PATH on this machine; it ships inside Claude Desktop. Add it for the session:
+
 ```bash
-cd examples/espresso-retrofit/agent-harness
-claude
+$env:PATH = "$env:APPDATA\Claude\claude-code\2.1.258;$env:PATH"
+```
+
+```bash
+cd C:\Users\vatsa\agentinteractioncontrol\examples\espresso-retrofit\agent-harness; claude
 ```
 
 The `.mcp.json` here connects Claude Code to that Chrome. Approve the `chrome-devtools` server when

@@ -20,12 +20,18 @@ All five surfaces confirmed live immediately before this was written.
    `--remote-debugging-port=9333`. It has the WebMCP flag and is already logged in as vince.
    Do not use your normal Chrome; it does not have the flag.
 
-2. **Second terminal, start the agent:**
+2. **Second terminal, start the agent.** `claude` is not on PATH on this machine - it ships inside
+   Claude Desktop. Add it for the session, then run it:
 
    ```bash
-   cd examples/espresso-retrofit/agent-harness
-   claude
+   $env:PATH = "$env:APPDATA\Claude\claude-code\2.1.258;$env:PATH"
    ```
+
+   ```bash
+   cd C:\Users\vatsa\agentinteractioncontrol\examples\espresso-retrofit\agent-harness; claude
+   ```
+
+   Run the two lines separately - pasting both at once makes PowerShell join them into one block.
 
    Approve the `chrome-devtools` server. Set `execute_webmcp_tool` to **always-allow** — otherwise
    you get an approval prompt on every tool call and the take is ruined.
