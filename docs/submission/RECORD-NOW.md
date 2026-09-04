@@ -9,6 +9,7 @@ All five surfaces confirmed live immediately before this was written.
 | Recording Chrome (CDP) | http://127.0.0.1:9333 — **200**, logged in, 16 tools |
 | Vercel demo | https://agentinteractioncontrol.vercel.app/injection — **200** |
 | Discovery manifest | https://agentinteractioncontrol.vercel.app/.well-known/agent.json — **200** |
+| Census page | https://claude.ai/code/artifact/a4bc346e-19be-434b-b135-415b2fa6c4c5 — private until shared |
 
 **Target 2:55.** Opens on the live store so a judge knows what they are looking at within five
 seconds, then a real agent calls the tools — not a console paste.
@@ -76,7 +77,11 @@ Say the project name here. It is the only place in the video a judge reliably ca
 
 ## 0:33 — 0:50 · The census
 
-**Screen:** the census page — the three counts, then the six-row field grid.
+**Screen:** the census page — https://claude.ai/code/artifact/a4bc346e-19be-434b-b135-415b2fa6c4c5
+The three counts, then the six-row field grid.
+
+It is **private** until you share it. Fine for recording; share it before putting the link on
+Devpost. Fallback if it misbehaves: `docs/evidence/webmcp-census.md` in the repo.
 
 > "So we scanned every public WebMCP app we could find. Seventy-five tools. Forty-nine of them
 > mutate state — `book_table`, `submit_order`, `delete_note`. Zero can tell an agent they're
