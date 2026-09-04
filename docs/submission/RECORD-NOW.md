@@ -44,10 +44,20 @@ seconds, then a real agent calls the tools — not a console paste.
 
    Must return **16**. If it returns 3 you are logged out; if 0, the tab is not on localhost:3000.
 
-4. Terminal font ~18pt. Close notifications.
+4. Close notifications.
 
-5. **Screen layout:** agent terminal on the left, Chrome on the right, both visible at once. The
-   whole point is watching the browser move while the agent talks.
+5. **Screen layout.** This display is 1707px wide, so true side-by-side leaves the terminal too
+   narrow for the agent's tool-call output. Instead: **Chrome full width, agent terminal as a
+   floating strip over the bottom third.** The storefront gets the full width for the cart drawer
+   opening, which is the visual payoff, while the agent's trace scrolls underneath. Terminal font
+   ~14pt — at 1080p that reads fine when a viewer full-screens the video.
+
+6. **OBS:** one **Display Capture** source, 1920x1080, 30fps, MP4. Not Window Capture — the
+   confirmation dialog is tab-modal and Window Capture can miss it. Set start/stop **hotkeys**;
+   you have one monitor, so OBS will be buried behind the demo.
+
+7. **Test-record 20 seconds** and play it back before the real take. Check three things: the confirm
+   dialog is visible, your mic actually recorded, terminal text is legible.
 
 ---
 
