@@ -22,7 +22,15 @@ Everything below was run end-to-end minutes before you started. Ports are live, 
    - `https://agentinteractioncontrol.vercel.app/injection`
    - `https://agentinteractioncontrol.vercel.app/.well-known/agent.json`
    - a terminal in `C:\Users\vatsa\agentinteractioncontrol`
-4. **Log into espresso** as `vince` / `espresso123` *before* recording, so the login isn't on camera.
+4. **Log into espresso before recording**, so the login isn't on camera.
+
+   **Type these by hand — do not copy-paste.** A leading or trailing space returns
+   "Invalid credentials" (the server rejects `vince ` with a 401 while `vince` succeeds).
+   Username is not case-sensitive; whitespace is.
+
+       username:  vince
+       password:  espresso123
+
 5. Close notifications.
 
 **If you stop and re-record**, reset the espresso state first — a successful checkout consumes the
@@ -127,6 +135,8 @@ Expect `"current_native_registrations": 16`, `"governed_registrations": 0`.
 ## If something misbehaves on camera
 
 - **`modelContext is undefined`** → the flag isn't on, or you're in the wrong Chrome profile.
+- **"Invalid credentials" on login** → whitespace from a paste. Type `vince` / `espresso123` by
+  hand. Verified: the server returns 200 for `vince` and 401 for `vince ` with a trailing space.
 - **`executeTool` throws immediately** → you're logged out; espresso gates tools on login.
 - **Coupon errors "already used"** → run the demoReset command above.
 - **Anything else** → cut to the committed evidence rather than retrying live:
