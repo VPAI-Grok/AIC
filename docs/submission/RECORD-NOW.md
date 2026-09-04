@@ -35,8 +35,12 @@ seconds, then a real agent calls the tools — not a console paste.
 
    Run the two lines separately - pasting both at once makes PowerShell join them into one block.
 
-   Approve the `chrome-devtools` server. Set `execute_webmcp_tool` to **always-allow** — otherwise
-   you get an approval prompt on every tool call and the take is ruined.
+   **Approve the `chrome-devtools` server.** A project-scoped `.mcp.json` is not loaded until you
+   do. Verify with `/mcp` — it must show as connected. If it isn't, the agent has no browser tools
+   and will tell you it can't go shopping.
+
+   Set `execute_webmcp_tool` to **always-allow**. **Deny `handle_dialog`** — that tool lets the
+   agent answer its own confirmation prompt, which would defeat the entire demo.
 
 3. **Smoke-test the agent before rolling:**
 
@@ -107,8 +111,11 @@ Devpost. Fallback if it misbehaves: `docs/evidence/webmcp-census.md` in the repo
 **Type into the agent:**
 
 ```
-Bianca in white, plus a water filter that fits it, and use whatever discount I've got.
+Using the WebMCP tools on the current page, do this for me: Bianca in white, plus a water filter that fits it, and use whatever discount I've got.
 ```
+
+Name the page tools explicitly — a bare shopping request reads as off-topic for a coding session and
+gets declined.
 
 Let the trace play: `search_products` → `check_compatibility` → `get_my_coupons` → `add_to_cart` ×2
 → `apply_coupon`. The cart drawer opens on its own; total lands at €2,096.01.
@@ -122,7 +129,7 @@ Let the trace play: `search_products` → `check_compatibility` → `get_my_coup
 **Type into the agent:**
 
 ```
-Place the order.
+Now place the order using the checkout tool.
 ```
 
 The agent calls `checkout`. **The confirmation dialog appears. Click Cancel.**
@@ -134,7 +141,7 @@ The agent calls `checkout`. **The confirmation dialog appears. Click Cancel.**
 > "The order was refused and the cart still has everything in it. That's not a polite message from
 > the model. That's the database."
 
-**Type again:** `Place the order.` — **this time click OK.**
+**Type again:** `Now place the order using the checkout tool.` — **this time click OK.**
 
 > "Same agent, same tool, same call. The only thing that changed is that a human agreed. Now the
 > order is placed and the cart is empty."
@@ -194,6 +201,7 @@ wsl -d Ubuntu-24.04 -- bash -lc 'export DATABASE_URL="postgresql://postgres:espr
 
 | Symptom | Cause |
 |---|---|
+| Agent says it has no browser access | `chrome-devtools` MCP server not approved. Run `/mcp` |
 | Agent sees 0 tools | Tab isn't on localhost:3000, or page still mounting |
 | Agent sees 3 tools | Logged out — 13 of 16 are auth-gated |
 | "Invalid credentials" | Whitespace from a paste. Type `vince` / `espresso123` by hand |

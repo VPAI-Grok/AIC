@@ -44,14 +44,27 @@ $env:PATH = "$env:APPDATA\Claude\claude-code\2.1.258;$env:PATH"
 cd C:\Users\vatsa\agentinteractioncontrol\examples\espresso-retrofit\agent-harness; claude
 ```
 
-The `.mcp.json` here connects Claude Code to that Chrome. Approve the `chrome-devtools` server when
-prompted, and set `execute_webmcp_tool` to always-allow so approvals do not interrupt the take.
+The `.mcp.json` here connects Claude Code to that Chrome.
+
+**A project-scoped `.mcp.json` is not loaded until you approve it.** If you miss the prompt on
+startup, the session has no browser tools at all and the agent will politely tell you it cannot go
+shopping. Run `/mcp` inside Claude Code to check: `chrome-devtools` must be listed as connected. If
+it is not, approve it there, or restart `claude` and accept the "New MCP server found" prompt.
+
+Then set `execute_webmcp_tool` to always-allow so approvals do not interrupt the take.
+
+### Do not allow `handle_dialog`
+
+The server also exposes `handle_dialog`, which lets the agent dismiss or accept a browser dialog by
+itself. **Deny it.** The entire point of the demo is that the confirmation waits for a human hand on
+the mouse - if the agent can answer its own confirmation prompt, the gate proves nothing.
 
 Check the agent can see the page:
 
 > list the WebMCP tools available on the current page
 
-Expect 16, including `checkout` and `apply_coupon`.
+Expect 16, including `checkout` and `apply_coupon`. If the agent says it has no browser access, the
+MCP server is not connected - see above.
 
 ## The two prompts
 
@@ -59,7 +72,11 @@ These are the espresso author's own scripted prompts from their README, so the t
 
 ### Prompt 1 — the agent shops, and stops short of buying
 
-> Bianca in white, plus a water filter that fits it, and use whatever discount I've got.
+> Using the WebMCP tools on the current page, do this for me: Bianca in white, plus a water filter
+> that fits it, and use whatever discount I've got.
+
+Name the page tools explicitly. Without that framing the model reads a bare shopping request as
+off-topic for a coding session and declines it.
 
 Expected trace: `search_products` → `check_compatibility` → `get_my_coupons` → `add_to_cart` ×2 →
 `apply_coupon` — and **no `checkout`**. The cart drawer opens by itself; total lands at €2,096.01
@@ -71,7 +88,7 @@ everything.
 
 ### Prompt 2 — the agent tries to buy, and hits the gate
 
-> Place the order.
+> Now place the order using the checkout tool.
 
 The agent calls `checkout`. **The AIC confirmation dialog appears.**
 
