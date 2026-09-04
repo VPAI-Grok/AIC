@@ -10,7 +10,8 @@ All five surfaces confirmed live immediately before this was written.
 | Vercel demo | https://agentinteractioncontrol.vercel.app/injection — **200** |
 | Discovery manifest | https://agentinteractioncontrol.vercel.app/.well-known/agent.json — **200** |
 
-**Target 2:50.** The centrepiece is a real agent calling the tools, not a console paste.
+**Target 2:55.** Opens on the live store so a judge knows what they are looking at within five
+seconds, then a real agent calls the tools — not a console paste.
 
 ---
 
@@ -49,31 +50,44 @@ All five surfaces confirmed live immediately before this was written.
 
 ---
 
-## 0:00 — 0:22 · The sentence
+## 0:00 — 0:15 · Open
+
+**Screen:** the live storefront on localhost:3000, catalog visible, cart empty. Let it sit for a
+beat before you speak.
+
+> "This is a coffee equipment store — a real open-source demo app. It exposes sixteen tools to AI
+> agents using WebMCP, the new browser API that lets a page tell an agent what it can do.
+>
+> In about a minute I'm going to turn an agent loose on it and let it spend my money. First, here's
+> the problem we found. This is AIC — Agent Interaction Control."
+
+Say the project name here. It is the only place in the video a judge reliably catches it.
+
+## 0:15 — 0:33 · The sentence
 
 **Screen:** https://github.com/vincanger/webmcp-espresso-store/blob/7dff5af/src/webmcp/WebMCPTools.tsx#L272-L287
 
-> "This is a real WebMCP tool from a real storefront. It charges a card, and the author knew it —
-> they wrote 'Irreversible. Only call when the user explicitly asks to buy.'
+> "Here's the checkout tool from that store. It charges a card, and the author knew it — they wrote
+> 'Irreversible. Only call when the user explicitly asks to buy.'
 >
 > But a WebMCP tool descriptor has exactly two annotations: `readOnlyHint` and
 > `untrustedContentHint`. That warning had nowhere to go except an English sentence. Nothing
 > enforces it. No agent can check it before acting."
 
-## 0:22 — 0:42 · The census
+## 0:33 — 0:50 · The census
 
-**Screen:** the census page — three counts, then the six-row field grid.
+**Screen:** the census page — the three counts, then the six-row field grid.
 
 > "So we scanned every public WebMCP app we could find. Seventy-five tools. Forty-nine of them
 > mutate state — `book_table`, `submit_order`, `delete_note`. Zero can tell an agent they're
-> dangerous. Including Google's own demos. Not carelessness. The protocol has no field for it."
+> dangerous. Including Google's own demos. Not carelessness — the protocol has no field for it."
 
-## 0:42 — 1:35 · The agent shops **(let it run — do not cut)**
+## 0:50 — 1:40 · The agent shops **(let it run — do not cut)**
 
-**Screen:** agent terminal + the storefront side by side.
+**Screen:** agent terminal over the storefront.
 
-> "That same storefront is running here, with sixteen WebMCP tools. This is Claude Code driving it
-> through Chrome DevTools MCP — it discovers the tools itself. I've told it nothing about the app."
+> "So let's watch that happen. This is Claude Code driving the store through Chrome DevTools MCP. It
+> discovers the tools itself — I've told it nothing about the app."
 
 **Type into the agent:**
 
@@ -81,15 +95,14 @@ All five surfaces confirmed live immediately before this was written.
 Bianca in white, plus a water filter that fits it, and use whatever discount I've got.
 ```
 
-Let the trace play. `search_products` → `check_compatibility` → `get_my_coupons` → `add_to_cart` ×2
+Let the trace play: `search_products` → `check_compatibility` → `get_my_coupons` → `add_to_cart` ×2
 → `apply_coupon`. The cart drawer opens on its own; total lands at €2,096.01.
 
 > "Five tool calls. It searched, checked the filter actually fits the machine, found my coupon and
-> filled the cart — and it never asked me for permission once, because none of that is
-> consequential. Applying a coupon moves money, but it's reversible, so we marked it `medium` and it
-> runs freely."
+> filled the cart — and it never once asked my permission, because none of that is consequential.
+> Applying a coupon moves money, but it's reversible, so we marked it `medium` and it runs freely."
 
-## 1:35 — 2:05 · The gate **(the money shot)**
+## 1:40 — 2:10 · The gate **(the money shot)**
 
 **Type into the agent:**
 
@@ -111,15 +124,15 @@ The agent calls `checkout`. **The confirmation dialog appears. Click Cancel.**
 > "Same agent, same tool, same call. The only thing that changed is that a human agreed. Now the
 > order is placed and the cart is empty."
 
-## 2:05 — 2:20 · Two of sixteen
+## 2:10 — 2:24 · Two of sixteen
 
 **Screen:** `~/espresso-aic/src/webmcp/aic-contract.ts`
 
-> "We governed two of the sixteen tools and left fourteen exactly as the author wrote them.
-> Applying a coupon is `medium` and reversible. Checkout is `critical` and isn't. A layer that
-> marked everything critical would be useless — the gradient is the product."
+> "We governed two of the sixteen tools and left fourteen exactly as the author wrote them. Applying
+> a coupon is `medium` and reversible. Checkout is `critical` and isn't. A layer that marked
+> everything critical would be useless — the gradient is the product."
 
-## 2:20 — 2:35 · Where the semantics live
+## 2:24 — 2:38 · Where the semantics live
 
 **Screen:** the `agent.json` tab, scrolled to the `webmcp` block.
 
@@ -127,22 +140,30 @@ The agent calls `checkout`. **The confirmation dialog appears. Click Cancel.**
 > agent can read it *before* it calls anything — risk, required permission, whether a human has to
 > confirm. Generated from the app, not hand-written."
 
-## 2:35 — 2:50 · The gift, and close
+## 2:38 — 2:55 · Close
 
-**Screen:** terminal.
+**Screen:** terminal, then hold on the end card.
 
 ```bash
 npx -y @aicorg/cli@alpha scan ./src --webmcp
 ```
 
-> "One command against any WebMCP app. Sixteen tools, sixteen ungoverned — that's this storefront
-> before we touched it.
+> "One command against any WebMCP app. Sixteen tools, sixteen ungoverned — that's this store before
+> we touched it.
 >
 > WebMCP made the web callable by agents. It didn't give a page any way to say *this one charges a
 > card*. We think that belongs in the spec, and we've written the proposal. Until then, it's one npm
-> install."
+> install.
+>
+> That's AIC. Thanks for watching."
 
-**End card:** `github.com/VPAI-Grok/AIC` · `npm i @aicorg/webmcp`
+**End card, hold 4 seconds:**
+
+```
+AIC — Agent Interaction Control
+github.com/VPAI-Grok/AIC
+npm i @aicorg/webmcp
+```
 
 ---
 
