@@ -167,8 +167,16 @@ The agent calls `checkout`. **The confirmation dialog appears. Click Cancel.**
 **Screen:** terminal, then hold on the end card.
 
 ```bash
-npx -y @aicorg/cli@alpha scan ./src --webmcp
+cd C:\demo
 ```
+
+```bash
+npx -y @aicorg/cli@alpha scan ./espresso-store --webmcp
+```
+
+The pristine espresso source is copied to `C:\demo\espresso-store` so the command reads cleanly on
+camera. Verified output: `current_native_registrations: 16`, `governed_registrations: 0`.
+`./src` on its own only works if you are already inside a project that has one.
 
 > "One command against any WebMCP app. Sixteen tools, sixteen ungoverned — that's this store before
 > we touched it.
